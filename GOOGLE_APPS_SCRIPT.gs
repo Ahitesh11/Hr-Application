@@ -1,0 +1,648 @@
+/**
+ * Google Apps Script for FMS Management System - V3 (Auto-Header Detection)
+ */
+
+function getSs() {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    if (ss) return ss;
+    throw new Error("No active spreadsheet");
+  } catch (e) {
+    throw new Error("Spreadsheet not found. Ensure the script is bound to the sheet.");
+  }
+}
+
+const IMAGE_FOLDER_ID = "1XI0dY2IrEc8y4OaO-KJioW2QLhPJHsmd";
+
+const SHEETS = {
+  'Salary Fms': ['Month', 'Year', 'Employee ID', 'Name', 'Gross Salary', 'Total Days', 'Paid Days', 'Leave Taken', 'LWP', 'Deductions', 'Net Salary', 'Slip Generated Date', 'Status'],
+  'Salary Increment': [
+    'Timestamp', 'Unique No.', 'Employee Code', 'Employee Name', 'Designation', 'Date of Joining', 
+    'Joining Company Name', 'Joining Salary', 'Current Salary', 'Department', 'Last Increment Amount', 
+    'Last Increment Date', 'Hod', 'Planned', 'Actual', 'Delay', 'Hod Amount', 'Hod Feedback', 
+    'Planned2', 'Actual2', 'Delay2', 'Mgmt Amount', 'Mgmt Feedback', 
+    'Planned3', 'Actual3', 'Delay3', 'Date Of Increment', 'Current Salary', 'Increment Amount', 
+    'Next Increment (No. Of Month)', 'Note', 'Status', 'Status2', 'Status3'
+  ]
+};
+
+// Helper to find the header row dynamically
+function getHeaderInfo(sheet) {
+  const data = sheet.getDataRange().getValues();
+  const commonHeaders = ['timestamp', 'year', 'employee id', 'emp id', 'leave no', 'pm no', 'pmmpl', 'name as per aadhar', 'joining'];
+  for (let i = 0; i < data.length; i++) {
+    if (data[i].some(cell => {
+      const val = cell.toString().toLowerCase();
+      return commonHeaders.some(h => val.includes(h));
+    })) {
+      return { index: i, headers: data[i] };
+    }
+  }
+  return { index: 0, headers: data[0] }; // Fallback to first row
+}
+
+function doGet(e) {
+  return ContentService.createTextOutput("FMS API is running. Time: " + new Date().toLocaleString())
+    .setMimeType(ContentService.MimeType.TEXT);
+}
+
+function doPost(e) {
+  if (!e || !e.postData) {
+    return createJsonResponse({ success: false, error: "No postData found" });
+  }
+
+  try {
+    const request = JSON.parse(e.postData.contents);
+    const action = request.action;
+    let result = { success: false };
+
+    const ss = getSs();
+
+    switch (action) {
+      case 'test':
+        result = { success: true, message: "Connection Successful!", sheets: ss.getSheets().map(s => s.getName()) };
+        break;
+      case 'login':
+        result = login(ss, request.employeeId, request.password);
+        break;
+      case 'getPunchMiss':
+        result = getData(ss, 'Punch Miss Fms', request.employeeId);
+        break;
+      case 'submitPunchMiss':
+        result = submitData(ss, 'Punch Miss Fms', request);
+        break;
+      case 'getLeaves':
+        result = getData(ss, 'Leave Fms', request.employeeId);
+        break;
+      case 'submitLeave':
+        result = submitData(ss, 'Leave Fms', request);
+        if (result.success) sendLeaveEmailToHod(ss, request);
+        break;
+      case 'getHolidayWorking':
+        result = getData(ss, 'Holiday Working Fms', request.employeeId);
+        break;
+      case 'submitHolidayWorking':
+        result = submitData(ss, 'Holiday Working Fms', request);
+        break;
+      case 'getAttendance':
+        result = getData(ss, 'Attendance', request.employeeId);
+        break;
+      case 'getSalaryRecords':
+        result = getData(ss, 'Salary Paid Records', request.employeeId);
+        break;
+      case 'getSalaryIncrements':
+        result = getData(ss, 'Salary Increment', request.employeeId);
+        break;
+      case 'getEmployeeDetails':
+        result = getData(ss, "User", request.employeeId);
+        break;
+
+      case 'submitSalaryIncrement':
+        result = submitData(ss, 'Salary Increment', request);
+        break;
+      case 'updateStep':
+        result = updateStep(ss, request.sheetName, request.rowId, request.step, request.actual, request.status, request.extraFields, request.rowIndex);
+        break;
+
+      case 'getJoining':
+        result = getData(ss, 'Joining', undefined);
+        break;
+
+      case 'submitJoining':
+        result = submitJoiningData(ss, request);
+        break;
+
+      case 'updateMailId':
+        result = updateMailId(ss, request.employeeId, request.mailId);
+        break;
+
+      case 'submitLiving':
+        result = submitLivingData(ss, request);
+        break;
+
+      case 'getLivingHistory':
+        result = getLivingHistory(ss);
+        break;
+
+    }
+    return createJsonResponse(result);
+  } catch (err) {
+    return createJsonResponse({ success: false, error: err.message });
+  }
+}
+
+function createJsonResponse(data) {
+  return ContentService.createTextOutput(JSON.stringify(data))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function login(ss, employeeId, password) {
+  const sheet = ss.getSheetByName('User');
+  if (!sheet) return { success: false, error: "User sheet not found" };
+  const { headers, index } = getHeaderInfo(sheet);
+  const data = sheet.getDataRange().getDisplayValues();
+  
+  const empIdCol = headers.findIndex(h => h.toLowerCase().includes('employee id') || h.toLowerCase().includes('emp id'));
+  const passCol = headers.findIndex(h => h.toLowerCase().includes('password'));
+
+  for (let i = index + 1; i < data.length; i++) {
+    if (data[i][empIdCol].toString() === employeeId.toString() && data[i][passCol].toString() === password.toString()) {
+      const row = {};
+      headers.forEach((h, idx) => {
+        const key = camelize(h);
+        row[key] = data[i][idx];
+      });
+      const hodCol = headers.findIndex(h => h.toLowerCase() === 'hod');
+      const isActuallyAnHod = data.some((r, idx) => idx > index && r[hodCol] === employeeId.toString());
+      let finalRole = row.role || "Staf";
+      if (isActuallyAnHod && finalRole !== "Admin") {
+        finalRole = "HOD";
+      }
+
+      return {
+        success: true,
+        user: {
+          employeeId: data[i][empIdCol],
+          name: row.name || "",
+          designation: row.designation || "",
+          companyName: row.companyName || "",
+          role: finalRole,
+          cl: parseFloat(row.cl) || 0,
+          el: parseFloat(row.el) || 0,
+          ml: parseFloat(row.ml) || 0,
+          hod: row.hod || "",
+          mailId: row.mailId || ""
+        }
+      };
+
+    }
+  }
+  return { success: false, error: "Invalid credentials" };
+}
+
+function updateMailId(ss, employeeId, mailId) {
+  try {
+    const sheet = ss.getSheetByName('User');
+    if (!sheet) return { success: false, error: "User sheet not found" };
+    const { headers, index } = getHeaderInfo(sheet);
+    const data = sheet.getDataRange().getValues();
+    const empIdCol = headers.findIndex(h => h.toLowerCase().includes('employee id') || h.toLowerCase().includes('emp id'));
+    const mailCol = headers.findIndex(h => h.toLowerCase().includes('mail id') || h.toLowerCase().includes('mailid') || h.toLowerCase().includes('email'));
+    if (empIdCol === -1) return { success: false, error: "Employee ID column not found" };
+    if (mailCol === -1) return { success: false, error: "Mail Id column not found" };
+    for (let i = index + 1; i < data.length; i++) {
+      if (data[i][empIdCol].toString() === employeeId.toString()) {
+        sheet.getRange(i + 1, mailCol + 1).setValue(mailId);
+        return { success: true };
+      }
+    }
+    return { success: false, error: "Employee not found" };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+}
+
+function getData(ss, sheetName, employeeId) {
+  const sheet = ss.getSheetByName(sheetName);
+  if (!sheet) return [];
+  
+  const { headers, index } = getHeaderInfo(sheet);
+  const data = sheet.getDataRange().getDisplayValues();
+  const results = [];
+  
+  let empIdIdx = headers.findIndex(h => {
+    const val = h.toLowerCase();
+    return val.includes('employee id') || val.includes('emp id') || val.includes('employee code') || val.includes('emp code');
+  });
+  
+  for (let i = index + 1; i < data.length; i++) {
+    const row = {};
+    let currentSalaryCount = 0;
+    headers.forEach((header, idx) => {
+      let key = camelize(header);
+      if (header === "Current Salary" || header === "current salary") {
+        currentSalaryCount++;
+        if (currentSalaryCount === 2) key = "currentSalaryAfterIncrement";
+      }
+      row[key] = data[i][idx];
+    });
+    
+    if (!employeeId || (empIdIdx !== -1 && data[i][empIdIdx].toString() === employeeId.toString())) {
+      row._row = i + 1; // Store the 1-based row number for fast updates
+      results.push(row);
+    }
+
+  }
+  return results;
+}
+
+function submitData(ss, sheetName, payload) {
+  const sheet = ss.getSheetByName(sheetName);
+  if (!sheet) return { success: false, error: "Sheet " + sheetName + " not found" };
+  
+  const { headers, index } = getHeaderInfo(sheet);
+  const data = sheet.getDataRange().getValues();
+  
+  if (payload.image && payload.image.startsWith("data:image")) {
+    const fileName = (payload.name || "Upload") + "_" + new Date().getTime() + ".png";
+    payload.image = saveImageToDrive(payload.image, fileName, IMAGE_FOLDER_ID);
+  }
+
+  if (payload.medicalCertificate && payload.medicalCertificate.startsWith("data:image")) {
+    const fileName = "MedCert_" + (payload.nameOfEmployee || "User") + "_" + new Date().getTime() + ".png";
+    const folderId = payload.folderId || "1d45zekLBdo-BcLp2-1fqmDOEZ1ZM-hXx";
+    payload.medicalCertificate = saveImageToDrive(payload.medicalCertificate, fileName, folderId);
+  }
+  
+  // Find Unique No column index
+  let idIdx = headers.findIndex(h => h.toLowerCase().includes('unique no') || h.toLowerCase().includes('uniqueno'));
+  if (idIdx === -1) idIdx = headers.findIndex(h => h.toLowerCase().includes('no.'));
+
+  // Logic to update existing row if ID exists
+  if (idIdx !== -1 && payload.uniqueNo) {
+    // Find row by Unique No.
+    let uniqueNoIdx = headers.findIndex(h => h.toLowerCase().includes('no.'));
+    for (let i = index + 1; i < data.length; i++) {
+      if (data[i][uniqueNoIdx].toString() === payload.uniqueNo.toString()) {
+        let currentSalaryCount = 0;
+        headers.forEach((header, colIdx) => {
+          let key = camelize(header);
+          if (header === "Current Salary" || header === "current salary") {
+            currentSalaryCount++;
+            if (currentSalaryCount === 2) key = "currentSalaryAfterIncrement";
+          }
+          
+          if (['planned', 'planned2', 'planned3'].includes(key)) return; 
+          if (payload[key] !== undefined) {
+            sheet.getRange(i + 1, colIdx + 1).setValue(payload[key]);
+          }
+        });
+        return { success: true, updated: true };
+      }
+    }
+  }
+
+  // Otherwise, Create New Row
+  const newRow = headers.map((header, colIdx) => {
+    const key = camelize(header);
+    // PROTECT FORMULA COLUMNS: leave empty so GAS/sheet maintains formula if applicable
+    if (['planned', 'planned2', 'planned3'].includes(key)) return "";
+    
+    return payload[key] !== undefined ? payload[key] : "";
+  });
+  
+  if (idIdx !== -1 && !newRow[idIdx]) {
+    newRow[idIdx] = sheetName.split(' ')[0].toUpperCase() + "-" + (sheet.getLastRow() + 1);
+  }
+  
+  // Find first empty row or append
+  let targetRow = data.length + 1;
+  for (let i = index + 1; i < data.length; i++) {
+    const isEmpty = data[i].every(cell => cell === "" || cell === null);
+    if (isEmpty) {
+      targetRow = i + 1;
+      break;
+    }
+  }
+  
+  sheet.getRange(targetRow, 1, 1, newRow.length).setValues([newRow]);
+  return { success: true, added: true };
+}
+
+function saveImageToDrive(base64Data, fileName, folderId) {
+  try {
+    const splitData = base64Data.split("base64,");
+    const contentType = splitData[0].split(":")[1].split(";")[0];
+    const bytes = Utilities.base64Decode(splitData[1]);
+    const blob = Utilities.newBlob(bytes, contentType, fileName);
+    
+    const folder = DriveApp.getFolderById(folderId || IMAGE_FOLDER_ID);
+    const file = folder.createFile(blob);
+    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    
+    return file.getUrl();
+  } catch (e) {
+    return "Error: " + e.message;
+  }
+}
+
+function updateStep(ss, sheetName, rowId, step, actual, customStatus, extraFields, rowIndex) {
+
+  const sheet = ss.getSheetByName(sheetName);
+  const { headers, index } = getHeaderInfo(sheet);
+  const data = sheet.getDataRange().getValues();
+  
+  let idIdx = headers.findIndex(h => {
+    const val = h.toLowerCase();
+    return val.includes('no.') || val.includes(' no') || val.endsWith('no') || val.includes('unique no') || val.includes('uniqueno');
+  });
+
+
+  if (idIdx === -1) return { success: false, error: "ID column not found" };
+  
+  // Use camelize for more robust header matching (matches 'Actual 1' as 'actual1')
+  let actualIdx = headers.findIndex(h => camelize(h) === 'actual' + step);
+  if (actualIdx === -1) actualIdx = headers.findIndex(h => camelize(h) === 'actual');
+  
+  let statusIdx = headers.findIndex(h => camelize(h) === 'status' + step);
+  if (statusIdx === -1) statusIdx = headers.findIndex(h => camelize(h) === 'status');
+  
+  // High-speed update using rowIndex if available
+  if (rowIndex && rowIndex > 0 && rowIndex <= data.length) {
+    const rIdx = rowIndex - 1;
+    if (data[rIdx][idIdx] && data[rIdx][idIdx].toString().trim() === rowId.toString().trim()) {
+      applyUpdates(sheet, rIdx, actualIdx, statusIdx, actual, customStatus, step, extraFields, headers);
+      return { success: true };
+    }
+  }
+
+  // Fallback slow search if rowIndex fails or is missing
+  for (let i = index + 1; i < data.length; i++) {
+    if (data[i][idIdx] && data[i][idIdx].toString().trim() === rowId.toString().trim()) {
+      applyUpdates(sheet, i, actualIdx, statusIdx, actual, customStatus, step, extraFields, headers);
+      return { success: true };
+    }
+  }
+  return { success: false, error: "Row not found" };
+}
+
+function applyUpdates(sheet, i, actualIdx, statusIdx, actual, customStatus, step, extraFields, headers) {
+  // 1. Set Actual Time
+  if (actualIdx !== -1) sheet.getRange(i + 1, actualIdx + 1).setValue(actual);
+  
+  // 2. Set Status
+  const defaultStatus = (step === 1) ? 'HOD Approved' : 'Work Done';
+  const finalStatus = customStatus || defaultStatus;
+  if (statusIdx !== -1) sheet.getRange(i + 1, statusIdx + 1).setValue(finalStatus);
+  
+  // 3. Set Extra Fields
+  if (extraFields && typeof extraFields === 'object') {
+    for (let key in extraFields) {
+      const val = extraFields[key];
+      const colIdx = headers.findIndex(h => camelize(h) === key);
+      if (colIdx !== -1) {
+        sheet.getRange(i + 1, colIdx + 1).setValue(val);
+      }
+    }
+  }
+}
+
+
+// ── HOD Email Notification ─────────────────────────────────────────────────
+
+function sendLeaveEmailToHod(ss, leavePayload) {
+  try {
+    var userSheet = ss.getSheetByName('User');
+    if (!userSheet) return;
+
+    var info    = getHeaderInfo(userSheet);
+    var headers = info.headers;
+    var index   = info.index;
+    var data    = userSheet.getDataRange().getDisplayValues();
+
+    var empIdIdx = headers.findIndex(function(h) {
+      return h.toLowerCase().includes('employee id') || h.toLowerCase().includes('emp id');
+    });
+    var hodIdx  = headers.findIndex(function(h) { return h.toLowerCase() === 'hod'; });
+    var mailIdx = headers.findIndex(function(h) { return h.toLowerCase().includes('mail'); });
+    var nameIdx = headers.findIndex(function(h) { return h.toLowerCase() === 'name'; });
+
+    if (empIdIdx === -1 || hodIdx === -1 || mailIdx === -1) return;
+
+    // Find employee row → get their HOD employee ID
+    var employeeId = leavePayload.employeeIdCode || leavePayload.employeeId || '';
+    var hodEmpId   = '';
+    var empName    = leavePayload.nameOfEmployee || employeeId;
+
+    for (var i = index + 1; i < data.length; i++) {
+      if (data[i][empIdIdx].toString() === employeeId.toString()) {
+        hodEmpId = data[i][hodIdx].toString();
+        break;
+      }
+    }
+    if (!hodEmpId) return;
+
+    // Find HOD row → get their email
+    var hodEmail = '';
+    var hodName  = 'HOD';
+    for (var j = index + 1; j < data.length; j++) {
+      if (data[j][empIdIdx].toString() === hodEmpId) {
+        hodEmail = data[j][mailIdx].toString().trim();
+        if (nameIdx !== -1) hodName = data[j][nameIdx].toString();
+        break;
+      }
+    }
+    if (!hodEmail) return;
+
+    // Build and send the email
+    var subject = '[Leave Request] ' + empName + ' (' + employeeId + ') – ' + leavePayload.typeOfLeave;
+    var body =
+      'Dear ' + hodName + ',\n\n' +
+      'A leave request has been submitted and requires your approval.\n\n' +
+      '───────────────────────────\n' +
+      'Employee  : ' + empName + ' (' + employeeId + ')\n' +
+      'Leave Type: ' + leavePayload.typeOfLeave + '\n' +
+      'From      : ' + leavePayload.dateRequestedFrom + '\n' +
+      'To        : ' + leavePayload.dateRequestedTo + '\n' +
+      'Days      : ' + leavePayload.noOfDays + '\n' +
+      'Reason    : ' + (leavePayload.reasonForRequestedLeave || '—') + '\n' +
+      '───────────────────────────\n\n' +
+      'Please login to the HR Portal to Approve or Reject this request.\n\n' +
+      'Regards,\n';
+
+    MailApp.sendEmail(hodEmail, subject, body);
+  } catch (e) {
+    // Email is non-critical – log but don't break the leave submission
+    Logger.log('Leave email error: ' + e.message);
+  }
+}
+
+// ── Joining Sheet ──────────────────────────────────────────────────────────
+// Header is in row 7 of the "Joining" sheet.
+// We override getHeaderInfo for this sheet by searching from row 6 (0-indexed)
+// so the generic Timestamp-search in getHeaderInfo still finds it correctly.
+
+function getJoiningData(ss) {
+  const sheet = ss.getSheetByName('Joining');
+  if (!sheet) return [];
+
+  const HEADER_ROW = 7; // 1-based
+  const data = sheet.getDataRange().getDisplayValues();
+  const headers = data[HEADER_ROW - 1]; // 0-based index = 6
+  const results = [];
+
+  for (let i = HEADER_ROW; i < data.length; i++) {
+    const row = data[i];
+    // Skip completely empty rows
+    if (row.every(cell => cell === '' || cell === null)) continue;
+    const obj = {};
+    headers.forEach((h, idx) => {
+      const key = camelize(h);
+      if (key) obj[key] = row[idx];
+    });
+    obj['_row'] = i + 1;
+    results.push(obj);
+  }
+  return results;
+}
+
+function submitJoiningData(ss, payload) {
+  const sheet = ss.getSheetByName('Joining');
+  if (!sheet) return { success: false, error: 'Joining sheet not found' };
+
+  const { headers, index } = getHeaderInfo(sheet);
+  const data = sheet.getDataRange().getValues();
+
+  // Handle image / document uploads to Drive
+  const imageKeys = [
+    'aadharFrontsidePhoto', 'panCard', 'candidateSPhoto',
+    'photoOfFrontBankPassbook', 'qualicationPhoto',
+    'salarySlip', 'resumeCopy', 'relievingExperienceLetter'
+  ];
+  imageKeys.forEach(function(k) {
+    if (payload[k] && payload[k].startsWith('data:')) {
+      const fileName = k + '_' + (payload.nameAsPerAadhar || 'Upload') + '_' + new Date().getTime();
+      payload[k] = saveImageToDrive(payload[k], fileName, IMAGE_FOLDER_ID);
+    }
+  });
+
+  // Build new row aligned to headers
+  const newRow = headers.map(function(h) {
+    const key = camelize(h);
+    if (key === 'timestamp') return payload.timestamp || new Date().toLocaleString();
+    return payload[key] !== undefined ? payload[key] : '';
+  });
+
+  // Find first empty row after header or append
+  let targetRow = data.length + 1;
+  for (let i = index + 1; i < data.length; i++) {
+    if (data[i].every(function(c) { return c === '' || c === null; })) {
+      targetRow = i + 1;
+      break;
+    }
+  }
+
+  sheet.getRange(targetRow, 1, 1, newRow.length).setValues([newRow]);
+  return { success: true, added: true };
+}
+
+// ── Living Sheet ───────────────────────────────────────────────────────────
+
+// Living data lives in the Joining sheet itself as extra columns.
+// submitLivingData: finds the employee row by PMMPL-AC and updates the Living columns.
+// getLivingHistory: reads Joining sheet, returns only rows where dateOfLiving is filled.
+
+function submitLivingData(ss, payload) {
+  const sheet = ss.getSheetByName('Joining');
+  if (!sheet) return { success: false, error: 'Joining sheet not found' };
+
+  const { headers, index } = getHeaderInfo(sheet);
+  const data = sheet.getDataRange().getValues();
+
+  // Find PMMPL-AC column
+  const pmmplIdx = headers.findIndex(function(h) {
+    return h.toString().toLowerCase().includes('pmmpl');
+  });
+  if (pmmplIdx === -1) return { success: false, error: 'PMMPL-AC column not found in Joining sheet' };
+
+  // Find the employee row
+  let targetRowIdx = -1;
+  for (let i = index + 1; i < data.length; i++) {
+    if (data[i][pmmplIdx] && data[i][pmmplIdx].toString().trim() === payload.pmmplAc.toString().trim()) {
+      targetRowIdx = i;
+      break;
+    }
+  }
+  if (targetRowIdx === -1) return { success: false, error: 'Employee ' + payload.pmmplAc + ' not found in Joining sheet' };
+
+  // Map each column header to the correct payload value using keyword matching.
+  // This handles long header names like "Handover Of Assets , Id Card , Visiting Card".
+  headers.forEach(function(h, colIdx) {
+    const kl = h.toString().toLowerCase();
+    let val = undefined;
+
+    if (kl.includes('date') && kl.includes('living')) {
+      val = payload.dateOfLiving;
+    } else if (kl.includes('actual')) {
+      val = payload.actual;                            // auto-timestamp
+    } else if (kl.includes('asset') || (kl.includes('handover') && (kl.includes('id card') || kl.includes('visiting')))) {
+      val = payload.handoverAssets;
+    } else if (kl.includes('clearance') && !kl.includes('document') && !kl.includes('signed')) {
+      val = payload.clearanceForm;
+    } else if ((kl.includes('handover') && kl.includes('document')) || (kl.includes('document') && kl.includes('sign'))) {
+      val = payload.handoverDocSigned;
+    } else if (kl.includes('biometric') || kl.includes('whatsapp') || (kl.includes('cancel') && kl.includes('email'))) {
+      val = payload.cancelEmailBiometric;
+    } else if (kl.includes('benefit') || kl.includes('enrollment')) {
+      val = payload.removeBenefitEnrollment;
+    }
+
+    if (val !== undefined) {
+      sheet.getRange(targetRowIdx + 1, colIdx + 1).setValue(val);
+    }
+  });
+
+  return { success: true, updated: true };
+}
+
+function getLivingHistory(ss) {
+  const sheet = ss.getSheetByName('Joining');
+  if (!sheet) return [];
+
+  const { headers, index } = getHeaderInfo(sheet);
+  const data = sheet.getDataRange().getDisplayValues();
+
+  // Find the dateOfLiving column index
+  const dateOfLivingIdx = headers.findIndex(function(h) {
+    const kl = h.toString().toLowerCase();
+    return kl.includes('date') && kl.includes('living');
+  });
+  if (dateOfLivingIdx === -1) return [];
+
+  const results = [];
+  for (let i = index + 1; i < data.length; i++) {
+    const dateVal = data[i][dateOfLivingIdx];
+    if (!dateVal || dateVal.toString().trim() === '') continue;
+
+    // Build row with standard camelized keys
+    const row = {};
+    headers.forEach(function(h, idx) {
+      row[camelize(h.toString())] = data[i][idx];
+    });
+
+    // Normalize Living-specific keys using same fuzzy logic as submitLivingData
+    // so the frontend always receives predictable short keys
+    headers.forEach(function(h, idx) {
+      const kl = h.toString().toLowerCase();
+      const val = data[i][idx];
+      if (kl.includes('asset') || (kl.includes('handover') && (kl.includes('id card') || kl.includes('visiting')))) {
+        row.handoverAssets = val;
+      } else if (kl.includes('clearance') && !kl.includes('document') && !kl.includes('signed')) {
+        row.clearanceForm = val;
+      } else if ((kl.includes('handover') && kl.includes('document')) || (kl.includes('document') && kl.includes('sign'))) {
+        row.handoverDocSigned = val;
+      } else if (kl.includes('biometric') || kl.includes('whatsapp') || (kl.includes('cancel') && kl.includes('email'))) {
+        row.cancelEmailBiometric = val;
+      } else if (kl.includes('benefit') || kl.includes('enrollment')) {
+        row.removeBenefitEnrollment = val;
+      } else if (kl.includes('date') && kl.includes('living')) {
+        row.dateOfLiving = val;
+      }
+    });
+
+    row._row = i + 1;
+    results.push(row);
+  }
+  return results;
+}
+
+function camelize(str) {
+  return str.toLowerCase()
+    .replace(/>=/g, 'ge')
+    .replace(/<=/g, 'le')
+    .replace(/</g, 'lt')
+    .replace(/>/g, 'gt')
+    .replace(/4-8/g, 'fourToEight')
+    .replace(/[^a-zA-Z0-9]+(.)/g, (m, chr) => chr.toUpperCase())
+    .replace(/[^a-zA-Z0-9]/g, '');
+}

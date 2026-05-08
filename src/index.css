@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+/* ─── Brand Palette: Passary Refractories Olive Green ─────────────────────── */
+/* Remapping Tailwind's "pink" scale to olive green so all existing classes     */
+/* (bg-pink-600, text-pink-500, etc.) render in brand colour automatically.     */
+@theme {
+  --color-pink-50:  #f3f5e7;
+  --color-pink-100: #e3e9c6;
+  --color-pink-200: #c4d28f;
+  --color-pink-300: #a1bb59;
+  --color-pink-400: #81a028;
+  --color-pink-500: #618016;
+  --color-pink-600: #4d6515;   /* ← primary brand (logo colour) */
+  --color-pink-700: #3a4e0f;
+  --color-pink-800: #283709;
+  --color-pink-900: #162004;
+}
+
+/* Custom scrollbar for sidebar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(77, 101, 21, 0.3);
+  border-radius: 99px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(77, 101, 21, 0.6);
+}
+
+/* Global scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f3f5e7;
+}
+::-webkit-scrollbar-thumb {
+  background: #a1bb59;
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #4d6515;
+}
+
+/* Smooth page transitions */
+* {
+  scroll-behavior: smooth;
+}
+
+/* Input autofill style override */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #283709;
+  -webkit-box-shadow: 0 0 0px 1000px rgba(77, 101, 21, 0.1) inset;
+  transition: background-color 5000s ease-in-out 0s;
+}

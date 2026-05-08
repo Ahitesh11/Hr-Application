@@ -1,0 +1,5 @@
+{
+  "name": "FMS Management System",
+  "description": "A comprehensive management system for Punch Miss, Leave, and Holiday Working FMS, integrated with Google Sheets.",
+  "requestFramePermissions": []
+}

@@ -178,8 +178,17 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
 
   const getFilteredSalaryHod = () => {
     if (!user) return [];
-    // For Salary Increment, the HOD ID is usually directly in the record
-    return salaryData.filter(d => d.hod === user.employeeId && (!d.status || d.status === "Pending"));
+    // Find all employees whose HOD is the current logged-in user (same as Leave filter logic)
+    const myEmployeeIds = new Set(
+      employees
+        .filter(e => e.hod && e.hod.toString().trim() === user.employeeId.toString().trim())
+        .map(e => e.employeeId.toString().trim())
+    );
+    return salaryData.filter(d =>
+      d.employeeCode &&
+      myEmployeeIds.has(d.employeeCode.toString().trim()) &&
+      (!d.status || d.status === "Pending")
+    );
   };
 
   const getFilteredSalaryMgmt = () => salaryData.filter(d => d.status === "Work Done" && d.status2 === "Pending");
@@ -189,6 +198,7 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
     { id: "punch", label: "Punch Miss", count: punchMissData.length, visible: role === "HR" },
     { id: "leave", label: "Leave", count: getFilteredLeave().length, visible: true },
     { id: "holiday", label: "Holiday Working", count: getFilteredHoliday().length, visible: true },
+    { id: "salary-hod", label: "Salary Increment", count: getFilteredSalaryHod().length, visible: role === "HOD" },
   ];
 
   const filteredSubTabs = subTabs.filter(tab => tab.visible);
@@ -246,7 +256,20 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
             <table className="w-full text-left border-collapse min-w-[900px]">
               <thead className="sticky top-0 z-10" style={{ background: "linear-gradient(135deg, #f8faff, #f0f4ff)", borderBottom: "2px solid #e2e8f0" }}>
                 <tr>
-                  {activeSubTab === "punch" ? (
+                  {activeSubTab === "salary-hod" ? (
+                    <>
+                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Unique No</th>
+                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Employee</th>
+                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Company</th>
+                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Designation</th>
+                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Dept</th>
+                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Joining Date</th>
+                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap text-right">Current Salary</th>
+                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap text-right">Last Inc. Amt</th>
+                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Last Inc. Date</th>
+                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Note</th>
+                    </>
+                  ) : activeSubTab === "punch" ? (
                     <>
                       <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">PM No</th>
                       <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">In/Out</th>
@@ -436,6 +459,58 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
                           style={{ background: "linear-gradient(135deg, #2563eb, #4f46e5)", boxShadow: "0 2px 8px rgba(37,99,235,0.3)" }}
                         >
                           Action
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+
+                {activeSubTab === "salary-hod" && (
+                  getFilteredSalaryHod().length === 0 ? (
+                    <tr><td colSpan={11} className="px-4 py-12 text-center text-slate-400 text-sm">No pending salary increment requests</td></tr>
+                  ) : getFilteredSalaryHod().map((item, idx) => (
+                    <tr
+                      key={idx}
+                      className={cn("transition-colors hover:bg-orange-50/40", idx % 2 === 0 ? "bg-white" : "bg-slate-50/40")}
+                      style={{ borderBottom: "1px solid #f1f5f9" }}
+                    >
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <span className="text-[11px] font-black text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg">{item.uniqueNo}</span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center text-white text-xs font-extrabold shrink-0">
+                            {(item.employeeName || "?").charAt(0).toUpperCase()}
+                          </div>
+                          <div>
+                            <p className="text-sm font-bold text-slate-800 whitespace-nowrap">{item.employeeName}</p>
+                            <p className="text-[10px] text-slate-400 font-medium">{item.employeeCode}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-xs text-slate-600 whitespace-nowrap">{item.joiningCompanyName || "—"}</td>
+                      <td className="px-4 py-3 text-xs text-slate-600 whitespace-nowrap">{item.designation || "—"}</td>
+                      <td className="px-4 py-3 text-xs text-slate-500 whitespace-nowrap">{item.department || "—"}</td>
+                      <td className="px-4 py-3 text-xs text-slate-500 whitespace-nowrap">{item.dateOfJoining || "—"}</td>
+                      <td className="px-4 py-3 text-right">
+                        <span className="text-xs font-black text-blue-600">₹{item.currentSalary || "—"}</span>
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <span className="text-xs font-bold text-slate-500">₹{item.lastIncrementAmount || "—"}</span>
+                      </td>
+                      <td className="px-4 py-3 text-xs text-slate-500 whitespace-nowrap">{item.lastIncrementDate || "—"}</td>
+                      <td className="px-4 py-3">
+                        <div className="text-xs text-slate-500 w-[200px] max-h-[80px] overflow-y-auto whitespace-normal break-words bg-slate-50 border border-slate-200 rounded-lg p-2 leading-relaxed">
+                          {item.note || "—"}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <button
+                          onClick={() => setSelectedRequest({ sheet: "Salary Increment", id: item.uniqueNo, step: 1, rowIndex: item._row })}
+                          className="px-3 py-1.5 text-white text-[10px] font-extrabold rounded-lg transition-all active:scale-95 whitespace-nowrap"
+                          style={{ background: "linear-gradient(135deg, #f97316, #ea580c)", boxShadow: "0 2px 8px rgba(249,115,22,0.3)" }}
+                        >
+                          Review
                         </button>
                       </td>
                     </tr>

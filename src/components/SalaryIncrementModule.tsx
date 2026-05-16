@@ -4,6 +4,8 @@ import { api } from "../services/api";
 import { SalaryIncrementFms } from "../types";
 import { cn } from "../lib/utils";
 import { format } from "date-fns";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 export const SalaryIncrementModule: React.FC = () => {
   const [data, setData] = useState<SalaryIncrementFms[]>([]);
@@ -257,6 +259,217 @@ export const SalaryIncrementModule: React.FC = () => {
     { label: "Completed", value: data.filter(d => d.actual3).length, icon: <CheckCircle className="w-5 h-5" />, color: "from-emerald-500 to-emerald-600" },
   ];
 
+  const downloadPdf = () => {
+    // Use Rs. instead of ₹ — jsPDF default font (Helvetica) doesn't support rupee symbol
+    const rs = (val: string | undefined) => val ? `Rs.${val}` : "-";
+
+    const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+    const pageW = 297;
+
+    // Header color per tab
+    const headerColor: [number, number, number] =
+      activeTab === "hod"     ? [37, 99, 235]  :
+      activeTab === "mgmt"    ? [234, 88, 12]  :
+      activeTab === "final"   ? [124, 58, 237] :
+                                [16, 185, 129];
+
+    const tabLabel = tabs.find(t => t.id === activeTab)?.label || activeTab;
+
+    const drawTitleBar = () => {
+      doc.setFillColor(...headerColor);
+      doc.rect(0, 0, pageW, 18, "F");
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(13);
+      doc.setFont("helvetica", "bold");
+      doc.text("Salary Increment Report", 14, 12);
+      doc.setFontSize(8);
+      doc.setFont("helvetica", "normal");
+      doc.text(`Generated: ${format(new Date(), "dd MMM yyyy HH:mm")}`, pageW - 70, 12);
+      doc.setTextColor(...headerColor);
+      doc.setFontSize(8);
+      doc.setFont("helvetica", "bold");
+      doc.text(`Stage: ${tabLabel}   Records: ${currentData.length}`, 14, 24);
+    };
+
+    drawTitleBar();
+
+    // Prepared rows — all salary as "Rs.XXXX"
+    const rows = currentData.map(d => ({
+      ...d,
+      joiningSalary:               rs(d.joiningSalary),
+      currentSalary:               rs(d.currentSalary),
+      lastIncrementAmount:         rs(d.lastIncrementAmount),
+      hodAmount:                   rs(d.hodAmount),
+      mgmtAmount:                  rs(d.mgmtAmount),
+      incrementAmount:             rs(d.incrementAmount),
+      currentSalaryAfterIncrement: rs(d.currentSalaryAfterIncrement),
+      lastIncrementDate:           d.lastIncrementDate || "-",
+      dateOfJoining:               d.dateOfJoining || "-",
+      dateOfIncrement:             d.dateOfIncrement || "-",
+      hodFeedback:                 d.hodFeedback || "-",
+      mgmtFeedback:                d.mgmtFeedback || "-",
+      note:                        d.note || "-",
+      department:                  d.department || "-",
+      joiningCompanyName:          d.joiningCompanyName || "-",
+    }));
+
+    const showHod = ["mgmt", "final", "history"].includes(activeTab);
+
+    // ── TABLE 1: Base employee + salary info (+ HOD columns when applicable) ─
+    autoTable(doc, {
+      startY: 28,
+      margin: { left: 6, right: 6 },
+      columns: [
+        { header: "Unique No",       dataKey: "uniqueNo"           },
+        { header: "Employee Name",   dataKey: "employeeName"       },
+        { header: "Code",            dataKey: "employeeCode"       },
+        { header: "Company",         dataKey: "joiningCompanyName" },
+        { header: "Designation",     dataKey: "designation"        },
+        { header: "Dept",            dataKey: "department"         },
+        { header: "Joining Date",    dataKey: "dateOfJoining"      },
+        { header: "Joining Sal.",    dataKey: "joiningSalary"      },
+        { header: "Current Sal.",    dataKey: "currentSalary"      },
+        { header: "Last Inc.Amt",    dataKey: "lastIncrementAmount"},
+        { header: "Last Inc.Date",   dataKey: "lastIncrementDate"  },
+        { header: "HOD",             dataKey: "hod"                },
+        ...(showHod ? [
+          { header: "HOD Amt",      dataKey: "hodAmount"   },
+          { header: "HOD Feedback", dataKey: "hodFeedback" },
+        ] : []),
+      ],
+      body: rows,
+      styles: { fontSize: 6.5, cellPadding: 2, overflow: "linebreak" },
+      headStyles: { fillColor: headerColor, textColor: [255,255,255], fontStyle: "bold", fontSize: 6.5 },
+      columnStyles: {
+        uniqueNo:            { cellWidth: 16 },
+        employeeName:        { cellWidth: 28 },
+        employeeCode:        { cellWidth: 16 },
+        joiningCompanyName:  { cellWidth: 16 },
+        designation:         { cellWidth: 24 },
+        department:          { cellWidth: 16 },
+        dateOfJoining:       { cellWidth: 18 },
+        joiningSalary:       { cellWidth: 18, halign: "right" },
+        currentSalary:       { cellWidth: 18, halign: "right" },
+        lastIncrementAmount: { cellWidth: 16, halign: "right" },
+        lastIncrementDate:   { cellWidth: 18 },
+        hod:                 { cellWidth: 16 },
+        ...(showHod ? {
+          hodAmount:   { cellWidth: 16, halign: "right" },
+          hodFeedback: { cellWidth: "auto" },
+        } : {}),
+      },
+      alternateRowStyles: { fillColor: [240, 245, 255] },
+      didParseCell: (h) => {
+        if (h.section !== "body") return;
+        if (h.column.dataKey === "currentSalary")
+          { h.cell.styles.textColor = [37,99,235]; h.cell.styles.fontStyle = "bold"; }
+        if (h.column.dataKey === "hodAmount")
+          { h.cell.styles.textColor = [234,88,12]; h.cell.styles.fontStyle = "bold"; }
+      },
+    });
+
+    // ── TABLE 2: HOD Review (always present for mgmt/final/history) ───────
+    if (["mgmt", "final", "history"].includes(activeTab)) {
+      doc.addPage();
+      drawTitleBar();
+      autoTable(doc, {
+        startY: 28,
+        margin: { left: 6, right: 6 },
+        columns: [
+          { header: "Unique No",    dataKey: "uniqueNo" },
+          { header: "Employee",     dataKey: "employeeName" },
+          { header: "HOD Amt",      dataKey: "hodAmount" },
+          { header: "HOD Feedback", dataKey: "hodFeedback" },
+        ],
+        body: rows,
+        styles: { fontSize: 7.5, cellPadding: 2.5, overflow: "linebreak" },
+        headStyles: { fillColor: [37,99,235], textColor: [255,255,255], fontStyle: "bold" },
+        columnStyles: {
+          uniqueNo:    { cellWidth: 25 },
+          employeeName:{ cellWidth: 45 },
+          hodAmount:   { cellWidth: 28, halign: "right" },
+          hodFeedback: { cellWidth: "auto" },
+        },
+        alternateRowStyles: { fillColor: [235, 245, 255] },
+        didParseCell: (h) => {
+          if (h.section !== "body") return;
+          if (h.column.dataKey === "hodAmount")
+            { h.cell.styles.textColor = [234,88,12]; h.cell.styles.fontStyle = "bold"; }
+        },
+      });
+    }
+
+    // ── TABLE 3: Mgmt Review (final / history) ────────────────────────────
+    if (["final", "history"].includes(activeTab)) {
+      doc.addPage();
+      drawTitleBar();
+      autoTable(doc, {
+        startY: 28,
+        margin: { left: 6, right: 6 },
+        columns: [
+          { header: "Unique No",     dataKey: "uniqueNo" },
+          { header: "Employee",      dataKey: "employeeName" },
+          { header: "Mgmt Amt",      dataKey: "mgmtAmount" },
+          { header: "Mgmt Feedback", dataKey: "mgmtFeedback" },
+        ],
+        body: rows,
+        styles: { fontSize: 7.5, cellPadding: 2.5, overflow: "linebreak" },
+        headStyles: { fillColor: [234,88,12], textColor: [255,255,255], fontStyle: "bold" },
+        columnStyles: {
+          uniqueNo:     { cellWidth: 25 },
+          employeeName: { cellWidth: 45 },
+          mgmtAmount:   { cellWidth: 28, halign: "right" },
+          mgmtFeedback: { cellWidth: "auto" },
+        },
+        alternateRowStyles: { fillColor: [255, 245, 235] },
+        didParseCell: (h) => {
+          if (h.section !== "body") return;
+          if (h.column.dataKey === "mgmtAmount")
+            { h.cell.styles.textColor = [234,88,12]; h.cell.styles.fontStyle = "bold"; }
+        },
+      });
+    }
+
+    // ── TABLE 4: Final Increment details (history only) ───────────────────
+    if (activeTab === "history") {
+      doc.addPage();
+      drawTitleBar();
+      autoTable(doc, {
+        startY: 28,
+        margin: { left: 6, right: 6 },
+        columns: [
+          { header: "Unique No",   dataKey: "uniqueNo" },
+          { header: "Employee",    dataKey: "employeeName" },
+          { header: "Inc. Date",   dataKey: "dateOfIncrement" },
+          { header: "Inc. Amount", dataKey: "incrementAmount" },
+          { header: "New Salary",  dataKey: "currentSalaryAfterIncrement" },
+          { header: "Next Inc.(M)",dataKey: "nextIncrementNoOfMonth" },
+          { header: "Note",        dataKey: "note" },
+        ],
+        body: rows,
+        styles: { fontSize: 7.5, cellPadding: 2.5, overflow: "linebreak" },
+        headStyles: { fillColor: [16,185,129], textColor: [255,255,255], fontStyle: "bold" },
+        columnStyles: {
+          uniqueNo:                    { cellWidth: 25 },
+          employeeName:                { cellWidth: 40 },
+          dateOfIncrement:             { cellWidth: 25 },
+          incrementAmount:             { cellWidth: 25, halign: "right" },
+          currentSalaryAfterIncrement: { cellWidth: 25, halign: "right" },
+          nextIncrementNoOfMonth:      { cellWidth: 20, halign: "center" },
+          note:                        { cellWidth: "auto" },
+        },
+        alternateRowStyles: { fillColor: [235, 255, 245] },
+        didParseCell: (h) => {
+          if (h.section !== "body") return;
+          if (["incrementAmount","currentSalaryAfterIncrement"].includes(h.column.dataKey as string))
+            { h.cell.styles.textColor = [16,185,129]; h.cell.styles.fontStyle = "bold"; }
+        },
+      });
+    }
+
+    doc.save(`salary-increment-${activeTab}-${format(new Date(), "yyyyMMdd-HHmm")}.pdf`);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -331,7 +544,11 @@ export const SalaryIncrementModule: React.FC = () => {
             <button onClick={fetchData} disabled={isLoading} className="w-9 h-9 bg-slate-50 text-slate-500 rounded-xl hover:bg-slate-100 transition-all flex items-center justify-center disabled:opacity-50">
               <RefreshCw className={cn("w-4 h-4", isLoading && "animate-spin")} />
             </button>
-            <button className="w-9 h-9 bg-slate-50 text-slate-500 rounded-xl hover:bg-slate-100 transition-all flex items-center justify-center">
+            <button
+              onClick={downloadPdf}
+              title="Download PDF"
+              className="w-9 h-9 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-all flex items-center justify-center"
+            >
               <FileDown className="w-4 h-4" />
             </button>
           </div>

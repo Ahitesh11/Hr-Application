@@ -59,38 +59,55 @@ export const SalaryIncrementModule: React.FC = () => {
 
   const handleFetchEmployee = async (code: string) => {
     if (!code) return;
-    const emp = allEmps.find(e => e.employeeId === code || e.employeeCode === code);
+    // GAS may return raw sheet heading names (with spaces) or camelCase — try both
+    const pick = (obj: any, ...keys: string[]): string => {
+      for (const k of keys) {
+        const v = obj[k];
+        if (v !== undefined && v !== null && v !== "") return String(v);
+      }
+      return "";
+    };
+
+    const emp = allEmps.find(
+      e => e.employeeId === code || e.employeeCode === code || e.pmmplAc === code
+    );
+    if (emp) console.log("DEBUG emp keys:", JSON.stringify(emp, null, 2));
+
+    // Most recent completed increment → drives Current Salary, Last Inc. Amount/Date
+    const lastIncrement = data
+      .filter(d => d.employeeCode === code && d.actual3 && d.incrementAmount)
+      .sort((a, b) => {
+        const tA = a.dateOfIncrement ? new Date(a.dateOfIncrement).getTime() : 0;
+        const tB = b.dateOfIncrement ? new Date(b.dateOfIncrement).getTime() : 0;
+        return tB - tA;
+      })[0];
+
+    const fillFromEmp = (src: any) => ({
+      employeeCode: code,
+      employeeName: pick(src, "nameAsPerAadhar", "Name As Per Aadhar", "name"),
+      designation: pick(src, "designation", "Designation"),
+      department: pick(src, "department", "Department"),
+      hod: pick(src, "reportingManagerHod", "Reporting Manager Hod", "hod", "Hod"),
+      // Joining sheet columns
+      joiningCompanyName: pick(src, "joiningCompanyName", "Joining Company Name"),
+      dateOfJoining: pick(src, "dateOfJoining", "Date Of Joining"),
+      joiningSalary: pick(src, "salary", "Salary", "joiningSalary", "Joining Salary"),
+      // Current Salary = salary after last increment (Salary Increment sheet), else from joining
+      currentSalary: lastIncrement?.currentSalaryAfterIncrement
+        || pick(src, "currentSalary", "Current Salary", "salary", "Salary"),
+      // Last increment data from Salary Increment sheet
+      lastIncrementAmount: lastIncrement?.incrementAmount || "",
+      lastIncrementDate: lastIncrement?.dateOfIncrement || "",
+    });
+
     if (emp) {
-      setNewEntry(prev => ({
-        ...prev,
-        employeeCode: code,
-        employeeName: emp.nameAsPerAadhar || emp.name || "",
-        joiningCompanyName: emp.joiningCompanyName || "",
-        dateOfJoining: emp.dateOfJoining || "",
-        designation: emp.designation || "",
-        joiningSalary: emp.joiningSalary || "",
-        currentSalary: emp.currentSalary || "",
-        department: emp.department || "",
-        hod: emp.reportingManagerHod || emp.hod || ""
-      }));
+      setNewEntry(prev => ({ ...prev, ...fillFromEmp(emp) }));
     } else {
       setIsSearching(true);
       try {
         const res = await api.getEmployeeById(code);
         if (res && res.length > 0) {
-          const empData = res[0];
-          setNewEntry(prev => ({
-            ...prev,
-            employeeCode: code,
-            employeeName: empData.nameAsPerAadhar || empData.name || "",
-            joiningCompanyName: empData.joiningCompanyName || "",
-            dateOfJoining: empData.dateOfJoining || "",
-            designation: empData.designation || "",
-            joiningSalary: empData.joiningSalary || "",
-            currentSalary: empData.currentSalary || "",
-            department: empData.department || "",
-            hod: empData.reportingManagerHod || empData.hod || ""
-          }));
+          setNewEntry(prev => ({ ...prev, ...fillFromEmp(res[0]) }));
         }
       } catch (error) {
         console.error("Error fetching employee:", error);
@@ -469,7 +486,7 @@ export const SalaryIncrementModule: React.FC = () => {
                   <TrendingUp className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-base sm:text-lg font-black text-white">Initiate Salary Increment</h3>
+                  <h3 className="text-base sm:text-lg font-black text-white">Salary Increment Form</h3>
                   <p className="text-xs text-blue-100 mt-0.5">Search employee and submit increment request</p>
                 </div>
               </div>

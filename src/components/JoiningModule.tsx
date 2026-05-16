@@ -11,15 +11,15 @@ type TabId = "new" | "present" | "living";
 
 const GENDER_OPTIONS = ["Male", "Female", "Other"];
 const PF_ESIC_OPTIONS = ["Yes", "No"];
-const PAYMENT_MODE = ["Cash", "Bank Transfer", "Cheque"];
+const PAYMENT_MODE = ["Cash", "Bank"];
 const ATTENDANCE_MODE = ["Machine", "Outsider"];
 const INCENTIVE_CAT = ["MIS Basis", "Non Incentive", "Non Mis", "OT Basis", "Per MT"];
 const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
 const JOINING_PLACE_OPTIONS = [
-  "Application", "Factory", "Factory Madhya", "Factory Purab",
+  "Application", "Factory Madhya", "Factory Purab",
   "Factory Refrasynth", "Factory Rkl", "Management", "MDO Office",
-  "Mdo Office", "Production", "Rkl Office", "Sales", "Technical",
+  "Mdo Office", "Production", "Rkl Office", "Sales",
 ];
 
 const DESIGNATION_OPTIONS = [
@@ -39,7 +39,7 @@ const DESIGNATION_OPTIONS = [
   "Sales & Marketing", "Sales Cordinator", "Sales Executive", "Sales Manager",
   "Senior General Manager", "Site Supervisor", "Sr Accountant",
   "Stock Yard Supervisor", "Store Executive", "Store Manager", "Store Purchaser",
-  "Technical Head", "Welder", "Workshop Operator",
+  "Technical Head", "Welder", "Workshop Operator","Admin Executive","Logistic Executive","Fitter",
 ];
 
 const emptyForm = {

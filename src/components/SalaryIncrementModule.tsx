@@ -13,6 +13,7 @@ export const SalaryIncrementModule: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [allEmps, setAllEmps] = useState<any[]>([]);
+  const [allJoining, setAllJoining] = useState<any[]>([]);
 
   const [newEntry, setNewEntry] = useState<Partial<SalaryIncrementFms>>({
     uniqueNo: `SI-${Date.now().toString().slice(-6)}`,
@@ -33,10 +34,14 @@ export const SalaryIncrementModule: React.FC = () => {
 
   const fetchEmployees = async () => {
     try {
-      const res = await api.getAllEmployees();
-      setAllEmps(res || []);
+      const [emps, joining] = await Promise.all([
+        api.getAllEmployees(),
+        api.getJoining(),
+      ]);
+      setAllEmps(emps || []);
+      setAllJoining(joining || []);
     } catch (error) {
-      console.error("Error fetching all employees:", error);
+      console.error("Error fetching employees:", error);
     }
   };
 
@@ -57,23 +62,37 @@ export const SalaryIncrementModule: React.FC = () => {
     fetchEmployees();
   }, []);
 
+  // Convert any date string to yyyy-MM-dd for HTML date input
+  const toIsoDate = (raw: string): string => {
+    if (!raw) return "";
+    if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw; // already correct
+    // M/D/YYYY or MM/DD/YYYY (Google Sheets default) → yyyy-MM-dd
+    const parts = raw.split("/");
+    if (parts.length === 3) {
+      const [a, b, year] = parts;
+      return `${year}-${a.padStart(2, "0")}-${b.padStart(2, "0")}`;
+    }
+    const d = new Date(raw);
+    return isNaN(d.getTime()) ? "" : d.toISOString().split("T")[0];
+  };
+
+  // Strip commas from numbers like "15,000" → "15000"
+  const cleanNum = (raw: string): string => (raw || "").replace(/,/g, "").trim();
+
   const handleFetchEmployee = async (code: string) => {
     if (!code) return;
-    // GAS may return raw sheet heading names (with spaces) or camelCase — try both
-    const pick = (obj: any, ...keys: string[]): string => {
-      for (const k of keys) {
-        const v = obj[k];
-        if (v !== undefined && v !== null && v !== "") return String(v);
-      }
-      return "";
-    };
 
+    // Login sheet → name, designation, hod, companyName
     const emp = allEmps.find(
       e => e.employeeId === code || e.employeeCode === code || e.pmmplAc === code
     );
-    if (emp) console.log("DEBUG emp keys:", JSON.stringify(emp, null, 2));
 
-    // Most recent completed increment → drives Current Salary, Last Inc. Amount/Date
+    // Joining sheet → dateOfJoining, salary (joining salary)
+    const joining = allJoining.find(
+      j => j.pmmplAc === code || j.employeeId === code || j.employeeCode === code
+    );
+
+    // Salary Increment sheet → currentSalaryAfterIncrement, incrementAmount, dateOfIncrement
     const lastIncrement = data
       .filter(d => d.employeeCode === code && d.actual3 && d.incrementAmount)
       .sort((a, b) => {
@@ -82,32 +101,44 @@ export const SalaryIncrementModule: React.FC = () => {
         return tB - tA;
       })[0];
 
-    const fillFromEmp = (src: any) => ({
-      employeeCode: code,
-      employeeName: pick(src, "nameAsPerAadhar", "Name As Per Aadhar", "name"),
-      designation: pick(src, "designation", "Designation"),
-      department: pick(src, "department", "Department"),
-      hod: pick(src, "reportingManagerHod", "Reporting Manager Hod", "hod", "Hod"),
-      // Joining sheet columns
-      joiningCompanyName: pick(src, "joiningCompanyName", "Joining Company Name"),
-      dateOfJoining: pick(src, "dateOfJoining", "Date Of Joining"),
-      joiningSalary: pick(src, "salary", "Salary", "joiningSalary", "Joining Salary"),
-      // Current Salary = salary after last increment (Salary Increment sheet), else from joining
-      currentSalary: lastIncrement?.currentSalaryAfterIncrement
-        || pick(src, "currentSalary", "Current Salary", "salary", "Salary"),
-      // Last increment data from Salary Increment sheet
-      lastIncrementAmount: lastIncrement?.incrementAmount || "",
-      lastIncrementDate: lastIncrement?.dateOfIncrement || "",
-    });
+    const rawJoiningDate = joining?.dateOfJoining || joining?.["Date Of Joining"] || "";
+    const rawJoiningSalary = joining?.salary || joining?.["Salary"] || "";
 
     if (emp) {
-      setNewEntry(prev => ({ ...prev, ...fillFromEmp(emp) }));
+      setNewEntry(prev => ({
+        ...prev,
+        employeeCode: code,
+        employeeName: emp.name || "",
+        designation: emp.designation || "",
+        hod: emp.hod || "",
+        joiningCompanyName: emp.companyName || "",
+        dateOfJoining: toIsoDate(rawJoiningDate),
+        joiningSalary: cleanNum(rawJoiningSalary),
+        department: joining?.department || joining?.["Department"] || "",
+        currentSalary: cleanNum(lastIncrement?.currentSalaryAfterIncrement || rawJoiningSalary),
+        lastIncrementAmount: cleanNum(lastIncrement?.incrementAmount || ""),
+        lastIncrementDate: toIsoDate(lastIncrement?.dateOfIncrement || ""),
+      }));
     } else {
       setIsSearching(true);
       try {
         const res = await api.getEmployeeById(code);
         if (res && res.length > 0) {
-          setNewEntry(prev => ({ ...prev, ...fillFromEmp(res[0]) }));
+          const empData = res[0];
+          setNewEntry(prev => ({
+            ...prev,
+            employeeCode: code,
+            employeeName: empData.name || empData.nameAsPerAadhar || "",
+            designation: empData.designation || "",
+            hod: empData.hod || "",
+            joiningCompanyName: empData.companyName || empData.joiningCompanyName || "",
+            dateOfJoining: toIsoDate(rawJoiningDate),
+            joiningSalary: cleanNum(rawJoiningSalary),
+            department: joining?.department || joining?.["Department"] || "",
+            currentSalary: cleanNum(lastIncrement?.currentSalaryAfterIncrement || rawJoiningSalary),
+            lastIncrementAmount: cleanNum(lastIncrement?.incrementAmount || ""),
+            lastIncrementDate: toIsoDate(lastIncrement?.dateOfIncrement || ""),
+          }));
         }
       } catch (error) {
         console.error("Error fetching employee:", error);
@@ -408,14 +439,14 @@ export const SalaryIncrementModule: React.FC = () => {
                       <td className="px-4 py-3 text-right bg-orange-50/40">
                         <span className="text-xs font-black text-orange-600">₹{item.hodAmount || "—"}</span>
                       </td>
-                      <td className="px-4 py-3 text-xs text-slate-500 bg-orange-50/40 max-w-[140px] truncate" title={item.hodFeedback}>{item.hodFeedback || "—"}</td>
+                      <td className="px-4 py-3 text-xs text-slate-500 bg-orange-50/40 max-w-[200px] whitespace-normal break-words">{item.hodFeedback || "—"}</td>
                     </>}
                     {/* Mgmt Amount & Feedback */}
                     {(activeTab === "final" || activeTab === "history") && <>
                       <td className="px-4 py-3 text-right bg-pink-50/40">
                         <span className="text-xs font-black text-pink-600">₹{item.mgmtAmount || "—"}</span>
                       </td>
-                      <td className="px-4 py-3 text-xs text-slate-500 bg-pink-50/40 max-w-[140px] truncate" title={item.mgmtFeedback}>{item.mgmtFeedback || "—"}</td>
+                      <td className="px-4 py-3 text-xs text-slate-500 bg-pink-50/40 max-w-[200px] whitespace-normal break-words">{item.mgmtFeedback || "—"}</td>
                     </>}
                     {/* History-only columns */}
                     {activeTab === "history" && <>

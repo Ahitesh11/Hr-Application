@@ -75,11 +75,18 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({ onNavigate }) => {
   /* ── Leave balance (own user) ── */
   const getLeaveStats = (type: string) => {
     const total    = parseFloat((user as any)?.[type.toLowerCase()] || 0);
+    // Only count as "used" when HR has given final approval (status2 = "Work Done")
     const approved = leaveData
       .filter(d => d.typeOfLeave === type && d.status2 === "Work Done")
       .reduce((acc, d) => acc + (parseFloat(d.noOfDays) || 0), 0);
+    // Pending = awaiting HR approval (not rejected by HOD or HR, HR not yet acted)
     const pending  = leaveData
-      .filter(d => d.typeOfLeave === type && (!d.status2 || d.status2 === "Pending"))
+      .filter(d =>
+        d.typeOfLeave === type &&
+        d.status1 !== "Rejected" &&
+        d.status2 !== "Rejected" &&
+        d.status2 !== "Work Done"
+      )
       .reduce((acc, d) => acc + (parseFloat(d.noOfDays) || 0), 0);
     return { total, approved, pending, balance: total - approved };
   };
@@ -100,7 +107,10 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({ onNavigate }) => {
       else if (l.typeOfLeave === "EL") empMap[key].el += days;
       else if (l.typeOfLeave === "ML") empMap[key].ml += days;
     }
-    if (!l.status2 || l.status2 === "Pending") empMap[key].pending += days;
+    // Pending HR approval = not rejected by HOD, not rejected/approved by HR
+    if (l.status1 !== "Rejected" && l.status2 !== "Rejected" && l.status2 !== "Work Done") {
+      empMap[key].pending += days;
+    }
   });
 
   const empSummary = Object.values(empMap).map(emp => {

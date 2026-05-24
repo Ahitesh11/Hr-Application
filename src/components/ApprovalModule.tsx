@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { api } from "../services/api";
 import { PunchMissFms, LeaveFms, HolidayWorkingFms, SalaryIncrementFms } from "../types";
-import { Loader2, CheckCircle, XCircle, Clock, AlertCircle, Image } from "lucide-react";
+import { Loader2, CheckCircle, XCircle, Image, Search } from "lucide-react";
 import { cn } from "../lib/utils";
 import { format } from "date-fns";
 import { useAuth } from "../context/AuthContext";
@@ -53,6 +53,7 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [activeSubTab, setActiveSubTab] = useState<"punch" | "leave" | "holiday" | "salary-hod" | "salary-mgmt" | "salary-final">("leave");
   const [selectedRequest, setSelectedRequest] = useState<{ sheet: string, id: string, step: number, rowIndex?: number } | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const [extraFields, setExtraFields] = useState<any>({});
 
@@ -137,65 +138,89 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
     }
   };
 
+  const q = searchTerm.toLowerCase().trim();
+
   // Filter logic for each sub-tab
   const getFilteredLeave = () => {
+    let rows: LeaveFms[];
     if (role === "HOD") {
       if (!user) return [];
-      // Get all employees that report to this HOD (robust comparison with trim)
       const myEmployees = new Set(employees
         .filter(e => e.hod && e.hod.toString().trim() === user.employeeId.toString().trim())
         .map(e => e.employeeId.toString().trim())
       );
-
-      return leaveData.filter(d =>
+      rows = leaveData.filter(d =>
         d && d.employeeIdCode &&
         myEmployees.has(d.employeeIdCode.toString().trim()) &&
         d.planned1 && d.planned1.trim() !== "" &&
         (!d.actual1 || d.actual1.trim() === "")
       );
     } else {
-      // HR filter: Show if HOD Approved (status1 is Work Done or HOD Approved) AND HR hasn't approved yet
-      return leaveData.filter(d => d && (d.status1 === "Work Done" || d.status1 === "HOD Approved" || (d.planned2 && d.planned2.trim() !== "")) && (!d.actual2 || d.actual2.trim() === ""));
+      rows = leaveData.filter(d => d && (d.status1 === "Work Done" || d.status1 === "HOD Approved" || (d.planned2 && d.planned2.trim() !== "")) && (!d.actual2 || d.actual2.trim() === ""));
     }
+    if (!q) return rows;
+    return rows.filter(d =>
+      d.leaveNo?.toLowerCase().includes(q) ||
+      d.nameOfEmployee?.toLowerCase().includes(q) ||
+      d.employeeIdCode?.toLowerCase().includes(q)
+    );
   };
 
   const getFilteredHoliday = () => {
+    let rows: HolidayWorkingFms[];
     if (role === "HOD") {
       if (!user) return [];
       const myEmployees = new Set(employees
         .filter(e => e.hod && e.hod.toString().trim() === user.employeeId.toString().trim())
         .map(e => e.employeeId.toString().trim())
       );
-      return holidayData.filter(d =>
+      rows = holidayData.filter(d =>
         d && d.employeeId &&
         myEmployees.has(d.employeeId.toString().trim()) &&
         d.planned1 && (!d.actual1)
       );
     } else {
-      return holidayData.filter(d => d && d.planned2 && (!d.actual2));
+      rows = holidayData.filter(d => d && d.planned2 && (!d.actual2));
     }
+    if (!q) return rows;
+    return rows.filter(d =>
+      d.holidayWorkingNo?.toLowerCase().includes(q) ||
+      d.name?.toLowerCase().includes(q) ||
+      d.employeeId?.toLowerCase().includes(q)
+    );
+  };
+
+  const getFilteredPunchMiss = () => {
+    if (!q) return punchMissData;
+    return punchMissData.filter(d =>
+      d.pmNo?.toLowerCase().includes(q) ||
+      d.name?.toLowerCase().includes(q) ||
+      d.employeeId?.toLowerCase().includes(q)
+    );
   };
 
   const getFilteredSalaryHod = () => {
     if (!user) return [];
-    // Find all employees whose HOD is the current logged-in user (same as Leave filter logic)
     const myEmployeeIds = new Set(
       employees
         .filter(e => e.hod && e.hod.toString().trim() === user.employeeId.toString().trim())
         .map(e => e.employeeId.toString().trim())
     );
-    return salaryData.filter(d =>
+    const rows = salaryData.filter(d =>
       d.employeeCode &&
       myEmployeeIds.has(d.employeeCode.toString().trim()) &&
       (!d.status || d.status === "Pending")
     );
+    if (!q) return rows;
+    return rows.filter(d =>
+      d.uniqueNo?.toLowerCase().includes(q) ||
+      d.employeeName?.toLowerCase().includes(q) ||
+      d.employeeCode?.toLowerCase().includes(q)
+    );
   };
 
-  const getFilteredSalaryMgmt = () => salaryData.filter(d => d.status === "Work Done" && d.status2 === "Pending");
-  const getFilteredSalaryFinal = () => salaryData.filter(d => d.status2 === "Work Done" && d.status3 === "Pending");
-
   const subTabs = [
-    { id: "punch", label: "Punch Miss", count: punchMissData.length, visible: role === "HR" },
+    { id: "punch", label: "Punch Miss", count: getFilteredPunchMiss().length, visible: role === "HR" },
     { id: "leave", label: "Leave", count: getFilteredLeave().length, visible: true },
     { id: "holiday", label: "Holiday Working", count: getFilteredHoliday().length, visible: true },
     { id: "salary-hod", label: "Salary Increment", count: getFilteredSalaryHod().length, visible: role === "HOD" },
@@ -242,6 +267,18 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
           <Loader2 className={cn("w-4 h-4", isLoading && "animate-spin")} />
           Refresh
         </button>
+      </div>
+
+      {/* Search Bar */}
+      <div className="relative w-full md:w-80">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+        <input
+          type="text"
+          placeholder="Search by name, ID or No..."
+          value={searchTerm}
+          onChange={e => { setSearchTerm(e.target.value); }}
+          className="w-full pl-9 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:border-blue-400 transition-all"
+        />
       </div>
 
       {/* Table Card */}
@@ -325,9 +362,9 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
               </thead>
               <tbody>
                 {activeSubTab === "punch" && (
-                  punchMissData.length === 0 ? (
+                  getFilteredPunchMiss().length === 0 ? (
                     <tr><td colSpan={9} className="px-4 py-12 text-center text-slate-400 text-sm">No pending punch miss requests</td></tr>
-                  ) : punchMissData.map((item, idx) => (
+                  ) : getFilteredPunchMiss().map((item, idx) => (
                     <tr
                       key={idx}
                       className={cn("transition-colors hover:bg-blue-50/40", idx % 2 === 0 ? "bg-white" : "bg-slate-50/40")}
@@ -583,7 +620,8 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
                   const employee = employees.find(e => e.employeeId === req.employeeIdCode);
                   if (!employee) return <p className="text-xs text-slate-400">Loading Balance...</p>;
 
-                  const userLeaves = leaveData.filter(l => l.employeeIdCode === req.employeeIdCode && l.status1 === "Work Done" && l.status2 === "Work Done");
+                  // Balance only counts leaves with final HR approval (status2 = "Work Done")
+                  const userLeaves = leaveData.filter(l => l.employeeIdCode === req.employeeIdCode && l.status2 === "Work Done");
                   const stats = {
                     cl: { total: parseFloat(employee.cl) || 0, taken: userLeaves.filter(l => l.typeOfLeave === "CL").reduce((acc, l) => acc + (parseFloat(l.noOfDays as any) || 0), 0) },
                     el: { total: parseFloat(employee.el) || 0, taken: userLeaves.filter(l => l.typeOfLeave === "EL").reduce((acc, l) => acc + (parseFloat(l.noOfDays as any) || 0), 0) },
@@ -619,6 +657,35 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
             )}
 
             <div className="space-y-4 mb-6">
+              {selectedRequest.sheet === "Leave Fms" && (() => {
+                const req = leaveData.find(l => l.leaveNo === selectedRequest.id);
+                if (!req) return null;
+                return (
+                  <div className="space-y-3 text-left animate-in fade-in duration-200">
+                    <div className="flex items-center justify-between px-3 py-2 rounded-xl bg-slate-50 border border-slate-100">
+                      <span className="text-xs font-bold text-slate-500">Requested Days</span>
+                      <span className="text-sm font-black text-slate-800">{req.noOfDays} Day(s)</span>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-600 mb-1">
+                        Override Days <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="number"
+                        min="0.5"
+                        step="0.5"
+                        placeholder={`e.g. ${req.noOfDays}`}
+                        onChange={e => {
+                          const val = e.target.value;
+                          setExtraFields((prev: any) => val ? { ...prev, noOfDays: parseFloat(val) } : (() => { const { noOfDays, ...rest } = prev; return rest; })());
+                        }}
+                        className="w-full border border-slate-200 p-2 rounded-xl text-sm text-center font-bold outline-none focus:border-blue-400 bg-white"
+                      />
+                    </div>
+                  </div>
+                );
+              })()}
+
               {selectedRequest.sheet === "Holiday Working Fms" && selectedRequest.step === 1 && (
                 <div className="space-y-3 font-bold">
                   <div className="grid grid-cols-1 gap-2">
@@ -683,6 +750,10 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
             <div className="grid grid-cols-2 gap-4">
               <button
                 onClick={() => {
+                  if (selectedRequest.sheet === "Leave Fms" && !extraFields.noOfDays) {
+                    alert("Override Days field is required.");
+                    return;
+                  }
                   const fields = selectedRequest.sheet === "Holiday Working Fms" && selectedRequest.step === 2
                     ? { ...extraFields, status3: "Rejected" }
                     : extraFields;
@@ -694,6 +765,10 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
               </button>
               <button
                 onClick={() => {
+                  if (selectedRequest.sheet === "Leave Fms" && !extraFields.noOfDays) {
+                    alert("Override Days field is required.");
+                    return;
+                  }
                   const fields = selectedRequest.sheet === "Holiday Working Fms" && selectedRequest.step === 2
                     ? { ...extraFields, status3: "Work Done" }
                     : extraFields;

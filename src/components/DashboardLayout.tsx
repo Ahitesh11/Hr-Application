@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import { api } from "../services/api";
 import {
   LayoutDashboard,
   Clock,
@@ -13,7 +14,10 @@ import {
   ChevronRight,
   CheckCircle,
   TrendingUp,
-  UserPlus
+  UserPlus,
+  UserCheck,
+  Search,
+  Loader2
 } from "lucide-react";
 import { cn } from "../lib/utils";
 
@@ -24,8 +28,58 @@ interface DashboardLayoutProps {
 }
 
 export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, activeTab, setActiveTab }) => {
-  const { user, logout } = useAuth();
+  const { user, logout, actingAs, setActingAs } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [showActAsPanel, setShowActAsPanel] = useState(false);
+  const [actAsInput, setActAsInput] = useState("");
+  const [actAsLookupResult, setActAsLookupResult] = useState<{ name: string; companyName: string } | null>(null);
+  const [actAsManualName, setActAsManualName] = useState("");
+  const [actAsManualCompany, setActAsManualCompany] = useState("");
+  const [actAsNotFound, setActAsNotFound] = useState(false);
+  const [actAsLoading, setActAsLoading] = useState(false);
+
+  const handleActAsLookup = async () => {
+    if (!actAsInput.trim()) return;
+    setActAsLoading(true);
+    setActAsLookupResult(null);
+    setActAsNotFound(false);
+    setActAsManualName("");
+    setActAsManualCompany("");
+    try {
+      const emps = await api.getEmployeeById(actAsInput.trim());
+      const emp = emps?.[0];
+      if (emp) {
+        const name = emp.name || emp.employeeName || "";
+        const companyName = emp.companyName || emp.company || emp.joiningCompanyName || "";
+        setActAsLookupResult({ name, companyName });
+      } else {
+        setActAsNotFound(true);
+      }
+    } catch {
+      setActAsNotFound(true);
+    } finally {
+      setActAsLoading(false);
+    }
+  };
+
+  const handleActAsSet = () => {
+    const name = actAsLookupResult?.name || actAsManualName;
+    const companyName = actAsLookupResult?.companyName || actAsManualCompany;
+    if (!actAsInput.trim() || !name) return;
+    setActingAs({ employeeId: actAsInput.trim(), name, companyName });
+    setShowActAsPanel(false);
+    setActAsInput("");
+    setActAsLookupResult(null);
+    setActAsNotFound(false);
+  };
+
+  const handleActAsClear = () => {
+    setActingAs(null);
+    setShowActAsPanel(false);
+    setActAsInput("");
+    setActAsLookupResult(null);
+    setActAsNotFound(false);
+  };
 
   const menuItems = [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["Staf", "Admin", "HOD"] },
@@ -129,23 +183,129 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
-        <header className="h-16 bg-white border-b border-pink-100 flex items-center justify-between px-4 md:px-8 shrink-0">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => setIsSidebarOpen(true)}
-              className="p-2 hover:bg-pink-50 rounded-lg transition-colors md:hidden"
-            >
-              <Menu className="w-6 h-6 text-slate-600" />
-            </button>
-            <h2 className="text-base md:text-lg font-bold text-slate-800 truncate">
-              {menuItems.find(i => i.id === activeTab)?.label}
-            </h2>
+        <header className="bg-white border-b border-pink-100 shrink-0">
+          <div className="h-16 flex items-center justify-between px-4 md:px-8">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => setIsSidebarOpen(true)}
+                className="p-2 hover:bg-pink-50 rounded-lg transition-colors md:hidden"
+              >
+                <Menu className="w-6 h-6 text-slate-600" />
+              </button>
+              <h2 className="text-base md:text-lg font-bold text-slate-800 truncate">
+                {menuItems.find(i => i.id === activeTab)?.label}
+              </h2>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-xs md:text-sm text-slate-500 hidden sm:inline">
+                {new Date().toLocaleDateString()}
+              </span>
+
+              {/* Act As Employee — Admin only */}
+              {user?.role === "Admin" && (
+                <div className="relative">
+                  {actingAs ? (
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold"
+                      style={{ background: "#ecfdf5", color: "#065f46", border: "1px solid #a7f3d0" }}>
+                      <UserCheck className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">Acting as:</span>
+                      <span>{actingAs.name}</span>
+                      <span className="text-[10px] opacity-70">({actingAs.employeeId})</span>
+                      <button onClick={handleActAsClear} className="ml-1 hover:opacity-70">
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setShowActAsPanel(v => !v)}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all"
+                      style={{ background: "#eff6ff", color: "#1d4ed8", border: "1px solid #bfdbfe" }}
+                    >
+                      <UserCheck className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">Act As Employee</span>
+                    </button>
+                  )}
+
+                  {/* Lookup panel */}
+                  {showActAsPanel && (
+                    <div className="absolute right-0 top-10 w-72 bg-white rounded-2xl shadow-xl border border-slate-100 p-4 z-50">
+                      <div className="flex items-center justify-between mb-3">
+                        <p className="text-sm font-black text-slate-800">Fill form on behalf of</p>
+                        <button onClick={() => setShowActAsPanel(false)} className="text-slate-400 hover:text-slate-600">
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+
+                      <div className="flex gap-2 mb-3">
+                        <input
+                          type="text"
+                          value={actAsInput}
+                          onChange={e => setActAsInput(e.target.value)}
+                          onKeyDown={e => e.key === "Enter" && handleActAsLookup()}
+                          placeholder="Employee ID (e.g. PMMPL-320)"
+                          className="flex-1 px-3 py-2 text-xs font-medium border border-slate-200 rounded-xl outline-none focus:border-blue-400"
+                        />
+                        <button
+                          onClick={handleActAsLookup}
+                          disabled={actAsLoading || !actAsInput.trim()}
+                          className="px-3 py-2 rounded-xl text-white text-xs font-bold disabled:opacity-50"
+                          style={{ background: "#1d4ed8" }}
+                        >
+                          {actAsLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Search className="w-3.5 h-3.5" />}
+                        </button>
+                      </div>
+
+                      {actAsLookupResult && (
+                        <div className="mb-3 p-2.5 rounded-xl text-xs" style={{ background: "#ecfdf5", border: "1px solid #a7f3d0" }}>
+                          <p className="font-black text-green-800">{actAsLookupResult.name}</p>
+                          <p className="text-green-600">{actAsLookupResult.companyName}</p>
+                        </div>
+                      )}
+
+                      {actAsNotFound && (
+                        <div className="mb-3 space-y-2">
+                          <p className="text-xs text-red-500 font-medium">Employee not found. Enter manually:</p>
+                          <input
+                            type="text"
+                            value={actAsManualName}
+                            onChange={e => setActAsManualName(e.target.value)}
+                            placeholder="Employee Name"
+                            className="w-full px-3 py-2 text-xs font-medium border border-slate-200 rounded-xl outline-none focus:border-blue-400"
+                          />
+                          <input
+                            type="text"
+                            value={actAsManualCompany}
+                            onChange={e => setActAsManualCompany(e.target.value)}
+                            placeholder="Company Name (e.g. Pmmpl)"
+                            className="w-full px-3 py-2 text-xs font-medium border border-slate-200 rounded-xl outline-none focus:border-blue-400"
+                          />
+                        </div>
+                      )}
+
+                      <button
+                        onClick={handleActAsSet}
+                        disabled={!actAsInput.trim() || (!actAsLookupResult && !actAsManualName)}
+                        className="w-full py-2 rounded-xl text-white text-xs font-black disabled:opacity-40"
+                        style={{ background: "#1d4ed8" }}
+                      >
+                        Set Employee
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
-          <div className="flex items-center gap-4">
-            <span className="text-xs md:text-sm text-slate-500 hidden sm:inline">
-              {new Date().toLocaleDateString()}
-            </span>
-          </div>
+
+          {/* Active "acting as" banner */}
+          {actingAs && user?.role === "Admin" && (
+            <div className="px-4 md:px-8 py-2 text-xs font-bold flex items-center gap-2"
+              style={{ background: "#d1fae5", color: "#065f46" }}>
+              <UserCheck className="w-3.5 h-3.5" />
+              Forms will be submitted for: <span className="font-black">{actingAs.name} ({actingAs.employeeId})</span>
+              <button onClick={handleActAsClear} className="ml-auto underline font-medium">Clear</button>
+            </div>
+          )}
         </header>
 
         <div className="flex-1 overflow-y-auto p-4 md:p-8">

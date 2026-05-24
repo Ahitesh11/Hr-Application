@@ -24,7 +24,7 @@ const StatusBadge = ({ status }: { status: string }) => {
 };
 
 export const PunchMissModule: React.FC = () => {
-  const { user } = useAuth();
+  const { user, actingAs } = useAuth();
   const [data, setData] = useState<PunchMissFms[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -100,8 +100,8 @@ export const PunchMissModule: React.FC = () => {
         pmNo: "", // GAS will generate this
         inOut: formData.inOut,
         date: formData.date,
-        employeeId: user?.employeeId,
-        name: user?.name,
+        employeeId: actingAs?.employeeId || user?.employeeId,
+        name: actingAs?.name || user?.name,
         punchMissTime: formData.punchMissTime ? `${formData.punchMissTime} ${formData.ampm}` : "",
         image: formData.image
       };

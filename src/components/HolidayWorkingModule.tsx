@@ -7,7 +7,7 @@ import { cn } from "../lib/utils";
 import { format } from "date-fns";
 
 export const HolidayWorkingModule: React.FC = () => {
-  const { user } = useAuth();
+  const { user, actingAs } = useAuth();
   const [data, setData] = useState<HolidayWorkingFms[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -50,9 +50,9 @@ export const HolidayWorkingModule: React.FC = () => {
     try {
       const success = await api.submitHolidayWorking({
         ...formData,
-        employeeId: user?.employeeId,
-        name: user?.name,
-        companyName: user?.companyName,
+        employeeId: actingAs?.employeeId || user?.employeeId,
+        name: actingAs?.name || user?.name,
+        companyName: actingAs?.companyName || user?.companyName,
         timestamp: format(new Date(), "yyyy-MM-dd HH:mm:ss")
       } as any);
 

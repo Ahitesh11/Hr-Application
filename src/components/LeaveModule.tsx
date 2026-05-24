@@ -40,7 +40,7 @@ const TypeBadge = ({ type }: { type: string }) => {
 };
 
 export const LeaveModule: React.FC = () => {
-  const { user } = useAuth();
+  const { user, actingAs } = useAuth();
   const [data, setData] = useState<LeaveFms[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -111,8 +111,9 @@ export const LeaveModule: React.FC = () => {
     try {
       const success = await api.submitLeave({
         ...formData,
-        employeeIdCode: user?.employeeId,
-        nameOfEmployee: user?.name,
+        employeeIdCode: actingAs?.employeeId || user?.employeeId,
+        nameOfEmployee: actingAs?.name || user?.name,
+        company: actingAs?.companyName || formData.company,
         timestamp: format(new Date(), "M/d/yyyy H:mm:ss"),
         folderId: "1d45zekLBdo-BcLp2-1fqmDOEZ1ZM-hXx"
       } as any);
@@ -471,21 +472,24 @@ export const LeaveModule: React.FC = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Number of Days</label>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Number of Days
+                  {formData.dateRequestedFrom !== formData.dateRequestedTo && (
+                    <span className="ml-2 text-[10px] font-bold text-blue-500 bg-blue-50 px-2 py-0.5 rounded-full">
+                      Auto-calculated · editable
+                    </span>
+                  )}
+                </label>
                 <input
                   type="number"
                   min="0.5"
                   step="0.5"
                   value={formData.noOfDays}
                   onChange={(e) => setFormData({ ...formData, noOfDays: parseFloat(e.target.value) })}
-                  readOnly={formData.dateRequestedFrom !== formData.dateRequestedTo}
-                  className={cn(
-                    "w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none",
-                    formData.dateRequestedFrom !== formData.dateRequestedTo ? "bg-slate-100 text-slate-500 cursor-not-allowed" : "bg-slate-50 text-slate-900"
-                  )}
+                  className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-slate-900"
                   required
                 />
-
+                <p className="text-[10px] text-slate-400 mt-1">0.5 = half day leave</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Reason for Leave</label>

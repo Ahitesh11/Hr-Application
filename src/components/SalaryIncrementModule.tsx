@@ -16,6 +16,7 @@ export const SalaryIncrementModule: React.FC = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [allEmps, setAllEmps] = useState<any[]>([]);
   const [allJoining, setAllJoining] = useState<any[]>([]);
+  const [allPresentEmps, setAllPresentEmps] = useState<any[]>([]);
 
   const [newEntry, setNewEntry] = useState<Partial<SalaryIncrementFms>>({
     uniqueNo: `SI-${Date.now().toString().slice(-6)}`,
@@ -36,12 +37,14 @@ export const SalaryIncrementModule: React.FC = () => {
 
   const fetchEmployees = async () => {
     try {
-      const [emps, joining] = await Promise.all([
+      const [emps, joining, presentEmps] = await Promise.all([
         api.getAllEmployees(),
         api.getJoining(),
+        api.getPresentEmployees(),
       ]);
       setAllEmps(emps || []);
       setAllJoining(joining || []);
+      setAllPresentEmps(presentEmps || []);
     } catch (error) {
       console.error("Error fetching employees:", error);
     }
@@ -94,7 +97,7 @@ export const SalaryIncrementModule: React.FC = () => {
       j => j.pmmplAc === code || j.employeeId === code || j.employeeCode === code
     );
 
-    // Salary Increment sheet → currentSalaryAfterIncrement, incrementAmount, dateOfIncrement
+    // Salary Increment sheet → lastIncrementAmount, dateOfIncrement
     const lastIncrement = data
       .filter(d => d.employeeCode === code && d.actual3 && d.incrementAmount)
       .sort((a, b) => {
@@ -102,6 +105,16 @@ export const SalaryIncrementModule: React.FC = () => {
         const tB = b.dateOfIncrement ? new Date(b.dateOfIncrement).getTime() : 0;
         return tB - tA;
       })[0];
+
+    // Present Employees sheet → Current Salary
+    const presentEmp = allPresentEmps.find(
+      p => p.employeeId === code || p.employeeCode === code || p.pmmplAc === code
+    );
+    const rawCurrentSalary = presentEmp
+      ? Object.entries(presentEmp).find(
+          ([k]) => k.replace(/\s+/g, " ").trim().toLowerCase() === "current salary"
+        )?.[1] as string || ""
+      : "";
 
     const rawJoiningDate = joining?.dateOfJoining || joining?.["Date Of Joining"] || "";
     const rawJoiningSalary = joining?.salary || joining?.["Salary"] || "";
@@ -117,7 +130,7 @@ export const SalaryIncrementModule: React.FC = () => {
         dateOfJoining: toIsoDate(rawJoiningDate),
         joiningSalary: cleanNum(rawJoiningSalary),
         department: joining?.department || joining?.["Department"] || "",
-        currentSalary: cleanNum(lastIncrement?.currentSalaryAfterIncrement || rawJoiningSalary),
+        currentSalary: cleanNum(rawCurrentSalary || lastIncrement?.currentSalaryAfterIncrement || rawJoiningSalary),
         lastIncrementAmount: cleanNum(lastIncrement?.incrementAmount || ""),
         lastIncrementDate: toIsoDate(lastIncrement?.dateOfIncrement || ""),
       }));
@@ -137,7 +150,7 @@ export const SalaryIncrementModule: React.FC = () => {
             dateOfJoining: toIsoDate(rawJoiningDate),
             joiningSalary: cleanNum(rawJoiningSalary),
             department: joining?.department || joining?.["Department"] || "",
-            currentSalary: cleanNum(lastIncrement?.currentSalaryAfterIncrement || rawJoiningSalary),
+            currentSalary: cleanNum(rawCurrentSalary || lastIncrement?.currentSalaryAfterIncrement || rawJoiningSalary),
             lastIncrementAmount: cleanNum(lastIncrement?.incrementAmount || ""),
             lastIncrementDate: toIsoDate(lastIncrement?.dateOfIncrement || ""),
           }));

@@ -134,6 +134,12 @@ export const api = {
     return !!(res && res.success);
   },
 
+  getPresentEmployees: async (): Promise<any[]> => {
+    if (useMock) return [];
+    const res = await callGas("getPresentEmployees", {});
+    return Array.isArray(res) ? res : [];
+  },
+
   getJoining: async (): Promise<any[]> => {
     if (useMock) return [];
     const res = await callGas("getJoining", {});

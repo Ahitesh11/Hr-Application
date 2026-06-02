@@ -25,6 +25,9 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({ onNavigate }) => {
   const [leaveSearch, setLeaveSearch]     = useState("");
   const [leaveStatusFilter, setLeaveStatusFilter] = useState<"all" | "Pending" | "Work Done" | "Rejected">("all");
   const [employeeFilter, setEmployeeFilter] = useState("");
+  const [hodSection, setHodSection] = useState<"leave" | "holiday">("leave");
+  const [hodSearch, setHodSearch] = useState("");
+  const [hodStatusFilter, setHodStatusFilter] = useState<"all" | "Pending" | "Work Done" | "Rejected">("all");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -46,7 +49,7 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({ onNavigate }) => {
 
         if (user.role === "Admin") {
           try {
-            const empRes = await api.getAllEmployees();
+            const empRes = await api.getActiveEmployees();
             if (Array.isArray(empRes) && empRes.length > 0) setAllEmployees(empRes);
           } catch (_) {}
         }
@@ -137,6 +140,34 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({ onNavigate }) => {
       (l.leaveNo        || "").toLowerCase().includes(leaveSearch.toLowerCase());
     const matchStatus = leaveStatusFilter === "all" || l.status2 === leaveStatusFilter ||
       (leaveStatusFilter === "Pending" && (!l.status2 || l.status2 === "Pending"));
+    return matchGlobal && matchSearch && matchStatus;
+  });
+
+  const filteredHodLeaves = leaveData.filter(l => {
+    const matchGlobal = !employeeFilter ||
+      (l.nameOfEmployee || "").toLowerCase().includes(employeeFilter.toLowerCase()) ||
+      (l.employeeIdCode || "").toLowerCase().includes(employeeFilter.toLowerCase());
+    const matchSearch = !hodSearch ||
+      (l.nameOfEmployee || "").toLowerCase().includes(hodSearch.toLowerCase()) ||
+      (l.employeeIdCode || "").toLowerCase().includes(hodSearch.toLowerCase()) ||
+      (l.leaveNo        || "").toLowerCase().includes(hodSearch.toLowerCase());
+    const hodSt = l.status1 || "Pending";
+    const matchStatus = hodStatusFilter === "all" || hodSt === hodStatusFilter ||
+      (hodStatusFilter === "Pending" && (!l.status1 || l.status1 === "Pending"));
+    return matchGlobal && matchSearch && matchStatus;
+  });
+
+  const filteredHodHoliday = holidayData.filter(h => {
+    const matchGlobal = !employeeFilter ||
+      (h.name || "").toLowerCase().includes(employeeFilter.toLowerCase()) ||
+      (h.employeeId || "").toLowerCase().includes(employeeFilter.toLowerCase());
+    const matchSearch = !hodSearch ||
+      (h.name || "").toLowerCase().includes(hodSearch.toLowerCase()) ||
+      (h.employeeId || "").toLowerCase().includes(hodSearch.toLowerCase()) ||
+      (h.holidayWorkingNo || "").toLowerCase().includes(hodSearch.toLowerCase());
+    const hodSt = h.status1 || "Pending";
+    const matchStatus = hodStatusFilter === "all" || hodSt === hodStatusFilter ||
+      (hodStatusFilter === "Pending" && (!h.status1 || h.status1 === "Pending"));
     return matchGlobal && matchSearch && matchStatus;
   });
 
@@ -422,6 +453,213 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({ onNavigate }) => {
                   </tfoot>
                 </table>
               </div>
+            )}
+          </div>
+
+          {/* ── HOD Approvals Section ── */}
+          <div className="bg-white rounded-3xl border border-pink-100 shadow-sm overflow-hidden">
+            <div className="p-6 border-b border-pink-50 flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-pink-700 rounded-xl">
+                  <CheckCircle className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900">HOD Approvals</h3>
+                  <p className="text-xs text-slate-400">HOD step approval status — Leave & Holiday Working</p>
+                </div>
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  onClick={() => setHodSection("leave")}
+                  className={cn(
+                    "px-4 py-2 rounded-xl text-xs font-bold transition-all",
+                    hodSection === "leave" ? "bg-pink-600 text-white shadow-md shadow-pink-100" : "bg-pink-50 text-pink-600 hover:bg-pink-100"
+                  )}
+                >
+                  Leave ({leaveData.length})
+                </button>
+                <button
+                  onClick={() => setHodSection("holiday")}
+                  className={cn(
+                    "px-4 py-2 rounded-xl text-xs font-bold transition-all",
+                    hodSection === "holiday" ? "bg-fuchsia-600 text-white shadow-md shadow-fuchsia-100" : "bg-fuchsia-50 text-fuchsia-600 hover:bg-fuchsia-100"
+                  )}
+                >
+                  Holiday Working ({holidayData.length})
+                </button>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <input
+                    type="text"
+                    value={hodSearch}
+                    onChange={e => setHodSearch(e.target.value)}
+                    placeholder="Search name / ID..."
+                    className="pl-9 pr-3 py-2 text-xs rounded-xl border border-pink-100 bg-pink-50 outline-none focus:ring-2 focus:ring-pink-400 font-medium text-slate-700 w-40"
+                  />
+                </div>
+                <select
+                  value={hodStatusFilter}
+                  onChange={e => setHodStatusFilter(e.target.value as any)}
+                  className="px-3 py-2 text-xs rounded-xl border border-pink-100 bg-pink-50 outline-none focus:ring-2 focus:ring-pink-400 font-medium text-slate-700"
+                >
+                  <option value="all">All HOD Status</option>
+                  <option value="Pending">Pending</option>
+                  <option value="Work Done">HOD Approved</option>
+                  <option value="Rejected">Rejected</option>
+                </select>
+              </div>
+            </div>
+
+            {/* HOD Summary Stats */}
+            <div className="px-6 py-4 bg-pink-50/40 border-b border-pink-50 flex flex-wrap gap-4">
+              {hodSection === "leave" ? (
+                <>
+                  <div className="flex items-center gap-2 bg-amber-50 border border-amber-100 px-4 py-2 rounded-xl">
+                    <span className="w-2 h-2 rounded-full bg-amber-400 inline-block" />
+                    <span className="text-xs font-bold text-amber-700">Pending HOD</span>
+                    <span className="text-sm font-extrabold text-amber-900 ml-1">
+                      {leaveData.filter(l => !l.status1 || l.status1 === "Pending").length}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-100 px-4 py-2 rounded-xl">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block" />
+                    <span className="text-xs font-bold text-emerald-700">HOD Approved</span>
+                    <span className="text-sm font-extrabold text-emerald-900 ml-1">
+                      {leaveData.filter(l => l.status1 === "Work Done").length}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 bg-red-50 border border-red-100 px-4 py-2 rounded-xl">
+                    <span className="w-2 h-2 rounded-full bg-red-400 inline-block" />
+                    <span className="text-xs font-bold text-red-700">HOD Rejected</span>
+                    <span className="text-sm font-extrabold text-red-900 ml-1">
+                      {leaveData.filter(l => l.status1 === "Rejected").length}
+                    </span>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex items-center gap-2 bg-amber-50 border border-amber-100 px-4 py-2 rounded-xl">
+                    <span className="w-2 h-2 rounded-full bg-amber-400 inline-block" />
+                    <span className="text-xs font-bold text-amber-700">Pending HOD</span>
+                    <span className="text-sm font-extrabold text-amber-900 ml-1">
+                      {holidayData.filter(h => !h.status1 || h.status1 === "Pending").length}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-100 px-4 py-2 rounded-xl">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block" />
+                    <span className="text-xs font-bold text-emerald-700">HOD Approved</span>
+                    <span className="text-sm font-extrabold text-emerald-900 ml-1">
+                      {holidayData.filter(h => h.status1 === "Work Done").length}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 bg-red-50 border border-red-100 px-4 py-2 rounded-xl">
+                    <span className="w-2 h-2 rounded-full bg-red-400 inline-block" />
+                    <span className="text-xs font-bold text-red-700">HOD Rejected</span>
+                    <span className="text-sm font-extrabold text-red-900 ml-1">
+                      {holidayData.filter(h => h.status1 === "Rejected").length}
+                    </span>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {isLoading ? (
+              <div className="py-16 flex flex-col items-center gap-3">
+                <Loader2 className="w-8 h-8 animate-spin text-pink-500" />
+                <p className="text-slate-400 text-sm">Loading HOD approval data...</p>
+              </div>
+            ) : hodSection === "leave" ? (
+              filteredHodLeaves.length === 0 ? (
+                <div className="py-16 flex flex-col items-center gap-3">
+                  <FileText className="w-10 h-10 text-slate-200" />
+                  <p className="text-slate-400 font-bold">No records found</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto overflow-y-auto" style={{ maxHeight: "400px" }}>
+                  <table className="w-full text-left min-w-[860px]">
+                    <thead className="bg-pink-50 border-b border-pink-100 sticky top-0 z-10">
+                      <tr>
+                        {["Leave No", "Employee", "Type", "Days", "HOD Status", "HR Status", "Applied On"].map(h => (
+                          <th key={h} className="px-5 py-3.5 text-[10px] font-bold text-pink-500 uppercase tracking-wider">{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-pink-50">
+                      {filteredHodLeaves.map((item, idx) => (
+                        <tr key={idx} className="hover:bg-pink-50/50 transition-colors">
+                          <td className="px-5 py-4"><p className="text-xs font-bold text-slate-700">{item.leaveNo}</p></td>
+                          <td className="px-5 py-4">
+                            <p className="text-sm font-bold text-slate-800">{item.nameOfEmployee}</p>
+                            <p className="text-[10px] text-slate-400 font-medium">{item.employeeIdCode}</p>
+                          </td>
+                          <td className="px-5 py-4">
+                            <span className={cn(
+                              "inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold",
+                              item.typeOfLeave === "CL" ? "bg-pink-50 text-pink-700 border border-pink-100" :
+                              item.typeOfLeave === "EL" ? "bg-rose-50 text-rose-700 border border-rose-100" :
+                                                          "bg-fuchsia-50 text-fuchsia-700 border border-fuchsia-100"
+                            )}>
+                              {item.typeOfLeave}
+                            </span>
+                          </td>
+                          <td className="px-5 py-4">
+                            <span className="text-sm font-bold text-slate-800">{item.noOfDays}</span>
+                            <span className="text-xs text-slate-400 ml-1">day{item.noOfDays > 1 ? "s" : ""}</span>
+                          </td>
+                          <td className="px-5 py-4"><StatusBadge status={item.status1} /></td>
+                          <td className="px-5 py-4"><StatusBadge status={item.status2} /></td>
+                          <td className="px-5 py-4">
+                            <p className="text-xs font-bold text-slate-500">{item.timestamp?.split(" ")[0]}</p>
+                            <p className="text-[10px] text-slate-300">{item.timestamp?.split(" ")[1]}</p>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )
+            ) : (
+              filteredHodHoliday.length === 0 ? (
+                <div className="py-16 flex flex-col items-center gap-3">
+                  <FileText className="w-10 h-10 text-slate-200" />
+                  <p className="text-slate-400 font-bold">No records found</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto overflow-y-auto" style={{ maxHeight: "400px" }}>
+                  <table className="w-full text-left min-w-[860px]">
+                    <thead className="bg-pink-50 border-b border-pink-100 sticky top-0 z-10">
+                      <tr>
+                        {["Holiday No", "Employee", "From Date", "To Date", "Days", "HOD Status", "Final Status", "Applied On"].map(h => (
+                          <th key={h} className="px-5 py-3.5 text-[10px] font-bold text-pink-500 uppercase tracking-wider">{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-pink-50">
+                      {filteredHodHoliday.map((item, idx) => (
+                        <tr key={idx} className="hover:bg-pink-50/50 transition-colors">
+                          <td className="px-5 py-4"><p className="text-xs font-bold text-slate-700">{item.holidayWorkingNo}</p></td>
+                          <td className="px-5 py-4">
+                            <p className="text-sm font-bold text-slate-800">{item.name}</p>
+                            <p className="text-[10px] text-slate-400 font-medium">{item.employeeId}</p>
+                          </td>
+                          <td className="px-5 py-4 text-sm text-slate-600 font-medium">{item.workingDateFrom}</td>
+                          <td className="px-5 py-4 text-sm text-slate-600 font-medium">{item.workingDateTo}</td>
+                          <td className="px-5 py-4">
+                            <span className="text-sm font-bold text-slate-800">{item.numberOfDays}</span>
+                            <span className="text-xs text-slate-400 ml-1">day{item.numberOfDays > 1 ? "s" : ""}</span>
+                          </td>
+                          <td className="px-5 py-4"><StatusBadge status={item.status1} /></td>
+                          <td className="px-5 py-4"><StatusBadge status={item.status3} /></td>
+                          <td className="px-5 py-4">
+                            <p className="text-xs font-bold text-slate-500">{item.timestamp?.split(" ")[0]}</p>
+                            <p className="text-[10px] text-slate-300">{item.timestamp?.split(" ")[1]}</p>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )
             )}
           </div>
 

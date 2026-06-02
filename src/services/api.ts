@@ -128,6 +128,37 @@ export const api = {
     return Array.isArray(res) ? res : [];
   },
 
+  /* Returns only employees who have NOT left (not in Living History) */
+  getActiveEmployees: async (): Promise<any[]> => {
+    if (useMock) return [];
+    const [all, living] = await Promise.all([
+      callGas("getEmployeeDetails", {}),
+      callGas("getLivingHistory", {}),
+    ]);
+    const allEmps      = Array.isArray(all)    ? all    : [];
+    const livingHistory = Array.isArray(living) ? living : [];
+    const livingIds = new Set(
+      livingHistory
+        .map((l: any) => (l.pmmplAc || l.employeeId || l.employeeCode || "").toString().trim())
+        .filter(Boolean)
+    );
+    return allEmps.filter((e: any) => {
+      const id = (e.employeeId || e.pmmplAc || e.employeeCode || "").toString().trim();
+      return !livingIds.has(id);
+    });
+  },
+
+  /* Check whether a single employee ID belongs to a living (ex-)employee */
+  isEmployeeLiving: async (employeeId: string): Promise<boolean> => {
+    if (useMock) return false;
+    const living = await callGas("getLivingHistory", {});
+    if (!Array.isArray(living)) return false;
+    const id = employeeId.toString().trim();
+    return living.some(
+      (l: any) => (l.pmmplAc || l.employeeId || l.employeeCode || "").toString().trim() === id
+    );
+  },
+
   submitSalaryIncrement: async (data: Partial<SalaryIncrementFms>): Promise<boolean> => {
     if (useMock) return true;
     const res = await callGas("submitSalaryIncrement", data);

@@ -38,7 +38,7 @@ export const SalaryIncrementModule: React.FC = () => {
   const fetchEmployees = async () => {
     try {
       const [emps, joining, presentEmps] = await Promise.all([
-        api.getAllEmployees(),
+        api.getActiveEmployees(),
         api.getJoining(),
         api.getPresentEmployees(),
       ]);

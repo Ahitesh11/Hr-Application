@@ -11,6 +11,7 @@ import { SalaryModule } from "./components/SalaryModule";
 import { SalaryIncrementModule } from "./components/SalaryIncrementModule";
 import { ApprovalModule } from "./components/ApprovalModule";
 import { JoiningModule } from "./components/JoiningModule";
+import { LeaveReportModule } from "./components/LeaveReportModule";
 import { Loader2 } from "lucide-react";
 
 const AppContent = () => {
@@ -54,6 +55,8 @@ const AppContent = () => {
         return <SalaryIncrementModule />;
       case "joining":
         return <JoiningModule />;
+      case "leave-report":
+        return <LeaveReportModule />;
       default:
         return <DashboardHome onNavigate={setActiveTab} />;
     }

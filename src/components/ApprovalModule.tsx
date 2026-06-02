@@ -68,7 +68,7 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
         api.getLeaves(),
         api.getHolidayWorking(),
         api.getSalaryIncrements(),
-        api.getAllEmployees()
+        api.getActiveEmployees()
       ]);
 
       const sortFn = (a: any, b: any) => {
@@ -145,16 +145,24 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
     let rows: LeaveFms[];
     if (role === "HOD") {
       if (!user) return [];
-      const myEmployees = new Set(employees
-        .filter(e => e.hod && e.hod.toString().trim() === user.employeeId.toString().trim())
-        .map(e => e.employeeId.toString().trim())
-      );
-      rows = leaveData.filter(d =>
-        d && d.employeeIdCode &&
-        myEmployees.has(d.employeeIdCode.toString().trim()) &&
-        d.planned1 && d.planned1.trim() !== "" &&
-        (!d.actual1 || d.actual1.trim() === "")
-      );
+      if (user.role === "Admin") {
+        // Admin sees ALL pending HOD-step leave approvals
+        rows = leaveData.filter(d =>
+          d && d.planned1 && d.planned1.trim() !== "" &&
+          (!d.actual1 || d.actual1.trim() === "")
+        );
+      } else {
+        const myEmployees = new Set(employees
+          .filter(e => e.hod && e.hod.toString().trim() === user.employeeId.toString().trim())
+          .map(e => e.employeeId.toString().trim())
+        );
+        rows = leaveData.filter(d =>
+          d && d.employeeIdCode &&
+          myEmployees.has(d.employeeIdCode.toString().trim()) &&
+          d.planned1 && d.planned1.trim() !== "" &&
+          (!d.actual1 || d.actual1.trim() === "")
+        );
+      }
     } else {
       rows = leaveData.filter(d => d && (d.status1 === "Work Done" || d.status1 === "HOD Approved" || (d.planned2 && d.planned2.trim() !== "")) && (!d.actual2 || d.actual2.trim() === ""));
     }
@@ -170,15 +178,22 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
     let rows: HolidayWorkingFms[];
     if (role === "HOD") {
       if (!user) return [];
-      const myEmployees = new Set(employees
-        .filter(e => e.hod && e.hod.toString().trim() === user.employeeId.toString().trim())
-        .map(e => e.employeeId.toString().trim())
-      );
-      rows = holidayData.filter(d =>
-        d && d.employeeId &&
-        myEmployees.has(d.employeeId.toString().trim()) &&
-        d.planned1 && (!d.actual1)
-      );
+      if (user.role === "Admin") {
+        // Admin sees ALL pending HOD-step holiday approvals
+        rows = holidayData.filter(d =>
+          d && d.planned1 && (!d.actual1)
+        );
+      } else {
+        const myEmployees = new Set(employees
+          .filter(e => e.hod && e.hod.toString().trim() === user.employeeId.toString().trim())
+          .map(e => e.employeeId.toString().trim())
+        );
+        rows = holidayData.filter(d =>
+          d && d.employeeId &&
+          myEmployees.has(d.employeeId.toString().trim()) &&
+          d.planned1 && (!d.actual1)
+        );
+      }
     } else {
       rows = holidayData.filter(d => d && d.planned2 && (!d.actual2));
     }
@@ -201,16 +216,24 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
 
   const getFilteredSalaryHod = () => {
     if (!user) return [];
-    const myEmployeeIds = new Set(
-      employees
-        .filter(e => e.hod && e.hod.toString().trim() === user.employeeId.toString().trim())
-        .map(e => e.employeeId.toString().trim())
-    );
-    const rows = salaryData.filter(d =>
-      d.employeeCode &&
-      myEmployeeIds.has(d.employeeCode.toString().trim()) &&
-      (!d.status || d.status === "Pending")
-    );
+    let rows: SalaryIncrementFms[];
+    if (user.role === "Admin") {
+      // Admin sees ALL pending HOD-step salary increment approvals
+      rows = salaryData.filter(d =>
+        d.employeeCode && (!d.status || d.status === "Pending")
+      );
+    } else {
+      const myEmployeeIds = new Set(
+        employees
+          .filter(e => e.hod && e.hod.toString().trim() === user.employeeId.toString().trim())
+          .map(e => e.employeeId.toString().trim())
+      );
+      rows = salaryData.filter(d =>
+        d.employeeCode &&
+        myEmployeeIds.has(d.employeeCode.toString().trim()) &&
+        (!d.status || d.status === "Pending")
+      );
+    }
     if (!q) return rows;
     return rows.filter(d =>
       d.uniqueNo?.toLowerCase().includes(q) ||

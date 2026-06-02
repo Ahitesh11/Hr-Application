@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { api } from "../services/api";
@@ -37,16 +38,25 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
   const [actAsManualCompany, setActAsManualCompany] = useState("");
   const [actAsNotFound, setActAsNotFound] = useState(false);
   const [actAsLoading, setActAsLoading] = useState(false);
+  const [actAsIsLiving, setActAsIsLiving] = useState(false);
 
   const handleActAsLookup = async () => {
     if (!actAsInput.trim()) return;
     setActAsLoading(true);
     setActAsLookupResult(null);
     setActAsNotFound(false);
+    setActAsIsLiving(false);
     setActAsManualName("");
     setActAsManualCompany("");
     try {
-      const emps = await api.getEmployeeById(actAsInput.trim());
+      const [emps, isLiving] = await Promise.all([
+        api.getEmployeeById(actAsInput.trim()),
+        api.isEmployeeLiving(actAsInput.trim()),
+      ]);
+      if (isLiving) {
+        setActAsIsLiving(true);
+        return;
+      }
       const emp = emps?.[0];
       if (emp) {
         const name = emp.name || emp.employeeName || "";
@@ -82,16 +92,17 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
   };
 
   const menuItems = [
-    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["Staf", "Admin", "HOD"] },
-    { id: "punch-miss", label: "Punch Miss", icon: Clock, roles: ["Staf", "Admin", "HOD"] },
-    { id: "leave", label: "Leave", icon: Calendar, roles: ["Staf", "Admin", "HOD"] },
-    { id: "holiday", label: "Holiday Working", icon: Briefcase, roles: ["Staf", "Admin", "HOD"] },
-    { id: "hod-approvals", label: "HOD Approvals", icon: CheckCircle, roles: ["Admin", "HOD"] },
-    { id: "hr-approvals", label: "HR Approvals", icon: Users, roles: ["Admin"] },
-    { id: "attendance", label: "Attendance", icon: Users, roles: ["Staf", "Admin", "HOD"] },
-    { id: "salary", label: "Salary Records", icon: CreditCard, roles: ["Staf", "Admin", "HOD"] },
-    { id: "salary-increment", label: "Salary Increment", icon: TrendingUp, roles: ["Admin"] },
-    { id: "joining", label: "Joining", icon: UserPlus, roles: ["Admin"] },
+    { id: "dashboard",     label: "Dashboard",          icon: LayoutDashboard, roles: ["Staf", "Admin", "HOD"] },
+    { id: "punch-miss",    label: "Punch Miss",          icon: Clock,           roles: ["Staf", "Admin", "HOD"] },
+    { id: "leave",         label: "Leave",               icon: Calendar,        roles: ["Staf", "Admin", "HOD"] },
+    { id: "holiday",       label: "Holiday Working",     icon: Briefcase,       roles: ["Staf", "Admin", "HOD"] },
+    { id: "hod-approvals", label: "HOD Approvals",       icon: CheckCircle,     roles: ["Admin", "HOD"] },
+    { id: "hr-approvals",  label: "HR Approvals",        icon: Users,           roles: ["Admin"] },
+    { id: "leave-report",  label: "Leave Report",        icon: TrendingUp,      roles: ["Admin"] },
+    { id: "attendance",    label: "Attendance",          icon: Users,           roles: ["Staf", "Admin", "HOD"] },
+    { id: "salary",        label: "Salary Records",      icon: CreditCard,      roles: ["Staf", "Admin", "HOD"] },
+    { id: "salary-increment", label: "Salary Increment", icon: TrendingUp,     roles: ["Admin"] },
+    { id: "joining",       label: "Joining",             icon: UserPlus,        roles: ["Admin"] },
   ];
 
   const filteredMenuItems = menuItems.filter(item => item.roles.includes(user?.role || "Staf"));
@@ -255,6 +266,13 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
                         </button>
                       </div>
 
+                      {actAsIsLiving && (
+                        <div className="mb-3 p-2.5 rounded-xl text-xs" style={{ background: "#fef2f2", border: "1px solid #fecaca" }}>
+                          <p className="font-black text-red-700">Employee has left the organization</p>
+                          <p className="text-red-500 mt-0.5">This employee is in Living History and cannot be selected.</p>
+                        </div>
+                      )}
+
                       {actAsLookupResult && (
                         <div className="mb-3 p-2.5 rounded-xl text-xs" style={{ background: "#ecfdf5", border: "1px solid #a7f3d0" }}>
                           <p className="font-black text-green-800">{actAsLookupResult.name}</p>
@@ -284,7 +302,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
 
                       <button
                         onClick={handleActAsSet}
-                        disabled={!actAsInput.trim() || (!actAsLookupResult && !actAsManualName)}
+                        disabled={!actAsInput.trim() || actAsIsLiving || (!actAsLookupResult && !actAsManualName)}
                         className="w-full py-2 rounded-xl text-white text-xs font-black disabled:opacity-40"
                         style={{ background: "#1d4ed8" }}
                       >

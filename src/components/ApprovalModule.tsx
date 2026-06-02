@@ -617,7 +617,7 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
                 {(() => {
                   const req = leaveData.find(l => l.leaveNo === selectedRequest.id);
                   if (!req) return null;
-                  const employee = employees.find(e => e.employeeId === req.employeeIdCode);
+                  const employee = employees.find(e => e.employeeId?.toString().trim() === req.employeeIdCode?.toString().trim());
                   if (!employee) return <p className="text-xs text-slate-400">Loading Balance...</p>;
 
                   // Balance only counts leaves with final HR approval (status2 = "Work Done")
@@ -631,7 +631,7 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
                   return (
                     <div className="space-y-4 text-left">
                       <div className="flex items-center justify-between border-b border-blue-100 pb-2">
-                        <p className="text-sm font-bold text-slate-900">{employee.name}</p>
+                        <p className="text-sm font-bold text-slate-900">{req.nameOfEmployee}</p>
                         <span className="px-2 py-0.5 bg-blue-600 text-white text-[10px] font-bold rounded-full uppercase">{req.typeOfLeave} Request</span>
                       </div>
                       <div className="grid grid-cols-3 gap-2">
@@ -668,7 +668,7 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
                     </div>
                     <div>
                       <label className="block text-xs font-bold text-slate-600 mb-1">
-                        Override Days <span className="text-red-500">*</span>
+                        Override Days <span className="text-slate-400 font-normal text-[10px]">(Accept ke liye)</span>
                       </label>
                       <input
                         type="number"
@@ -750,10 +750,6 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
             <div className="grid grid-cols-2 gap-4">
               <button
                 onClick={() => {
-                  if (selectedRequest.sheet === "Leave Fms" && !extraFields.noOfDays) {
-                    alert("Override Days field is required.");
-                    return;
-                  }
                   const fields = selectedRequest.sheet === "Holiday Working Fms" && selectedRequest.step === 2
                     ? { ...extraFields, status3: "Rejected" }
                     : extraFields;

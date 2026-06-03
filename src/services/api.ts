@@ -201,4 +201,10 @@ export const api = {
     const res = await callGas("getLivingHistory", {});
     return Array.isArray(res) ? res : [];
   },
+
+  savePaidLeaveReport: async (rows: any[]): Promise<boolean> => {
+    if (useMock) return true;
+    const res = await callGas("savePaidLeaveReport", { rows });
+    return !!(res && res.success);
+  },
 };

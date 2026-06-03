@@ -4,7 +4,7 @@ import { LeaveFms } from "../types";
 import {
   Calendar, Users, CheckCircle, Clock, XCircle,
   Download, Printer, Search, Filter, TrendingUp,
-  Loader2, AlertCircle, FileText, ChevronDown, BarChart2, BookOpen, X,
+  Loader2, AlertCircle, FileText, ChevronDown, BarChart2, BookOpen, X, Save,
 } from "lucide-react";
 import { cn } from "../lib/utils";
 import jsPDF from "jspdf";
@@ -150,7 +150,9 @@ export const LeaveReportModule: React.FC = () => {
   const [pbEmpId,  setPbEmpId]  = useState<string|null>(null);  // passbook modal
   const [leaves,   setLeaves]   = useState<LeaveFms[]>([]);
   const [emps,     setEmps]     = useState<any[]>([]);
-  const [loading,  setLoading]  = useState(true);
+  const [loading,    setLoading]    = useState(true);
+  const [saving,     setSaving]     = useState(false);
+  const [saveStatus, setSaveStatus] = useState<"success"|"error"|null>(null);
 
   useEffect(() => {
     (async () => {
@@ -229,7 +231,11 @@ export const LeaveReportModule: React.FC = () => {
     taken:    fmt(filtered.reduce((s,r)=>s+r.current.el.availed+r.current.cl.availed+r.current.ml.availed,0)),
     pending:  fmt(filtered.reduce((s,r)=>s+r.current.el.pending+r.current.cl.pending+r.current.ml.pending,0)),
     approved: fmt(filtered.reduce((s,r)=>s+r.current.el.availed+r.current.cl.availed+r.current.ml.availed,0)),
-    lowCount: filtered.filter(r=>r.current.total < 3).length,
+    lowCount:          filtered.filter(r=>r.current.total < 3).length,
+    elCredited:        filtered.length * EL_PER_MONTH,
+    clCredited:        filtered.length * CL_PER_MONTH,
+    paidLeaveBalance:  fmt(filtered.reduce((s,r)=>s+r.current.el.close+r.current.cl.close,0)),
+    paidLeaveAvailed:  fmt(filtered.reduce((s,r)=>s+r.current.el.availed+r.current.cl.availed,0)),
   }), [filtered]);
 
   const depts = useMemo(() =>
@@ -309,6 +315,35 @@ export const LeaveReportModule: React.FC = () => {
     doc.save(`Leave_Accrual_${MONTHS[selMonth]}_${selYear}.pdf`);
   };
 
+  const handleSaveReport = async () => {
+    setSaving(true);
+    setSaveStatus(null);
+    try {
+      const rows = allRows.map(r => ({
+        employeeId:        r.id,
+        employeeName:      r.name,
+        department:        r.dept,
+        month:             MONTHS[selMonth],
+        year:              String(selYear),
+        elOpening:         r.current.el.open,
+        elCredit:          r.current.el.credit,
+        elAvailed:         r.current.el.availed,
+        elClosing:         r.current.el.close,
+        clOpening:         r.current.cl.open,
+        clCredit:          r.current.cl.credit,
+        clAvailed:         r.current.cl.availed,
+        clClosing:         r.current.cl.close,
+        totalLeaveBalance: fmt(r.current.el.close + r.current.cl.close),
+      }));
+      const ok = await api.savePaidLeaveReport(rows);
+      setSaveStatus(ok ? "success" : "error");
+    } catch {
+      setSaveStatus("error");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   /* ════════════════════════════════════ render ══ */
   return (
     <div className="space-y-6 print:space-y-4">
@@ -359,19 +394,48 @@ export const LeaveReportModule: React.FC = () => {
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-50 text-slate-700 border border-slate-100 text-sm font-bold hover:bg-slate-100 transition-all">
               <Printer className="w-4 h-4"/> Print
             </button>
+            <button onClick={handleSaveReport} disabled={saving || loading}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-violet-600 text-white text-sm font-bold hover:bg-violet-700 transition-all disabled:opacity-50 shadow-lg shadow-violet-200">
+              {saving ? <Loader2 className="w-4 h-4 animate-spin"/> : <Save className="w-4 h-4"/>}
+              {saving ? "Saving…" : "Generate Monthly Report"}
+            </button>
           </div>
         </div>
       </div>
 
+      {/* ── Save Status Notification ── */}
+      {saveStatus === "success" && (
+        <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl p-4 flex items-center gap-3 print:hidden">
+          <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0"/>
+          <div>
+            <p className="font-bold text-sm">Report saved to "Paid Leave" sheet!</p>
+            <p className="text-xs opacity-70">{MONTHS[selMonth]} {selYear} — {allRows.length} employees saved. Existing entries updated automatically.</p>
+          </div>
+          <button onClick={()=>setSaveStatus(null)} className="ml-auto p-1.5 hover:bg-emerald-100 rounded-xl transition-all">
+            <X className="w-4 h-4"/>
+          </button>
+        </div>
+      )}
+      {saveStatus === "error" && (
+        <div className="bg-red-50 border border-red-200 text-red-800 rounded-2xl p-4 flex items-center gap-3 print:hidden">
+          <AlertCircle className="w-5 h-5 text-red-500 shrink-0"/>
+          <div>
+            <p className="font-bold text-sm">Failed to save report</p>
+            <p className="text-xs opacity-70">Ensure the "Paid Leave" sheet exists in Google Sheets and the GAS is re-deployed, then try again.</p>
+          </div>
+          <button onClick={()=>setSaveStatus(null)} className="ml-auto p-1.5 hover:bg-red-100 rounded-xl transition-all">
+            <X className="w-4 h-4"/>
+          </button>
+        </div>
+      )}
+
       {/* ── Summary Cards ── */}
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
-        <SCard label="EL Balance"   value={tot.elBal}    sub="days accumulated"    icon={Calendar}    color="bg-blue-50    border-blue-100    text-blue-700"     />
-        <SCard label="CL Balance"   value={tot.clBal}    sub="days accumulated"    icon={Calendar}    color="bg-pink-50    border-pink-100    text-pink-700"     />
-        <SCard label="ML Balance"   value={tot.mlBal}    sub="days remaining"      icon={Calendar}    color="bg-fuchsia-50 border-fuchsia-100 text-fuchsia-700"  />
-        <SCard label="Leave Taken"  value={tot.taken}    sub="approved this month" icon={CheckCircle} color="bg-emerald-50  border-emerald-100 text-emerald-700" />
-        <SCard label="Pending"      value={tot.pending}  sub="awaiting approval"   icon={Clock}       color="bg-amber-50   border-amber-100   text-amber-700"    />
-        <SCard label="Employees"    value={filtered.length} sub="in report"        icon={Users}       color="bg-white      border-slate-100   text-slate-700"    />
-        <SCard label="Low Balance"  value={tot.lowCount} sub="< 3 days total"      icon={AlertCircle} color="bg-red-50     border-red-100     text-red-700"      />
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+        <SCard label="Total Employees"  value={filtered.length}       sub="in report"                icon={Users}       color="bg-white       border-slate-100   text-slate-700"   />
+        <SCard label="EL Credited"      value={tot.elCredited}        sub={`+${EL_PER_MONTH}/month`} icon={TrendingUp}  color="bg-blue-50     border-blue-100    text-blue-700"    />
+        <SCard label="CL Credited"      value={tot.clCredited}        sub={`+${CL_PER_MONTH}/month`} icon={TrendingUp}  color="bg-pink-50     border-pink-100    text-pink-700"    />
+        <SCard label="Leave Availed"    value={tot.paidLeaveAvailed}  sub="EL + CL approved"         icon={CheckCircle} color="bg-emerald-50  border-emerald-100 text-emerald-700" />
+        <SCard label="Leave Balance"    value={tot.paidLeaveBalance}  sub="EL + CL available"        icon={Calendar}    color="bg-violet-50   border-violet-100  text-violet-700"  />
       </div>
 
       {/* ── Filter Bar ── */}

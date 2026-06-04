@@ -942,7 +942,7 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({ onNavigate }) => {
                             {item.workingDateFrom} <span className="text-slate-300 mx-1">→</span> {item.workingDateTo}
                             <span className="ml-2 text-xs font-bold text-slate-400">({item.numberOfDays} day{item.numberOfDays > 1 ? "s" : ""})</span>
                           </p>
-                          {item.reason && <p className="text-xs text-slate-400 truncate max-w-xs">{item.reason}</p>}
+                          {item.workDoneReason && <p className="text-xs text-slate-400 truncate max-w-xs">{item.workDoneReason}</p>}
                         </div>
                         <div className="text-right shrink-0">
                           <p className="text-[10px] font-bold text-slate-400">{item.timestamp?.split(" ")[0]}</p>

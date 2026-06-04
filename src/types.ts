@@ -108,7 +108,7 @@ export interface HolidayWorkingFms {
   workingDateFrom: string;
   workingDateTo: string;
   numberOfDays: number;
-  reason: string;
+  workDoneReason: string;
   planned1: string;
   actual1: string;
   delay1: string;

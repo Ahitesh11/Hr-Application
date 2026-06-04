@@ -365,6 +365,7 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
                       <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Employee</th>
                       <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Company</th>
                       <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Status1</th>
+                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Status2</th>
                       <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Date From</th>
                       <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Date To</th>
                       <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Days</th>
@@ -602,14 +603,15 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
                       </td>
                       <td className="px-4 py-3 text-xs text-slate-600">{item.companyName}</td>
                       <td className="px-4 py-3"><StatusBadge status={item.status1} /></td>
+                      <td className="px-4 py-3"><StatusBadge status={item.status2} /></td>
                       <td className="px-4 py-3 text-xs text-slate-600 uppercase whitespace-nowrap">{item.workingDateFrom}</td>
                       <td className="px-4 py-3 text-xs text-slate-600 uppercase whitespace-nowrap">{item.workingDateTo}</td>
                       <td className="px-4 py-3 text-xs font-bold text-slate-800">{item.numberOfDays}</td>
-                      <td className="px-4 py-3 text-xs text-slate-500 max-w-[120px] truncate" title={item.reason}>{item.reason}</td>
+                      <td className="px-4 py-3 text-xs text-slate-500 max-w-[200px] break-words whitespace-normal">{item.workDoneReason}</td>
                       <td className="px-4 py-3 text-xs font-bold text-slate-800">{item.adjustDays || "-"}</td>
                       <td className="px-4 py-3 text-xs text-slate-600">{item.adjustMonth || "-"}</td>
                       <td className="px-4 py-3 text-xs text-slate-600">{item.adjustYear || "-"}</td>
-                      <td className="px-4 py-3 text-xs text-slate-500 max-w-[100px] truncate" title={item.remarks}>{item.remarks || "-"}</td>
+                      <td className="px-4 py-3 text-xs text-slate-500 max-w-[150px] break-words whitespace-normal">{item.remarks || "-"}</td>
                       <td className="px-4 py-3 text-xs text-slate-400 whitespace-nowrap">{role === "HOD" ? item.planned1 : item.planned2}</td>
                       <td className="px-4 py-3">
                         <button

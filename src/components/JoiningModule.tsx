@@ -16,6 +16,10 @@ const ATTENDANCE_MODE = ["Machine", "Outsider"];
 const INCENTIVE_CAT = ["MIS Basis", "Non Incentive", "Non Mis", "OT Basis", "Per MT"];
 const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
+const JOINING_COMPANY_OPTIONS = [
+  "Pmmpl", "Purab", "Refrasynth", "Refratech", "Rkl", "Pasmin Llp",
+];
+
 const JOINING_PLACE_OPTIONS = [
   "Application", "Factory Madhya", "Factory Purab",
   "Factory Refrasynth", "Factory Rkl", "Management", "MDO Office",
@@ -547,7 +551,7 @@ export const JoiningModule = () => {
                 <Field label="Relationship With Family Person" name="relationshipWithFamilyPerson" value={form.relationshipWithFamilyPerson} onChange={setField} />
                 <Field label="Personal Email-ID" name="personalEmailId" value={form.personalEmailId} onChange={setField} type="email" />
                 <Field label="Email Address" name="emailAddress" value={form.emailAddress} onChange={setField} type="email" />
-                <Field label="Joining Company Name" name="joiningCompanyName" value={form.joiningCompanyName} onChange={setField} required />
+                <SelectField label="Joining Company Name" name="joiningCompanyName" value={form.joiningCompanyName} onChange={setField} options={JOINING_COMPANY_OPTIONS} required />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">
                 <div>
@@ -722,9 +726,17 @@ export const JoiningModule = () => {
                           <td key={col} className="px-4 py-3.5 max-w-[200px]">
                             {ci === 0 ? (
                               <div className="flex items-center gap-2">
-                                <div className="w-7 h-7 rounded-lg bg-pink-600 flex items-center justify-center text-white text-[10px] font-bold shrink-0">
-                                  {String(firstVal).charAt(0).toUpperCase()}
-                                </div>
+                                {r.candidateSPhoto ? (
+                                  <img
+                                    src={r.candidateSPhoto}
+                                    alt="photo"
+                                    className="w-7 h-7 rounded-lg object-cover shrink-0"
+                                  />
+                                ) : (
+                                  <div className="w-7 h-7 rounded-lg bg-pink-600 flex items-center justify-center text-white text-[10px] font-bold shrink-0">
+                                    {String(firstVal).charAt(0).toUpperCase()}
+                                  </div>
+                                )}
                                 <span className="text-sm font-bold text-slate-800 truncate">{r[col] || "—"}</span>
                               </div>
                             ) : (
@@ -820,7 +832,7 @@ export const JoiningModule = () => {
               <table className="w-full text-left" style={{ minWidth: "1500px" }}>
                 <thead className="bg-pink-50 border-b border-pink-100 sticky top-0 z-10">
                   <tr>
-                    {["#", "PMMPL-AC", "Employee Name", "Designation", "Date Of Living", "Working Days", "Amount", "Assets", "Clearance", "Doc Signed", "Email/Bio", "Benefits", "Saved On", "Pay Planned", "Pay Actual", "Payment Form", "Salary Payment"].map(h => (
+                    {["#", "PMMPL-AC", "Employee Name", "Designation", "Date Of Living", "Working Days", "Amount", "Assets", "Clearance", "Doc Signed", "Email/Bio", "Benefits", "Pay Planned", "Payment Form", "Salary Payment"].map(h => (
                       <th key={h} className={cn(
                         "px-4 py-3.5 text-[10px] font-bold uppercase tracking-wider whitespace-nowrap",
                         h === "Salary Payment" ? "text-emerald-700" : h === "Payment Form" ? "text-blue-600" : "text-pink-600"
@@ -846,9 +858,7 @@ export const JoiningModule = () => {
                           )}>{r[key] || "—"}</span>
                         </td>
                       ))}
-                      <td className="px-4 py-3.5 text-[10px] text-slate-400">{r.timestamp || "—"}</td>
                       <td className="px-4 py-3.5 text-xs text-slate-500">{r.planned1 || "—"}</td>
-                      <td className="px-4 py-3.5 text-xs text-slate-500">{r.actual1 || "—"}</td>
                       <td className="px-4 py-3.5">
                         {r.makePaymentForm && r.makePaymentForm.toString().startsWith("http") ? (
                           <a

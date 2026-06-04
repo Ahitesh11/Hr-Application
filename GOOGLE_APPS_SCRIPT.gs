@@ -124,6 +124,10 @@ function doPost(e) {
         result = getLivingHistory(ss);
         break;
 
+      case 'updateLivingPayment':
+        result = updateLivingPayment(ss, request.pmmplAc, request.paymentDate);
+        break;
+
       case 'savePaidLeaveReport':
         result = savePaidLeaveReport(ss, request.rows);
         break;
@@ -567,7 +571,13 @@ function submitLivingData(ss, payload) {
 
     if (kl.includes('date') && kl.includes('living')) {
       val = payload.dateOfLiving;
-    } else if (kl.includes('actual')) {
+    } else if (kl.includes('total') && kl.includes('working')) {
+      val = payload.totalWorkingDays;
+    } else if (kl === 'amount' || (kl.includes('amount') && !kl.includes('increment'))) {
+      val = payload.amount;
+    } else if (kl === 'planned1' || kl === 'planned 1') {
+      val = payload.dateOfLiving;                      // planned payment = date of living
+    } else if (kl.includes('actual') && !kl.includes('1')) {
       val = payload.actual;                            // auto-timestamp
     } else if (kl.includes('asset') || (kl.includes('handover') && (kl.includes('id card') || kl.includes('visiting')))) {
       val = payload.handoverAssets;
@@ -593,8 +603,21 @@ function getLivingHistory(ss) {
   const sheet = ss.getSheetByName('Joining');
   if (!sheet) return [];
 
-  const { headers, index } = getHeaderInfo(sheet);
+  // Single sheet read (avoids the extra getValues() call inside getHeaderInfo)
   const data = sheet.getDataRange().getDisplayValues();
+  const commonHeaders = ['timestamp', 'year', 'employee id', 'emp id', 'leave no', 'pm no', 'pmmpl', 'name as per aadhar', 'joining'];
+  let index = 0;
+  let headers = data[0] || [];
+  for (let r = 0; r < data.length; r++) {
+    if (data[r].some(function(cell) {
+      const val = cell.toString().toLowerCase();
+      return commonHeaders.some(function(h) { return val.includes(h); });
+    })) {
+      index = r;
+      headers = data[r];
+      break;
+    }
+  }
 
   // Find the dateOfLiving column index
   const dateOfLivingIdx = headers.findIndex(function(h) {
@@ -619,7 +642,19 @@ function getLivingHistory(ss) {
     headers.forEach(function(h, idx) {
       const kl = h.toString().toLowerCase();
       const val = data[i][idx];
-      if (kl.includes('asset') || (kl.includes('handover') && (kl.includes('id card') || kl.includes('visiting')))) {
+      if (kl.includes('date') && kl.includes('living')) {
+        row.dateOfLiving = val;
+      } else if (kl.includes('total') && kl.includes('working')) {
+        row.totalWorkingDays = val;
+      } else if (kl === 'amount' || (kl.includes('amount') && !kl.includes('increment'))) {
+        row.amount = val;
+      } else if (kl === 'planned1' || kl === 'planned 1') {
+        row.planned1 = val;
+      } else if (kl === 'actual1' || kl === 'actual 1') {
+        row.actual1 = val;
+      } else if (kl.includes('make payment') || kl.includes('payment form')) {
+        row.makePaymentForm = val;
+      } else if (kl.includes('asset') || (kl.includes('handover') && (kl.includes('id card') || kl.includes('visiting')))) {
         row.handoverAssets = val;
       } else if (kl.includes('clearance') && !kl.includes('document') && !kl.includes('signed')) {
         row.clearanceForm = val;
@@ -629,8 +664,6 @@ function getLivingHistory(ss) {
         row.cancelEmailBiometric = val;
       } else if (kl.includes('benefit') || kl.includes('enrollment')) {
         row.removeBenefitEnrollment = val;
-      } else if (kl.includes('date') && kl.includes('living')) {
-        row.dateOfLiving = val;
       }
     });
 
@@ -638,6 +671,43 @@ function getLivingHistory(ss) {
     results.push(row);
   }
   return results;
+}
+
+// ── Living Salary Payment Step ────────────────────────────────────────────
+
+function updateLivingPayment(ss, pmmplAc, paymentDate) {
+  const sheet = ss.getSheetByName('Joining');
+  if (!sheet) return { success: false, error: 'Joining sheet not found' };
+
+  const { headers, index } = getHeaderInfo(sheet);
+  const data = sheet.getDataRange().getValues();
+
+  const pmmplIdx = headers.findIndex(function(h) {
+    return h.toString().toLowerCase().includes('pmmpl');
+  });
+  if (pmmplIdx === -1) return { success: false, error: 'PMMPL-AC column not found' };
+
+  let targetRowIdx = -1;
+  for (let i = index + 1; i < data.length; i++) {
+    if (data[i][pmmplIdx] && data[i][pmmplIdx].toString().trim() === pmmplAc.toString().trim()) {
+      targetRowIdx = i;
+      break;
+    }
+  }
+  if (targetRowIdx === -1) return { success: false, error: 'Employee ' + pmmplAc + ' not found' };
+
+  const actual = paymentDate || new Date().toLocaleDateString('en-IN');
+
+  // Only write to Actual1 column — nothing else
+  const actual1Idx = headers.findIndex(function(h) {
+    const kl = h.toString().toLowerCase();
+    return kl === 'actual1' || kl === 'actual 1';
+  });
+  if (actual1Idx === -1) return { success: false, error: 'Actual1 column not found in Joining sheet' };
+
+  sheet.getRange(targetRowIdx + 1, actual1Idx + 1).setValue(actual);
+
+  return { success: true, updated: true };
 }
 
 // ── Paid Leave Passbook ────────────────────────────────────────────────────

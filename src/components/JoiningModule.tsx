@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useAuth } from "../context/AuthContext";
 import { api } from "../services/api";
 import {
@@ -91,6 +91,8 @@ type FormState = typeof emptyForm;
 
 type LivingForm = {
   dateOfLiving: string;
+  totalWorkingDays: string;
+  amount: string;
   handoverAssets: boolean;
   clearanceForm: boolean;
   handoverDocSigned: boolean;
@@ -100,6 +102,8 @@ type LivingForm = {
 
 const emptyLivingForm: LivingForm = {
   dateOfLiving: "",
+  totalWorkingDays: "",
+  amount: "",
   handoverAssets: false,
   clearanceForm: false,
   handoverDocSigned: false,
@@ -228,7 +232,8 @@ function SelectField({
 }
 
 export const JoiningModule = () => {
-  useAuth();
+  const { user } = useAuth();
+  const isAdmin = user?.role === "Admin";
   const [activeTab, setActiveTab] = useState<TabId>("new");
   const [form, setForm] = useState<FormState>(emptyForm);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -243,9 +248,23 @@ export const JoiningModule = () => {
   const [isLivingSubmitting, setIsLivingSubmitting] = useState(false);
   const [livingSubmitResult, setLivingSubmitResult] = useState<"success" | "error" | null>(null);
   const [livingErrorMsg, setLivingErrorMsg] = useState<string>("");
+  const [paymentLoadingId, setPaymentLoadingId] = useState<string | null>(null);
+  const [paymentModal, setPaymentModal] = useState<any | null>(null);
+  const [paymentDate, setPaymentDate] = useState<string>("");
+  const [livingView, setLivingView] = useState<"all" | "paid">("all");
+  const [isLivingLoading, setIsLivingLoading] = useState(false);
+  const livingLoadedRef = useRef(false);
 
-  // Load once on mount — Refresh buttons handle subsequent reloads
-  useEffect(() => { loadJoining(); loadLivingHistory(); }, []);
+  // Only load joining data on mount (living history is lazy-loaded)
+  useEffect(() => { loadJoining(); }, []);
+
+  // Lazy-load living history the first time the "living" tab is opened
+  useEffect(() => {
+    if (activeTab === "living" && !livingLoadedRef.current) {
+      livingLoadedRef.current = true;
+      loadLivingHistory();
+    }
+  }, [activeTab]);
 
   // Auto-set PMMPL-AC whenever we get fresh joining data
   useEffect(() => {
@@ -267,12 +286,14 @@ export const JoiningModule = () => {
     return `PMMPL-${maxNum + 1}`;
   };
 
-  const loadLivingHistory = async () => {
+  const loadLivingHistory = useCallback(async () => {
+    setIsLivingLoading(true);
     try {
       const res = await api.getLivingHistory();
       setLivingList(Array.isArray(res) ? res : []);
     } catch { setLivingList([]); }
-  };
+    finally { setIsLivingLoading(false); }
+  }, []);
 
   const handleLivingSubmit = async () => {
     if (!livingTarget) return;
@@ -285,6 +306,8 @@ export const JoiningModule = () => {
         designation: livingTarget.designation || "",
         joiningPlace: livingTarget.joiningPlace || "",
         dateOfLiving: livingForm.dateOfLiving,
+        totalWorkingDays: livingForm.totalWorkingDays,
+        amount: livingForm.amount,
         actual: new Date().toLocaleString("en-IN"),
         handoverAssets: livingForm.handoverAssets ? "Yes" : "No",
         clearanceForm: livingForm.clearanceForm ? "Yes" : "No",
@@ -313,6 +336,25 @@ export const JoiningModule = () => {
     } finally {
       setIsLivingSubmitting(false);
     }
+  };
+
+  const handlePaymentApprove = async () => {
+    if (!paymentModal) return;
+    setPaymentLoadingId(paymentModal.pmmplAc);
+    try {
+      const res = await api.updateLivingPayment(paymentModal.pmmplAc, paymentDate);
+      if (res.ok) {
+        await loadLivingHistory();
+        setPaymentModal(null);
+      }
+    } finally {
+      setPaymentLoadingId(null);
+    }
+  };
+
+  const openPaymentModal = (record: any) => {
+    setPaymentModal(record);
+    setPaymentDate(new Date().toISOString().split("T")[0]);
   };
 
   const loadJoining = async () => {
@@ -731,12 +773,28 @@ export const JoiningModule = () => {
                 <p className="text-xs text-slate-400">Employees who have left the organisation</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-wrap">
+              <div className="flex rounded-xl border border-pink-100 overflow-hidden text-xs font-bold">
+                <button
+                  onClick={() => setLivingView("all")}
+                  className={cn("px-4 py-2 transition-all", livingView === "all" ? "bg-pink-700 text-white" : "bg-pink-50 text-pink-700 hover:bg-pink-100")}
+                >
+                  All Exits
+                </button>
+                <button
+                  onClick={() => setLivingView("paid")}
+                  className={cn("px-4 py-2 transition-all border-l border-pink-100", livingView === "paid" ? "bg-emerald-600 text-white" : "bg-pink-50 text-emerald-700 hover:bg-emerald-50")}
+                >
+                  Payment History
+                </button>
+              </div>
               <button
                 onClick={loadLivingHistory}
-                className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-pink-700 bg-pink-50 border border-pink-100 rounded-xl hover:bg-pink-100 transition-all"
+                disabled={isLivingLoading}
+                className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-pink-700 bg-pink-50 border border-pink-100 rounded-xl hover:bg-pink-100 transition-all disabled:opacity-60"
               >
-                <Loader2 className="w-3.5 h-3.5" /> Refresh
+                <Loader2 className={cn("w-3.5 h-3.5", isLivingLoading && "animate-spin")} />
+                {isLivingLoading ? "Loading..." : "Refresh"}
               </button>
               <span className="text-xs font-bold text-slate-500 bg-pink-50 px-3 py-2 rounded-xl border border-pink-100">
                 {livingList.length} Records
@@ -744,7 +802,12 @@ export const JoiningModule = () => {
             </div>
           </div>
 
-          {livingList.length === 0 ? (
+          {isLivingLoading ? (
+            <div className="py-20 flex flex-col items-center gap-3">
+              <Loader2 className="w-10 h-10 text-pink-300 animate-spin" />
+              <p className="text-slate-400 font-bold">Loading records...</p>
+            </div>
+          ) : livingList.length === 0 ? (
             <div className="py-20 flex flex-col items-center gap-3">
               <History className="w-10 h-10 text-slate-200" />
               <p className="text-slate-400 font-bold">No living records yet</p>
@@ -754,22 +817,27 @@ export const JoiningModule = () => {
             </div>
           ) : (
             <div className="overflow-x-auto overflow-y-auto" style={{ maxHeight: "560px" }}>
-              <table className="w-full text-left" style={{ minWidth: "1100px" }}>
+              <table className="w-full text-left" style={{ minWidth: "1500px" }}>
                 <thead className="bg-pink-50 border-b border-pink-100 sticky top-0 z-10">
                   <tr>
-                    {["#", "PMMPL-AC", "Employee Name", "Designation", "Date Of Living", "Assets", "Clearance", "Doc Signed", "Email/Bio", "Benefits", "Saved On"].map(h => (
-                      <th key={h} className="px-4 py-3.5 text-[10px] font-bold text-pink-600 uppercase tracking-wider whitespace-nowrap">{h}</th>
+                    {["#", "PMMPL-AC", "Employee Name", "Designation", "Date Of Living", "Working Days", "Amount", "Assets", "Clearance", "Doc Signed", "Email/Bio", "Benefits", "Saved On", "Pay Planned", "Pay Actual", "Payment Form", "Salary Payment"].map(h => (
+                      <th key={h} className={cn(
+                        "px-4 py-3.5 text-[10px] font-bold uppercase tracking-wider whitespace-nowrap",
+                        h === "Salary Payment" ? "text-emerald-700" : h === "Payment Form" ? "text-blue-600" : "text-pink-600"
+                      )}>{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-pink-50">
-                  {livingList.map((r: any, idx: number) => (
+                  {(livingView === "paid" ? livingList.filter(r => r.actual1) : livingList).map((r: any, idx: number) => (
                     <tr key={idx} className="hover:bg-pink-50/40 transition-colors">
                       <td className="px-4 py-3.5 text-xs text-slate-400 font-bold">{idx + 1}</td>
                       <td className="px-4 py-3.5 text-xs font-bold text-pink-700">{r.pmmplAc || "—"}</td>
                       <td className="px-4 py-3.5 text-sm font-bold text-slate-800">{r.nameAsPerAadhar || r.employeeName || "—"}</td>
                       <td className="px-4 py-3.5 text-xs text-slate-600">{r.designation || "—"}</td>
                       <td className="px-4 py-3.5 text-xs font-bold text-slate-700">{r.dateOfLiving || "—"}</td>
+                      <td className="px-4 py-3.5 text-xs text-slate-600">{r.totalWorkingDays || "—"}</td>
+                      <td className="px-4 py-3.5 text-xs text-slate-600">{r.amount || "—"}</td>
                       {["handoverAssets", "clearanceForm", "handoverDocSigned", "cancelEmailBiometric", "removeBenefitEnrollment"].map(key => (
                         <td key={key} className="px-4 py-3.5">
                           <span className={cn(
@@ -779,12 +847,137 @@ export const JoiningModule = () => {
                         </td>
                       ))}
                       <td className="px-4 py-3.5 text-[10px] text-slate-400">{r.timestamp || "—"}</td>
+                      <td className="px-4 py-3.5 text-xs text-slate-500">{r.planned1 || "—"}</td>
+                      <td className="px-4 py-3.5 text-xs text-slate-500">{r.actual1 || "—"}</td>
+                      <td className="px-4 py-3.5">
+                        {r.makePaymentForm && r.makePaymentForm.toString().startsWith("http") ? (
+                          <a
+                            href={r.makePaymentForm}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[10px] font-bold text-blue-600 hover:text-blue-800 underline underline-offset-2 whitespace-nowrap"
+                          >
+                            Open Form
+                          </a>
+                        ) : (
+                          <span className="text-[10px] text-slate-400">{r.makePaymentForm || "—"}</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3.5">
+                        {r.actual1 ? (
+                          <button
+                            onClick={() => openPaymentModal(r)}
+                            className="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-700 hover:bg-emerald-200 transition-all"
+                          >
+                            Payment Done
+                          </button>
+                        ) : isAdmin ? (
+                          <button
+                            onClick={() => openPaymentModal(r)}
+                            disabled={paymentLoadingId === r.pmmplAc}
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold text-white bg-pink-700 hover:bg-pink-800 rounded-lg transition-all disabled:opacity-60 disabled:cursor-not-allowed whitespace-nowrap"
+                          >
+                            {paymentLoadingId === r.pmmplAc ? (
+                              <><Loader2 className="w-3 h-3 animate-spin" /> Saving...</>
+                            ) : (
+                              "Mark Paid"
+                            )}
+                          </button>
+                        ) : (
+                          <span className="text-[10px] text-slate-400">Pending</span>
+                        )}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
           )}
+        </div>
+      )}
+
+      {/* ── Payment Modal ── */}
+      {paymentModal && (
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[110] flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col">
+
+            {/* Header */}
+            <div className="px-6 py-4 bg-gradient-to-r from-emerald-50 to-emerald-50 border-b border-emerald-100 flex items-center justify-between">
+              <div>
+                <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-emerald-600" /> Living Salary Payment
+                </h3>
+                <p className="text-xs text-emerald-700 font-bold mt-0.5">
+                  {paymentModal.nameAsPerAadhar || paymentModal.employeeName || "—"} · {paymentModal.pmmplAc || "—"}
+                </p>
+              </div>
+              <button onClick={() => setPaymentModal(null)} className="p-2 hover:bg-emerald-100 rounded-xl transition-colors">
+                <X className="w-5 h-5 text-slate-500" />
+              </button>
+            </div>
+
+            {/* Details */}
+            <div className="p-6 space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { label: "Designation",     value: paymentModal.designation },
+                  { label: "Date Of Living",  value: paymentModal.dateOfLiving },
+                  { label: "Working Days",    value: paymentModal.totalWorkingDays },
+                  { label: "Amount",          value: paymentModal.amount ? `₹ ${paymentModal.amount}` : undefined },
+                ].map(({ label, value }) => (
+                  <div key={label} className="bg-slate-50 rounded-xl px-4 py-3">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{label}</p>
+                    <p className="text-sm font-bold text-slate-800 mt-0.5">{value || "—"}</p>
+                  </div>
+                ))}
+              </div>
+
+              {paymentModal.actual1 ? (
+                <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0" />
+                  <div>
+                    <p className="text-xs font-bold text-emerald-700">Payment Already Done</p>
+                    <p className="text-[10px] text-emerald-600 mt-0.5">{paymentModal.actual1}</p>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1.5">
+                    Payment Date <span className="text-emerald-600 ml-0.5">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    value={paymentDate}
+                    onChange={e => setPaymentDate(e.target.value)}
+                    className="w-full px-3.5 py-2.5 bg-emerald-50 border border-emerald-100 rounded-xl text-sm font-medium text-slate-800 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none transition-all"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="px-6 py-4 border-t border-emerald-100 flex justify-end gap-3 bg-emerald-50/50">
+              <button
+                onClick={() => setPaymentModal(null)}
+                className="px-5 py-2.5 text-xs font-bold text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-all"
+              >
+                Cancel
+              </button>
+              {!paymentModal.actual1 && (
+                <button
+                  onClick={handlePaymentApprove}
+                  disabled={!paymentDate || paymentLoadingId === paymentModal.pmmplAc}
+                  className="flex items-center gap-2 px-5 py-2.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-md shadow-emerald-200 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {paymentLoadingId === paymentModal.pmmplAc ? (
+                    <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Saving...</>
+                  ) : (
+                    <><CheckCircle className="w-3.5 h-3.5" /> Save Payment</>
+                  )}
+                </button>
+              )}
+            </div>
+          </div>
         </div>
       )}
 
@@ -883,6 +1076,36 @@ export const JoiningModule = () => {
                   onChange={e => setLivingForm(f => ({ ...f, dateOfLiving: e.target.value }))}
                   className="w-full px-3.5 py-2.5 bg-pink-50 border border-pink-100 rounded-xl text-sm font-medium text-slate-800 focus:border-pink-500 focus:ring-2 focus:ring-pink-100 outline-none transition-all"
                 />
+              </div>
+
+              {/* Total Working Days & Amount */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1.5">
+                    Total Working Days
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    placeholder="e.g. 26"
+                    value={livingForm.totalWorkingDays}
+                    onChange={e => setLivingForm(f => ({ ...f, totalWorkingDays: e.target.value }))}
+                    className="w-full px-3.5 py-2.5 bg-pink-50 border border-pink-100 rounded-xl text-sm font-medium text-slate-800 focus:border-pink-500 focus:ring-2 focus:ring-pink-100 outline-none transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1.5">
+                    Amount
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    placeholder="e.g. 15000"
+                    value={livingForm.amount}
+                    onChange={e => setLivingForm(f => ({ ...f, amount: e.target.value }))}
+                    className="w-full px-3.5 py-2.5 bg-pink-50 border border-pink-100 rounded-xl text-sm font-medium text-slate-800 focus:border-pink-500 focus:ring-2 focus:ring-pink-100 outline-none transition-all"
+                  />
+                </div>
               </div>
 
               {/* Checklist */}

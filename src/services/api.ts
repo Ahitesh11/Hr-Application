@@ -202,6 +202,13 @@ export const api = {
     return Array.isArray(res) ? res : [];
   },
 
+  updateLivingPayment: async (pmmplAc: string, paymentDate?: string): Promise<{ ok: boolean; error?: string }> => {
+    if (useMock) return { ok: true };
+    const res = await callGas("updateLivingPayment", { pmmplAc, paymentDate });
+    if (res && res.success) return { ok: true };
+    return { ok: false, error: res?.error || "Failed to update payment" };
+  },
+
   savePaidLeaveReport: async (rows: any[]): Promise<boolean> => {
     if (useMock) return true;
     const res = await callGas("savePaidLeaveReport", { rows });

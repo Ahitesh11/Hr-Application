@@ -726,17 +726,9 @@ export const JoiningModule = () => {
                           <td key={col} className="px-4 py-3.5 max-w-[200px]">
                             {ci === 0 ? (
                               <div className="flex items-center gap-2">
-                                {r.candidateSPhoto ? (
-                                  <img
-                                    src={r.candidateSPhoto}
-                                    alt="photo"
-                                    className="w-7 h-7 rounded-lg object-cover shrink-0"
-                                  />
-                                ) : (
-                                  <div className="w-7 h-7 rounded-lg bg-pink-600 flex items-center justify-center text-white text-[10px] font-bold shrink-0">
-                                    {String(firstVal).charAt(0).toUpperCase()}
-                                  </div>
-                                )}
+                                <div className="w-7 h-7 rounded-lg bg-pink-600 flex items-center justify-center text-white text-[10px] font-bold shrink-0">
+                                  {String(firstVal).charAt(0).toUpperCase()}
+                                </div>
                                 <span className="text-sm font-bold text-slate-800 truncate">{r[col] || "—"}</span>
                               </div>
                             ) : (

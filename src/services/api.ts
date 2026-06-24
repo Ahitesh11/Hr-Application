@@ -209,6 +209,12 @@ export const api = {
     return { ok: false, error: res?.error || "Failed to update payment" };
   },
 
+  getActualSalaryIncrements: async (): Promise<any[]> => {
+    if (useMock) return [];
+    const res = await callGas("getActualSalaryIncrements", {});
+    return Array.isArray(res) ? res : [];
+  },
+
   savePaidLeaveReport: async (rows: any[]): Promise<boolean> => {
     if (useMock) return true;
     const res = await callGas("savePaidLeaveReport", { rows });

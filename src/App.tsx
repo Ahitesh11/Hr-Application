@@ -12,6 +12,7 @@ import { SalaryIncrementModule } from "./components/SalaryIncrementModule";
 import { ApprovalModule } from "./components/ApprovalModule";
 import { JoiningModule } from "./components/JoiningModule";
 import { LeaveReportModule } from "./components/LeaveReportModule";
+import { UpcomingIncrementModule } from "./components/UpcomingIncrementModule";
 import { Loader2 } from "lucide-react";
 
 const AppContent = () => {
@@ -53,6 +54,8 @@ const AppContent = () => {
         return <SalaryModule />;
       case "salary-increment":
         return <SalaryIncrementModule />;
+      case "upcoming-increment":
+        return <UpcomingIncrementModule />;
       case "joining":
         return <JoiningModule />;
       case "leave-report":

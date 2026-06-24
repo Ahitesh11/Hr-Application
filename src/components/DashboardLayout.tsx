@@ -18,7 +18,8 @@ import {
   UserPlus,
   UserCheck,
   Search,
-  Loader2
+  Loader2,
+  Bell
 } from "lucide-react";
 import { cn } from "../lib/utils";
 
@@ -101,8 +102,9 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
     { id: "leave-report",  label: "Leave Report",        icon: TrendingUp,      roles: ["Admin"] },
     { id: "attendance",    label: "Attendance",          icon: Users,           roles: ["Staf", "Admin", "HOD"] },
     { id: "salary",        label: "Salary Records",      icon: CreditCard,      roles: ["Staf", "Admin", "HOD"] },
-    { id: "salary-increment", label: "Salary Increment", icon: TrendingUp,     roles: ["Admin"] },
-    { id: "joining",       label: "Joining",             icon: UserPlus,        roles: ["Admin"] },
+    { id: "salary-increment",          label: "Salary Increment",          icon: TrendingUp, roles: ["Admin"] },
+    { id: "upcoming-increment",        label: "Upcoming Increment",         icon: Bell,       roles: ["Admin"] },
+    { id: "joining",                   label: "Joining",                    icon: UserPlus,   roles: ["Admin"] },
   ];
 
   const filteredMenuItems = menuItems.filter(item => item.roles.includes(user?.role || "Staf"));

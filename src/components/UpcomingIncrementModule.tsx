@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useMemo } from "react";
-import { Search, Loader2, RefreshCw, Bell, Calendar, User, Building2, History, TrendingUp, IndianRupee } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
+import { Search, Loader2, RefreshCw, Bell, Calendar, User, Building2, History, BarChart3 } from "lucide-react";
 import { api } from "../services/api";
 import { cn } from "../lib/utils";
 import { format, addMonths, addDays, differenceInDays } from "date-fns";
@@ -40,7 +40,7 @@ const urgencyLabel = (days: number) => {
 type MainTab = "upcoming" | "history";
 
 // ── component ────────────────────────────────────────────────────────────────
-export const UpcomingIncrementModule: React.FC = () => {
+export const UpcomingIncrementModule = () => {
   const [actualRows, setActualRows]   = useState<any[]>([]);   // Actual Salary Increment sheet
   const [activeEmps, setActiveEmps]   = useState<any[]>([]);
   const [joinings,   setJoinings]     = useState<any[]>([]);
@@ -90,7 +90,7 @@ export const UpcomingIncrementModule: React.FC = () => {
     const byEmp = new Map<string, any>();
     for (const r of actualRows) {
       const months = parseInt(r.nextIncrementNoOfMonth || "0", 10);
-      if (months <= 0) continue;
+      if (isNaN(months) || months <= 0) continue;
       const id = r.employeeId.trim();
       if (!id) continue;
       const existing = byEmp.get(id);
@@ -406,7 +406,11 @@ export const UpcomingIncrementModule: React.FC = () => {
                           <span className={cn("text-xs font-bold",
                             item.daysLeft < 0 ? "text-red-600" : item.daysLeft <= 30 ? "text-orange-600"
                             : item.daysLeft <= 90 ? "text-yellow-700" : "text-slate-700"
-                          )}>{format(item.nextDueDate, "dd MMM yyyy")}</span>
+                          )}>
+                            {item.nextDueDate && !isNaN(item.nextDueDate.getTime())
+                              ? format(item.nextDueDate, "dd MMM yyyy")
+                              : "—"}
+                          </span>
                         </td>
                         <td className="px-4 py-3 text-center">
                           <span className={cn("text-xs font-black px-2.5 py-1 rounded-xl",
@@ -452,7 +456,7 @@ export const UpcomingIncrementModule: React.FC = () => {
               { label: "Total Records",     value: histStats.total,                                           color: "from-emerald-600 to-emerald-700", icon: <History className="w-5 h-5 opacity-80" /> },
               { label: "This Year",         value: histStats.thisYear,                                        color: "from-blue-500 to-blue-600",     icon: <Calendar className="w-5 h-5 opacity-80" /> },
               { label: "Unique Employees",  value: histStats.unique,                                          color: "from-violet-500 to-violet-600", icon: <User className="w-5 h-5 opacity-80" /> },
-              { label: "Total Amount Paid", value: `₹${histStats.totalAmt.toLocaleString("en-IN")}`,          color: "from-orange-400 to-orange-500", icon: <IndianRupee className="w-5 h-5 opacity-80" /> },
+              { label: "Total Amount Paid", value: `₹${histStats.totalAmt.toLocaleString("en-IN")}`,          color: "from-orange-400 to-orange-500", icon: <BarChart3 className="w-5 h-5 opacity-80" /> },
             ].map((s, i) => (
               <div key={i} className={`bg-gradient-to-br ${s.color} rounded-2xl p-4 text-white shadow-lg`}>
                 <div className="flex items-center justify-between mb-2">
@@ -562,7 +566,9 @@ export const UpcomingIncrementModule: React.FC = () => {
                           <div className="flex items-center gap-1.5">
                             <Calendar className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                             <span className="text-xs font-bold text-slate-700">
-                              {incDate ? format(incDate, "dd MMM yyyy") : item.dateOfIncrement || "—"}
+                              {incDate && !isNaN(incDate.getTime())
+                                ? format(incDate, "dd MMM yyyy")
+                                : item.dateOfIncrement || "—"}
                             </span>
                           </div>
                         </td>

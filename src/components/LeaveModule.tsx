@@ -242,22 +242,22 @@ export const LeaveModule: React.FC = () => {
       </div>
 
       {/* Data Table */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
         <div className="overflow-x-auto overflow-y-auto" style={{ maxHeight: "520px" }}>
           <table className="w-full text-left border-collapse min-w-[900px]">
-            <thead className="sticky top-0 z-10" style={{ background: "linear-gradient(135deg, #f8faff, #f0f4ff)", borderBottom: "2px solid #e2e8f0" }}>
+            <thead className="sticky top-0 z-20 bg-slate-50 border-b border-slate-200">
               <tr>
-                <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Timestamp</th>
-                <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Leave No</th>
-                <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Type</th>
-                <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Company</th>
-                <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Employee</th>
-                <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Reason</th>
-                <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Date Range</th>
-                <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Medical Cert</th>
-                <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">HOD Status</th>
-                <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">HR Status</th>
-                <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Action</th>
+                <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Timestamp</th>
+                <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Leave No</th>
+                <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Type</th>
+                <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Company</th>
+                <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Employee</th>
+                <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Reason</th>
+                <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Date Range</th>
+                <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Medical Cert</th>
+                <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">HOD Status</th>
+                <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">HR Status</th>
+                <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -278,7 +278,7 @@ export const LeaveModule: React.FC = () => {
                 filteredData.map((item, idx) => (
                   <tr
                     key={idx}
-                    className={cn("transition-colors hover:bg-blue-50/40", idx % 2 === 0 ? "bg-white" : "bg-slate-50/40")}
+                    className={cn("transition-colors hover:bg-pink-50/40 transition-colors duration-200", idx % 2 === 0 ? "bg-white" : "bg-slate-50/40")}
                     style={{ borderBottom: "1px solid #f1f5f9" }}
                   >
                     <td className="px-4 py-3 text-xs text-slate-500 whitespace-nowrap">

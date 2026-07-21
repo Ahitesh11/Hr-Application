@@ -512,7 +512,7 @@ export const LeaveReportModule: React.FC = () => {
             <table className="w-full text-left" style={{minWidth:"1120px"}}>
 
               {/* ── 2-row grouped header ── */}
-              <thead className="sticky top-0 z-10">
+              <thead className="sticky top-0 z-20 bg-slate-50 border-b border-slate-200">
                 {/* Row 1 */}
                 <tr className="bg-slate-800 text-white text-[10px] font-black uppercase tracking-wide">
                   <th rowSpan={2} className="px-4 py-3 border-r border-slate-700 align-middle">#</th>
@@ -711,7 +711,7 @@ export const LeaveReportModule: React.FC = () => {
             {/* Passbook Table */}
             <div className="overflow-auto flex-1 p-1">
               <table className="w-full text-left" style={{minWidth:"900px"}}>
-                <thead className="sticky top-0 z-10">
+                <thead className="sticky top-0 z-20 bg-slate-50 border-b border-slate-200">
                   <tr className="bg-slate-800 text-white text-[10px] font-black uppercase tracking-wide">
                     <th rowSpan={2} className="px-4 py-3 border-r border-slate-700 align-middle">Month</th>
                     <th colSpan={4} className="px-2 py-2 text-center border-r border-slate-700 bg-blue-900">EL (+{EL_PER_MONTH}/month)</th>
@@ -742,7 +742,7 @@ export const LeaveReportModule: React.FC = () => {
                       <tr key={i} className={cn(
                         "transition-colors text-sm",
                         isCurrent ? "bg-pink-50 border-l-4 border-l-pink-500" :
-                        hasActivity ? "bg-emerald-50/30" : "hover:bg-slate-50/50"
+                        hasActivity ? "bg-emerald-50/30" : "hover:bg-pink-50/40 transition-colors duration-200"
                       )}>
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2">

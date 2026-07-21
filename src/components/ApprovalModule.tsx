@@ -305,7 +305,7 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
       </div>
 
       {/* Table Card */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
         {isLoading ? (
           <div className="p-12 text-center">
             <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-2" />
@@ -314,74 +314,74 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
         ) : (
           <div className="overflow-x-auto overflow-y-auto" style={{ maxHeight: "480px" }}>
             <table className="w-full text-left border-collapse min-w-[900px]">
-              <thead className="sticky top-0 z-10" style={{ background: "linear-gradient(135deg, #f8faff, #f0f4ff)", borderBottom: "2px solid #e2e8f0" }}>
+              <thead className="sticky top-0 z-20 bg-slate-50 border-b border-slate-200">
                 <tr>
                   {activeSubTab === "salary-hod" ? (
                     <>
-                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Unique No</th>
-                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Employee</th>
-                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Company</th>
-                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Designation</th>
-                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Dept</th>
-                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Joining Date</th>
-                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap text-right">Current Salary</th>
-                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap text-right">Last Inc. Amt</th>
-                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Last Inc. Date</th>
-                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Note</th>
+                      <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Unique No</th>
+                      <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Employee</th>
+                      <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Company</th>
+                      <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Designation</th>
+                      <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Dept</th>
+                      <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Joining Date</th>
+                      <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap text-right">Current Salary</th>
+                      <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap text-right">Last Inc. Amt</th>
+                      <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Last Inc. Date</th>
+                      <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Note</th>
                     </>
                   ) : activeSubTab === "punch" ? (
                     <>
-                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">PM No</th>
-                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">In/Out</th>
-                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Date</th>
-                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Employee</th>
-                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Reason</th>
-                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">PM Time</th>
-                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Image</th>
-                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Planned</th>
+                      <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">PM No</th>
+                      <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">In/Out</th>
+                      <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Date</th>
+                      <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Employee</th>
+                      <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Reason</th>
+                      <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">PM Time</th>
+                      <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Image</th>
+                      <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Planned</th>
                     </>
                   ) : activeSubTab === "leave" ? (
                     <>
-                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Leave No</th>
-                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Type</th>
-                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Company</th>
-                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Employee</th>
-                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Reason</th>
-                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Date Range</th>
-                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Medical Cert</th>
+                      <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Leave No</th>
+                      <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Type</th>
+                      <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Company</th>
+                      <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Employee</th>
+                      <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Reason</th>
+                      <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Date Range</th>
+                      <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Medical Cert</th>
                       {role === "HOD" ? (
-                        <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Planned1</th>
+                        <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Planned1</th>
                       ) : (
                         <>
-                          <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">HOD Status</th>
-                          <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Planned2</th>
+                          <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">HOD Status</th>
+                          <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Planned2</th>
                         </>
                       )}
                     </>
                   ) : (
                     <>
-                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Timestamp</th>
-                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Holiday No</th>
-                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Employee</th>
-                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Company</th>
-                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Status1</th>
-                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Status2</th>
-                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Date From</th>
-                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Date To</th>
-                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Days</th>
-                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Reason</th>
-                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Adj Days</th>
-                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Adj Month</th>
-                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Adj Year</th>
-                      <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Remarks</th>
+                      <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Timestamp</th>
+                      <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Holiday No</th>
+                      <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Employee</th>
+                      <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Company</th>
+                      <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Status1</th>
+                      <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Status2</th>
+                      <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Date From</th>
+                      <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Date To</th>
+                      <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Days</th>
+                      <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Reason</th>
+                      <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Adj Days</th>
+                      <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Adj Month</th>
+                      <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Adj Year</th>
+                      <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Remarks</th>
                       {role === "HOD" ? (
-                        <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Planned1</th>
+                        <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Planned1</th>
                       ) : (
-                        <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Planned2</th>
+                        <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Planned2</th>
                       )}
                     </>
                   )}
-                  <th className="px-4 py-3.5 text-[10px] font-extrabold text-slate-500 uppercase tracking-widest whitespace-nowrap">Action</th>
+                  <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -391,7 +391,7 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
                   ) : getFilteredPunchMiss().map((item, idx) => (
                     <tr
                       key={idx}
-                      className={cn("transition-colors hover:bg-blue-50/40", idx % 2 === 0 ? "bg-white" : "bg-slate-50/40")}
+                      className={cn("transition-colors hover:bg-pink-50/40 transition-colors duration-200", idx % 2 === 0 ? "bg-white" : "bg-slate-50/40")}
                       style={{ borderBottom: "1px solid #f1f5f9" }}
                     >
                       <td className="px-4 py-3 text-xs font-bold text-slate-800 whitespace-nowrap">{item.pmNo}</td>
@@ -455,7 +455,7 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
                   ) : getFilteredLeave().map((item, idx) => (
                     <tr
                       key={idx}
-                      className={cn("transition-colors hover:bg-blue-50/40", idx % 2 === 0 ? "bg-white" : "bg-slate-50/40")}
+                      className={cn("transition-colors hover:bg-pink-50/40 transition-colors duration-200", idx % 2 === 0 ? "bg-white" : "bg-slate-50/40")}
                       style={{ borderBottom: "1px solid #f1f5f9" }}
                     >
                       <td className="px-4 py-3 text-xs font-bold text-slate-800 whitespace-nowrap">{item.leaveNo}</td>
@@ -584,7 +584,7 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
                   ) : getFilteredHoliday().map((item, idx) => (
                     <tr
                       key={idx}
-                      className={cn("transition-colors hover:bg-blue-50/40", idx % 2 === 0 ? "bg-white" : "bg-slate-50/40")}
+                      className={cn("transition-colors hover:bg-pink-50/40 transition-colors duration-200", idx % 2 === 0 ? "bg-white" : "bg-slate-50/40")}
                       style={{ borderBottom: "1px solid #f1f5f9" }}
                     >
                       <td className="px-4 py-3 text-xs text-slate-500 whitespace-nowrap">{item.timestamp ? format(new Date(item.timestamp), "dd/MM/yy HH:mm") : "-"}</td>

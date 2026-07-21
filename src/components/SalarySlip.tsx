@@ -72,6 +72,7 @@ export const SalarySlip: React.FC<SalarySlipProps> = ({ record, onClose }) => {
 <div class="slip">
   <div class="hdr">
     <div class="hdr-l">
+      <img src="/logo.png" alt="Logo" style="height:36px;margin-bottom:8px;" />
       <h1>${record.company || "Company"}</h1>
       <p>${record.location || ""}</p>
     </div>
@@ -239,7 +240,7 @@ export const SalarySlip: React.FC<SalarySlipProps> = ({ record, onClose }) => {
           <div className="bg-gradient-to-r from-blue-700 via-blue-600 to-blue-500 px-8 py-6 flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center shrink-0">
-                <Building2 className="w-7 h-7 text-white" />
+                <img src="/logo.png" alt="Logo" className="w-10 h-10 object-contain" />
               </div>
               <div>
                 <h1 className="text-xl font-black text-white tracking-tight leading-none">{record.company || "Company Name"}</h1>

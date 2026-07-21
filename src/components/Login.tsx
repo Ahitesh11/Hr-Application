@@ -54,9 +54,12 @@ export const Login = () => {
           style={{ background: "rgba(255,255,255,0.02)" }} />
 
         {/* Logo */}
-        <div className="relative z-10">
-          <h1 className="text-white font-black text-2xl leading-none tracking-tight">Passary</h1>
-          <p className="text-white/70 text-sm font-semibold tracking-wide">Refractories</p>
+        <div className="relative z-10 flex flex-col items-start gap-2">
+          <img src="/logo.png" alt="Logo" className="h-10 w-auto" />
+          <div>
+            <h1 className="text-white font-black text-2xl leading-none tracking-tight">Passary</h1>
+            <p className="text-white/70 text-sm font-semibold tracking-wide">Refractories</p>
+          </div>
         </div>
 
         {/* Center content */}
@@ -86,7 +89,7 @@ export const Login = () => {
         </div>
 
         <div className="relative z-10">
-          <p className="text-white/30 text-[11px] font-medium">© 2026 Passary Refractories. All Rights Reserved.</p>
+          <p className="text-white/30 text-[11px] font-medium">© 2026 Ahitesh Tandan. All Rights Reserved.</p>
         </div>
       </div>
 
@@ -94,7 +97,8 @@ export const Login = () => {
       <div className="flex-1 flex flex-col items-center justify-center p-6 sm:p-10 bg-white">
 
         {/* Mobile logo */}
-        <div className="lg:hidden flex flex-col mb-10">
+        <div className="lg:hidden flex flex-col items-center mb-10">
+          <img src="/logo.png" alt="Logo" className="h-12 w-auto mb-3" />
           <p className="font-black text-slate-900 text-base leading-none">Passary Refractories</p>
           <p className="text-slate-400 text-[10px] font-medium"></p>
         </div>
@@ -102,7 +106,8 @@ export const Login = () => {
         <div className="w-full max-w-sm">
 
           {/* Desktop header */}
-          <div className="hidden lg:flex flex-col mb-8">
+          <div className="hidden lg:flex flex-col mb-8 items-start">
+            <img src="/logo.png" alt="Logo" className="h-10 w-auto mb-3" />
             <p className="font-black text-slate-900 text-sm leading-none">Passary Refractories</p>
             <p className="text-slate-400 text-[10px] font-medium"></p>
           </div>
@@ -191,7 +196,7 @@ export const Login = () => {
             <div className="flex-1 h-px bg-slate-100" />
           </div>
           <p className="text-center text-[11px] text-slate-300 font-medium mt-3">
-            © 2026 Passary Refractories. All Rights Reserved.
+            © 2026 Ahitesh Tandan. All Rights Reserved.
           </p>
         </div>
       </div>

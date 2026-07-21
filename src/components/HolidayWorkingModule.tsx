@@ -141,7 +141,7 @@ export const HolidayWorkingModule: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead className="bg-slate-50 border-b border-slate-200">
@@ -159,7 +159,7 @@ export const HolidayWorkingModule: React.FC = () => {
                 <th className="px-6 py-4 text-[10px] font-bold text-slate-600 capitalize text-center">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-slate-100 bg-white">
               {isLoading ? (
                 <tr>
                   <td colSpan={7} className="px-6 py-12 text-center">
@@ -175,7 +175,7 @@ export const HolidayWorkingModule: React.FC = () => {
                 </tr>
               ) : (
                 filteredData.map((item, idx) => (
-                  <tr key={idx} className="hover:bg-slate-50/50 transition-colors">
+                  <tr key={idx} className="hover:bg-pink-50/40 transition-colors duration-200">
                     <td className="px-3 py-4 text-xs text-slate-600 text-center whitespace-nowrap">{item.timestamp}</td>
                     <td className="px-6 py-4 font-medium text-slate-900 text-center">{item.holidayWorkingNo}</td>
                     <td className="px-6 py-4 text-xs text-slate-500 text-center">{item.employeeId}</td>

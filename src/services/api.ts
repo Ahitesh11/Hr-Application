@@ -220,4 +220,22 @@ export const api = {
     const res = await callGas("savePaidLeaveReport", { rows });
     return !!(res && res.success);
   },
+
+  getHiringTracker: async (): Promise<any[]> => {
+    if (useMock) return [];
+    const res = await callGas("getHiringTracker", {});
+    return Array.isArray(res) ? res : [];
+  },
+
+  submitHiringTracker: async (data: Record<string, any>): Promise<boolean> => {
+    if (useMock) return true;
+    const res = await callGas("submitHiringTracker", data);
+    return !!(res && res.success);
+  },
+
+  updateHiringTrackerStep: async (data: Record<string, any>): Promise<boolean> => {
+    if (useMock) return true;
+    const res = await callGas("updateHiringTrackerStep", data);
+    return !!(res && res.success);
+  },
 };

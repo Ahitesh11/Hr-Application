@@ -345,13 +345,13 @@ export const UpcomingIncrementModule = () => {
             </div>
             <div className="overflow-x-auto overflow-y-auto" style={{ maxHeight: "460px" }}>
               <table className="w-full text-sm border-collapse min-w-max">
-                <thead className="sticky top-0 z-10">
+                <thead className="sticky top-0 z-20 bg-slate-50 border-b border-slate-200">
                   <tr className="bg-gradient-to-r from-violet-600 to-violet-500 text-white">
                     {["Employee","Designation","Company","Current Salary","Last Inc. Amt","Last Inc. / Joining Date","Next Due Date","Days Left","Type","Status"]
                       .map(h => <th key={h} className="px-4 py-3.5 text-[10px] font-black uppercase tracking-wider text-left whitespace-nowrap">{h}</th>)}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-slate-100 bg-white">
                   {isLoading ? (
                     <tr><td colSpan={10} className="py-20 text-center">
                       <Loader2 className="w-8 h-8 animate-spin text-violet-600 mx-auto" />
@@ -513,7 +513,7 @@ export const UpcomingIncrementModule = () => {
 
             <div className="overflow-x-auto overflow-y-auto" style={{ maxHeight: "500px" }}>
               <table className="w-full text-sm border-collapse min-w-max">
-                <thead className="sticky top-0 z-10">
+                <thead className="sticky top-0 z-20 bg-slate-50 border-b border-slate-200">
                   <tr className="bg-gradient-to-r from-emerald-600 to-emerald-500 text-white">
                     <th className="px-4 py-3.5 text-[10px] font-black uppercase tracking-wider text-left whitespace-nowrap">#</th>
                     <th className="px-4 py-3.5 text-[10px] font-black uppercase tracking-wider text-left whitespace-nowrap">Employee</th>
@@ -526,7 +526,7 @@ export const UpcomingIncrementModule = () => {
                     <th className="px-4 py-3.5 text-[10px] font-black uppercase tracking-wider text-left whitespace-nowrap">Timestamp</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-slate-100 bg-white">
                   {isLoading ? (
                     <tr><td colSpan={9} className="py-20 text-center">
                       <Loader2 className="w-8 h-8 animate-spin text-emerald-600 mx-auto" />

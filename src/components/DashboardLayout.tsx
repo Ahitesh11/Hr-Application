@@ -104,6 +104,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
     { id: "salary",        label: "Salary Records",      icon: CreditCard,      roles: ["Staf", "Admin", "HOD"] },
     { id: "salary-increment",          label: "Salary Increment",          icon: TrendingUp, roles: ["Admin"] },
     { id: "upcoming-increment",        label: "Upcoming Increment",         icon: Bell,       roles: ["Admin"] },
+    { id: "hiring-tracker",            label: "Hiring Tracker",             icon: Search,     roles: ["Admin"] },
     { id: "joining",                   label: "Joining",                    icon: UserPlus,   roles: ["Admin"] },
   ];
 
@@ -134,9 +135,10 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
         )}
       >
         <div className="p-6 flex items-center justify-between shrink-0">
-          <span className={cn("font-bold text-xl text-pink-600 transition-opacity", !isSidebarOpen && "md:opacity-0 lg:opacity-100")}>
-            FMS
-          </span>
+          <div className={cn("flex items-center gap-2 transition-opacity", !isSidebarOpen && "md:opacity-0 lg:opacity-100")}>
+            <img src="/logo.png" alt="Logo" className="h-8 w-auto" />
+            <span className="font-bold text-xl text-pink-600">Human Resource Application</span>
+          </div>
           <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
             className="p-2 hover:bg-pink-50 rounded-lg transition-colors md:hidden"

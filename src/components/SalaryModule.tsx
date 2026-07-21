@@ -51,7 +51,7 @@ export const SalaryModule: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-[11px]">
             <thead className="bg-slate-50 border-b border-slate-200">
@@ -64,7 +64,7 @@ export const SalaryModule: React.FC = () => {
                 <th className="px-3 py-4 font-bold text-slate-600 text-center uppercase">Salary Slip</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-slate-100 bg-white">
               {isLoading ? (
                 <tr>
                   <td colSpan={6} className="px-3 py-12 text-center">
@@ -80,7 +80,7 @@ export const SalaryModule: React.FC = () => {
                 </tr>
               ) : (
                 filteredData.map((item, idx) => (
-                  <tr key={idx} className="hover:bg-slate-50/50 transition-colors">
+                  <tr key={idx} className="hover:bg-pink-50/40 transition-colors duration-200">
                     <td className="px-3 py-4 font-medium text-slate-900">{item.employeeCode}</td>
                     <td className="px-3 py-4 font-bold text-slate-900">{item.employeeName}</td>
                     <td className="px-3 py-4 text-slate-600 font-bold">{item.noOfDaysPresent} <span className="text-[9px] opacity-60">Days</span></td>

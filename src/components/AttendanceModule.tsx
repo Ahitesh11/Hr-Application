@@ -71,7 +71,7 @@ export const AttendanceModule: React.FC = () => {
         </button>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead className="bg-slate-50 border-b border-slate-200">
@@ -89,7 +89,7 @@ export const AttendanceModule: React.FC = () => {
                 <th className="px-2 md:px-4 py-3 text-[10px] font-bold text-slate-600 capitalize text-center whitespace-nowrap">Working Hour</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-slate-100 bg-white">
               {isLoading ? (
                 <tr>
                   <td colSpan={11} className="px-4 py-12 text-center">
@@ -105,7 +105,7 @@ export const AttendanceModule: React.FC = () => {
                 </tr>
               ) : (
                 filteredData.map((item, idx) => (
-                  <tr key={idx} className="hover:bg-slate-50/50 transition-colors">
+                  <tr key={idx} className="hover:bg-pink-50/40 transition-colors duration-200">
                     <td className="px-2 md:px-4 py-3 text-slate-600 text-center">{item.year}</td>
                     <td className="px-2 md:px-4 py-3 text-slate-600 text-center">{item.month}</td>
                     <td className="px-2 md:px-4 py-3 text-slate-600 text-center">{item.department}</td>

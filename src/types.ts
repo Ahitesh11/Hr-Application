@@ -184,3 +184,34 @@ export interface SalaryRecord {
   year: string;
   month: string;
 }
+
+export interface HiringTracker {
+  timestamp?: string;
+  indentNumber: string;
+  company: string;
+  post: string;
+  gender: string;
+  prefer: string;
+  numberOfEnquiryNeed: string;
+  positionFullFillDate: string;
+  department: string;
+  experience: string;
+
+  planned1?: string;
+  actual1?: string;
+  delay1?: string;
+  socialSitePost?: string;
+  which?: string;
+
+  planned2?: string;
+  actual2?: string;
+  delay2?: string;
+  whatDidTheCandidateSays?: string;
+  trackerStatus?: string;
+  nextCallDate?: string;
+
+  planned3?: string;
+  actual3?: string;
+  delay3?: string;
+  interviewStatus?: string;
+}

@@ -570,7 +570,7 @@ export const SalaryIncrementModule: React.FC = () => {
         {/* Table */}
         <div className="overflow-x-auto overflow-y-auto" style={{ maxHeight: "460px" }}>
           <table className="w-full text-sm border-collapse min-w-max">
-            <thead className="sticky top-0 z-10">
+            <thead className="sticky top-0 z-20 bg-slate-50 border-b border-slate-200">
               <tr className="bg-gradient-to-r from-blue-600 to-blue-500 text-white">
                 <th className="px-4 py-3.5 text-[10px] font-black uppercase tracking-wider text-left whitespace-nowrap">Unique No</th>
                 <th className="px-4 py-3.5 text-[10px] font-black uppercase tracking-wider text-left whitespace-nowrap">Employee</th>
@@ -604,7 +604,7 @@ export const SalaryIncrementModule: React.FC = () => {
                 {activeTab !== "history" && <th className="px-4 py-3.5 text-[10px] font-black uppercase tracking-wider text-center whitespace-nowrap">Action</th>}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-slate-100 bg-white">
               {isLoading ? (
                 <tr>
                   <td colSpan={20} className="py-20 text-center">
@@ -623,7 +623,7 @@ export const SalaryIncrementModule: React.FC = () => {
                 </tr>
               ) : (
                 currentData.map((item, idx) => (
-                  <tr key={idx} className={cn("transition-colors hover:bg-blue-50/40", idx % 2 === 0 ? "bg-white" : "bg-slate-50/30")}>
+                  <tr key={idx} className={cn("transition-colors hover:bg-pink-50/40 transition-colors duration-200", idx % 2 === 0 ? "bg-white" : "bg-slate-50/30")}>
                     {/* Unique No */}
                     <td className="px-4 py-3 whitespace-nowrap">
                       <span className="text-[11px] font-black text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg">{item.uniqueNo}</span>

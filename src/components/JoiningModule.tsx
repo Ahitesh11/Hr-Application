@@ -47,6 +47,7 @@ const DESIGNATION_OPTIONS = [
 ];
 
 const emptyForm = {
+  linkedIndentNumber: "",
   pmmplAc: "",
   nameAsPerAadhar: "",
   fatherName: "",
@@ -244,6 +245,7 @@ export const JoiningModule = () => {
   const [submitResult, setSubmitResult] = useState<"success" | "error" | null>(null);
   const [joiningList, setJoiningList] = useState<any[]>([]);
   const [livingList, setLivingList] = useState<any[]>([]);
+  const [hiringTrackerList, setHiringTrackerList] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [viewRecord, setViewRecord] = useState<any | null>(null);
@@ -364,7 +366,10 @@ export const JoiningModule = () => {
   const loadJoining = async () => {
     setIsLoading(true);
     try {
-      const res = await api.getJoining();
+      const [res, hrRes] = await Promise.all([
+        api.getJoining(),
+        api.getHiringTracker()
+      ]);
       const raw = Array.isArray(res) ? res : [];
       // Remove completely empty records
       const nonEmpty = raw.filter((r: any) =>
@@ -373,6 +378,7 @@ export const JoiningModule = () => {
         )
       );
       setJoiningList(nonEmpty);
+      setHiringTrackerList(Array.isArray(hrRes) ? hrRes : []);
     } finally {
       setIsLoading(false);
     }
@@ -517,31 +523,84 @@ export const JoiningModule = () => {
           <form onSubmit={handleSubmit} className="p-8 space-y-8">
 
             {/* Section 1: Basic Info */}
-            <Section title="Basic Information">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                {/* PMMPL-AC — auto-generated, read-only */}
-                <div>
-                  <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1.5">
-                    PMMPL-AC <span className="text-pink-500 ml-0.5">*</span>
-                  </label>
-                  <div className="flex items-center gap-2 px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl">
-                    <span className="text-sm font-bold text-slate-800 flex-1">{form.pmmplAc || "Loading…"}</span>
-                    <span className="text-[10px] font-bold text-pink-600 bg-pink-100 px-2 py-0.5 rounded-lg">AUTO</span>
-                  </div>
+            <div className="bg-indigo-50 border border-indigo-100 rounded-2xl p-6 mb-8">
+              <h4 className="text-sm font-bold text-indigo-900 mb-4 flex items-center gap-2">
+                <Search className="w-4 h-4" /> Link Approved Indent
+              </h4>
+              <p className="text-xs text-indigo-700 mb-4">
+                You must select an Indent from the Hiring Tracker with "Selected" or "Hired" interview status to proceed.
+              </p>
+              <div>
+                <label className="text-xs font-bold text-indigo-800 uppercase tracking-wider block mb-1.5">
+                  Select Indent <span className="text-pink-500 ml-0.5">*</span>
+                </label>
+                <div className="relative max-w-md">
+                  <select
+                    value={form.linkedIndentNumber || ""}
+                    onChange={e => {
+                      const indentNo = e.target.value;
+                      setField("linkedIndentNumber", indentNo);
+                      
+                      const selectedIndent = hiringTrackerList.find(r => r.indentNumber === indentNo);
+                      if (selectedIndent) {
+                        setForm(prev => ({
+                          ...prev,
+                          joiningCompanyName: selectedIndent.company || prev.joiningCompanyName,
+                          designation: selectedIndent.post || prev.designation,
+                          gender: selectedIndent.gender || prev.gender,
+                        }));
+                      }
+                    }}
+                    required
+                    className="w-full px-3.5 py-2.5 bg-white border border-indigo-200 rounded-xl text-sm font-bold text-slate-800 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none transition-all appearance-none shadow-sm"
+                  >
+                    <option value="">-- Choose Approved Candidate --</option>
+                    {hiringTrackerList
+                      .filter(r => {
+                        // Hide if already joined
+                        const isJoined = joiningList.some(j => j.linkedIndentNumber === r.indentNumber);
+                        if (isJoined) return false;
+
+                        const status = r.interviewStatus?.toLowerCase() || "";
+                        return status.includes("selected") || status.includes("hired");
+                      })
+                      .map(r => (
+                        <option key={r.indentNumber} value={r.indentNumber}>
+                          {r.indentNumber} - {r.post} ({r.company})
+                        </option>
+                      ))}
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-indigo-400 pointer-events-none" />
                 </div>
-                <Field label="Name As Per Aadhar" name="nameAsPerAadhar" value={form.nameAsPerAadhar} onChange={setField} required />
-                <Field label="Father Name" name="fatherName" value={form.fatherName} onChange={setField} required />
-                <Field label="Date Of Joining" name="dateOfJoining" value={form.dateOfJoining} onChange={setField} type="date" required />
-                <SelectField label="Joining Place" name="joiningPlace" value={form.joiningPlace} onChange={setField} options={JOINING_PLACE_OPTIONS} required />
-                <SelectField label="Designation" name="designation" value={form.designation} onChange={setField} options={DESIGNATION_OPTIONS} required />
-                <Field label="Salary" name="salary" value={form.salary} onChange={setField} type="number" required placeholder="₹" />
-                <Field label="Date Of Birth (Aadhar)" name="dateOfBirthAsPerAadharCard" value={form.dateOfBirthAsPerAadharCard} onChange={setField} type="date" required />
-                <SelectField label="Gender" name="gender" value={form.gender} onChange={setField} options={GENDER_OPTIONS} required />
-                <SelectField label="Blood Group" name="bloodGroup" value={form.bloodGroup} onChange={setField} options={BLOOD_GROUPS} />
-                <Field label="Identification Marks" name="identificationMarks" value={form.identificationMarks} onChange={setField} />
-                <Field label="Highest Qualification" name="highestQualification" value={form.highestQualification} onChange={setField} required />
               </div>
-            </Section>
+            </div>
+
+            <div className={cn("transition-all duration-300", !form.linkedIndentNumber ? "opacity-50 pointer-events-none grayscale-[50%]" : "")}>
+              <Section title="Basic Information">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                  {/* PMMPL-AC — auto-generated, read-only */}
+                  <div>
+                    <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1.5">
+                      PMMPL-AC <span className="text-pink-500 ml-0.5">*</span>
+                    </label>
+                    <div className="flex items-center gap-2 px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                      <span className="text-sm font-bold text-slate-800 flex-1">{form.pmmplAc || "Loading…"}</span>
+                      <span className="text-[10px] font-bold text-pink-600 bg-pink-100 px-2 py-0.5 rounded-lg">AUTO</span>
+                    </div>
+                  </div>
+                  <Field label="Name As Per Aadhar" name="nameAsPerAadhar" value={form.nameAsPerAadhar} onChange={setField} required />
+                  <Field label="Father Name" name="fatherName" value={form.fatherName} onChange={setField} required />
+                  <Field label="Date Of Joining" name="dateOfJoining" value={form.dateOfJoining} onChange={setField} type="date" required />
+                  <SelectField label="Joining Place" name="joiningPlace" value={form.joiningPlace} onChange={setField} options={JOINING_PLACE_OPTIONS} required />
+                  <SelectField label="Designation" name="designation" value={form.designation} onChange={setField} options={DESIGNATION_OPTIONS} required />
+                  <Field label="Salary" name="salary" value={form.salary} onChange={setField} type="number" required placeholder="₹" />
+                  <Field label="Date Of Birth (Aadhar)" name="dateOfBirthAsPerAadharCard" value={form.dateOfBirthAsPerAadharCard} onChange={setField} type="date" required />
+                  <SelectField label="Gender" name="gender" value={form.gender} onChange={setField} options={GENDER_OPTIONS} required />
+                  <SelectField label="Blood Group" name="bloodGroup" value={form.bloodGroup} onChange={setField} options={BLOOD_GROUPS} />
+                  <Field label="Identification Marks" name="identificationMarks" value={form.identificationMarks} onChange={setField} />
+                  <Field label="Highest Qualification" name="highestQualification" value={form.highestQualification} onChange={setField} required />
+                </div>
+              </Section>
 
             {/* Section 2: Contact */}
             <Section title="Contact Details">
@@ -627,7 +686,7 @@ export const JoiningModule = () => {
             <div className="flex justify-end pt-2">
               <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || !form.linkedIndentNumber}
                 className="flex items-center gap-2.5 px-8 py-3.5 bg-pink-600 hover:bg-pink-700 active:scale-[0.98] text-white font-bold text-sm rounded-2xl shadow-lg shadow-pink-200 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? (
@@ -636,6 +695,7 @@ export const JoiningModule = () => {
                   <><UserPlus className="w-5 h-5" /> Submit Joining Form</>
                 )}
               </button>
+            </div>
             </div>
           </form>
         </div>

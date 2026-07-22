@@ -214,4 +214,6 @@ export interface HiringTracker {
   actual3?: string;
   delay3?: string;
   interviewStatus?: string;
+  followUpHistory?: string;
+  _row?: number;
 }

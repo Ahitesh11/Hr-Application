@@ -23,10 +23,11 @@ const emptyUpdateForm = {
   whatDidTheCandidateSays: "",
   trackerStatus: "",
   nextCallDate: "",
-  interviewStatus: ""
+  interviewStatus: "",
+  followUpHistory: ""
 };
 
-type TabId = "social-site" | "call-tracker" | "interview" | "history";
+type TabId = "social-site" | "call-tracker" | "follow-up" | "interview" | "history";
 
 export const HiringTrackerModule = () => {
   const [data, setData] = useState<HiringTracker[]>([]);
@@ -107,10 +108,11 @@ export const HiringTrackerModule = () => {
       indentNumber: item.indentNumber || "",
       socialSitePost: item.socialSitePost || "",
       which: item.which || "",
-      whatDidTheCandidateSays: item.whatDidTheCandidateSays || "",
+      whatDidTheCandidateSays: "",
       trackerStatus: item.trackerStatus || "",
       nextCallDate: item.nextCallDate || "",
-      interviewStatus: item.interviewStatus || ""
+      interviewStatus: item.interviewStatus || "",
+      followUpHistory: item.followUpHistory || item.whatDidTheCandidateSays || ""
     });
     setIsUpdateModalOpen(true);
   };
@@ -130,8 +132,11 @@ export const HiringTrackerModule = () => {
       // Show if Planned1 exists and Actual1 is empty
       return item.planned1 && !item.actual1;
     } else if (activeTab === "call-tracker") {
-      // Show if Planned2 exists and Actual2 is empty
-      return item.planned2 && !item.actual2;
+      // Show if Planned2 exists and Actual2 is empty AND not In Progress
+      return item.planned2 && !item.actual2 && item.trackerStatus !== "In Progress";
+    } else if (activeTab === "follow-up") {
+      // Show if Planned2 exists and Actual2 is empty AND Tracker Status IS In Progress
+      return item.planned2 && !item.actual2 && item.trackerStatus === "In Progress";
     } else if (activeTab === "interview") {
       // Show if Planned3 exists and Actual3 is empty
       return item.planned3 && !item.actual3;
@@ -142,6 +147,26 @@ export const HiringTrackerModule = () => {
 
     return true;
   });
+
+  const getTabCount = (tab: TabId) => {
+    return data.filter((item) => {
+      const term = searchQuery.toLowerCase();
+      const matchesSearch = (
+        item.indentNumber?.toLowerCase().includes(term) ||
+        item.company?.toLowerCase().includes(term) ||
+        item.post?.toLowerCase().includes(term) ||
+        item.department?.toLowerCase().includes(term)
+      );
+      if (!matchesSearch) return false;
+
+      if (tab === "social-site") return item.planned1 && !item.actual1;
+      if (tab === "call-tracker") return item.planned2 && !item.actual2 && item.trackerStatus !== "In Progress";
+      if (tab === "follow-up") return item.planned2 && !item.actual2 && item.trackerStatus === "In Progress";
+      if (tab === "interview") return item.planned3 && !item.actual3;
+      if (tab === "history") return !!item.actual3;
+      return false;
+    }).length;
+  };
 
   const getStatusColor = (status: string | undefined) => {
     if (!status) return "bg-slate-100 text-slate-600";
@@ -199,27 +224,48 @@ export const HiringTrackerModule = () => {
         <div className="flex gap-6 mt-2">
           <button
             onClick={() => setActiveTab("social-site")}
-            className={cn("py-3 font-bold text-sm border-b-2 transition-colors", activeTab === "social-site" ? "border-indigo-600 text-indigo-600" : "border-transparent text-slate-500 hover:text-slate-700")}
+            className={cn("py-3 font-bold text-sm border-b-2 transition-colors flex items-center gap-1.5", activeTab === "social-site" ? "border-indigo-600 text-indigo-600" : "border-transparent text-slate-500 hover:text-slate-700")}
           >
             1st Tab: Social Site
+            <span className={cn("px-2 py-0.5 rounded-full text-[10px]", activeTab === "social-site" ? "bg-indigo-100 text-indigo-700" : "bg-slate-100 text-slate-500")}>
+              {getTabCount("social-site")}
+            </span>
           </button>
           <button
             onClick={() => setActiveTab("call-tracker")}
-            className={cn("py-3 font-bold text-sm border-b-2 transition-colors", activeTab === "call-tracker" ? "border-indigo-600 text-indigo-600" : "border-transparent text-slate-500 hover:text-slate-700")}
+            className={cn("py-3 font-bold text-sm border-b-2 transition-colors flex items-center gap-1.5", activeTab === "call-tracker" ? "border-indigo-600 text-indigo-600" : "border-transparent text-slate-500 hover:text-slate-700")}
           >
             2st Tab: Call Tracker
+            <span className={cn("px-2 py-0.5 rounded-full text-[10px]", activeTab === "call-tracker" ? "bg-indigo-100 text-indigo-700" : "bg-slate-100 text-slate-500")}>
+              {getTabCount("call-tracker")}
+            </span>
+          </button>
+          <button
+            onClick={() => setActiveTab("follow-up")}
+            className={cn("py-3 font-bold text-sm border-b-2 transition-colors flex items-center gap-1.5", activeTab === "follow-up" ? "border-indigo-600 text-indigo-600" : "border-transparent text-slate-500 hover:text-slate-700")}
+          >
+            Follow Up
+            <span className={cn("px-2 py-0.5 rounded-full text-[10px]", activeTab === "follow-up" ? "bg-indigo-100 text-indigo-700" : "bg-slate-100 text-slate-500")}>
+              {getTabCount("follow-up")}
+            </span>
           </button>
           <button
             onClick={() => setActiveTab("interview")}
-            className={cn("py-3 font-bold text-sm border-b-2 transition-colors", activeTab === "interview" ? "border-indigo-600 text-indigo-600" : "border-transparent text-slate-500 hover:text-slate-700")}
+            className={cn("py-3 font-bold text-sm border-b-2 transition-colors flex items-center gap-1.5", activeTab === "interview" ? "border-indigo-600 text-indigo-600" : "border-transparent text-slate-500 hover:text-slate-700")}
           >
             3st Tab: Interview
+            <span className={cn("px-2 py-0.5 rounded-full text-[10px]", activeTab === "interview" ? "bg-indigo-100 text-indigo-700" : "bg-slate-100 text-slate-500")}>
+              {getTabCount("interview")}
+            </span>
           </button>
           <button
             onClick={() => setActiveTab("history")}
             className={cn("py-3 font-bold text-sm border-b-2 transition-colors flex items-center gap-1.5", activeTab === "history" ? "border-indigo-600 text-indigo-600" : "border-transparent text-slate-500 hover:text-slate-700")}
           >
             History
+            <span className={cn("px-2 py-0.5 rounded-full text-[10px]", activeTab === "history" ? "bg-indigo-100 text-indigo-700" : "bg-slate-100 text-slate-500")}>
+              {getTabCount("history")}
+            </span>
           </button>
         </div>
       </div>
@@ -271,6 +317,15 @@ export const HiringTrackerModule = () => {
                       </>
                     )}
                     
+                    {activeTab === "follow-up" && (
+                      <>
+                        <th className="px-4 py-3 text-[11px] font-bold tracking-wider text-slate-500 uppercase tracking-wider border-b border-r border-slate-100 min-w-[200px]">Follow Up History</th>
+                        <th className="px-4 py-3 text-[11px] font-bold tracking-wider text-slate-500 uppercase tracking-wider border-b border-r border-slate-100">Next Call Date</th>
+                        <th className="px-4 py-3 text-[11px] font-bold tracking-wider text-slate-500 uppercase tracking-wider border-b border-r border-slate-100">Tracker Status</th>
+                        <th className="px-4 py-3 text-[11px] font-bold tracking-wider text-indigo-600 uppercase tracking-wider border-b border-r border-slate-200 bg-indigo-50/50">Planned2</th>
+                      </>
+                    )}
+                    
                     {(activeTab === "interview" || activeTab === "history") && (
                       <>
                         <th className="px-4 py-3 text-[11px] font-bold tracking-wider text-slate-500 uppercase tracking-wider border-b border-r border-slate-100">Social Site Post</th>
@@ -312,6 +367,25 @@ export const HiringTrackerModule = () => {
                           <td className="px-4 py-3 text-xs font-medium text-slate-600 border-r border-slate-100 truncate max-w-[150px]" title={row.socialSitePost}>{row.socialSitePost || "—"}</td>
                           <td className="px-4 py-3 text-xs font-medium text-slate-600 border-r border-slate-200 whitespace-nowrap">{row.which || "—"}</td>
                           <td className="px-4 py-3 text-xs font-bold text-indigo-700 whitespace-nowrap bg-indigo-50/30 border-r border-slate-200">{row.planned2 || "—"}</td>
+                        </>
+                      )}
+
+                      {activeTab === "follow-up" && (
+                        <>
+                          <td className="px-4 py-3 border-r border-slate-100 align-top">
+                            <div className="max-h-24 overflow-y-auto custom-scrollbar text-[10px] text-slate-600 whitespace-pre-wrap leading-relaxed pr-2">
+                              {row.followUpHistory || row.whatDidTheCandidateSays || "—"}
+                            </div>
+                          </td>
+                          <td className="px-4 py-3 text-xs font-medium text-slate-600 border-r border-slate-200 whitespace-nowrap align-top">{row.nextCallDate || "—"}</td>
+                          <td className="px-4 py-3 border-r border-slate-100 align-top">
+                            {row.trackerStatus ? (
+                              <span className={cn("px-2.5 py-1 rounded-md text-[10px] font-black whitespace-nowrap uppercase tracking-wider", getStatusColor(row.trackerStatus))}>
+                                {row.trackerStatus}
+                              </span>
+                            ) : "—"}
+                          </td>
+                          <td className="px-4 py-3 text-xs font-bold text-indigo-700 whitespace-nowrap bg-indigo-50/30 border-r border-slate-200 align-top">{row.planned2 || "—"}</td>
                         </>
                       )}
                       
@@ -373,7 +447,7 @@ export const HiringTrackerModule = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 {[
                   { label: "Company", name: "company", type: "select", options: ["Pmmpl", "Purab", "Refrasynth", "Refratech", "Rkl"] },
-                  { label: "Post", name: "post", type: "text" },
+                  { label: "Post", name: "post", type: "select", options: ["Accounts Executive", "Accounts Manager", "Admin Executive", "Application Incharge", "Application Labour", "Application Manager", "Application Supervisor", "Asset Fitter", "Assistant Chemist", "Assistant Marketing Manager", "Cashier", "Cfo", "Civil Site Supervisor", "Crm", "Crusher Supervisor", "Data Operator", "Dme", "Draftsman", "Driver", "Ea", "Electrical Helper", "Financial Executive", "Gm Hr", "Grinding Mill Supervisor", "Guard", "Help", "Helper", "Hr", "Hydra Operator", "Jcb Operator", "Jr Accountant", "Jr. Purchase Executive", "Lab Assistant", "Lab Helper", "Lab Incharge", "Labour", "Liasoning", "Logistic Executive", "Marketing Executive", "Marketing Manager", "Mechanical Hepler", "Mechnical Helper", "Office Boy", "Pc", "Plant Electrician", "Plant Executive", "Plant Helper", "Plant Incharge", "Plant Mechanical", "Plant Supervisor", "Production Supervisor", "Project Manager", "Purchase Executive", "Purchase Manager", "Sales & Marketing", "Sales Cordinator", "Sales Executive", "Sales Manager", "Senior General Manager", "Site Supervisor", "Sr Accountant", "Stock Yard Supervisor", "Store Executive", "Store Manager", "Store Purchaser", "Technical Head", "Welder", "Workshop Operator"] },
                   { label: "Gender", name: "gender", type: "select", options: ["Male", "Female"] },
                   { label: "Prefer", name: "prefer", type: "select", options: ["Any", "Experience", "Fresher"] },
                   { label: "Number Of Enquiry Need", name: "numberOfEnquiryNeed", type: "number" },
@@ -452,7 +526,7 @@ export const HiringTrackerModule = () => {
                 <p className="text-xs font-bold text-indigo-800">Indent: {updateData.indentNumber}</p>
                 <p className="text-xs text-indigo-600 mt-1">Completing {
                   activeTab === 'social-site' ? '1st Step (Social Site)' : 
-                  activeTab === 'call-tracker' ? '2nd Step (Call Tracker)' : 
+                  (activeTab === 'call-tracker' || activeTab === 'follow-up') ? '2nd Step (Call Tracker)' : 
                   '3rd Step (Interview)'
                 }</p>
               </div>
@@ -483,10 +557,18 @@ export const HiringTrackerModule = () => {
                 </>
               )}
 
-              {activeTab === 'call-tracker' && (
+              {(activeTab === 'call-tracker' || activeTab === 'follow-up') && (
                 <>
-                  <div>
-                    <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1.5">What Did The Candidate Says</label>
+                  {updateData.followUpHistory && (
+                    <div className="sm:col-span-2">
+                      <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1.5">Conversation History</label>
+                      <div className="w-full px-3.5 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-xs font-medium text-slate-600 whitespace-pre-wrap max-h-32 overflow-y-auto custom-scrollbar">
+                        {updateData.followUpHistory}
+                      </div>
+                    </div>
+                  )}
+                  <div className="sm:col-span-2">
+                    <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1.5">Add New Remark</label>
                     <textarea
                       value={updateData.whatDidTheCandidateSays}
                       onChange={(e) => setUpdateData({ ...updateData, whatDidTheCandidateSays: e.target.value })}
@@ -505,7 +587,7 @@ export const HiringTrackerModule = () => {
                         className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium appearance-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none transition-all"
                       >
                         <option value="">-- Select Status --</option>
-                        <option value="Pending">Pending</option>
+                        {/* <option value="Pending">Pending</option> */}
                         <option value="In Progress">In Progress</option>
                         <option value="Done">Done</option>
                         <option value="Rejected">Rejected</option>
@@ -513,15 +595,17 @@ export const HiringTrackerModule = () => {
                       <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                     </div>
                   </div>
-                  <div>
-                    <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1.5">Next Call Date</label>
-                    <input
-                      type="date"
-                      value={updateData.nextCallDate}
-                      onChange={(e) => setUpdateData({ ...updateData, nextCallDate: e.target.value })}
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none transition-all"
-                    />
-                  </div>
+                  {updateData.trackerStatus === "In Progress" && (
+                    <div>
+                      <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1.5">Next Call Date</label>
+                      <input
+                        type="date"
+                        value={updateData.nextCallDate}
+                        onChange={(e) => setUpdateData({ ...updateData, nextCallDate: e.target.value })}
+                        className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none transition-all"
+                      />
+                    </div>
+                  )}
                 </>
               )}
 

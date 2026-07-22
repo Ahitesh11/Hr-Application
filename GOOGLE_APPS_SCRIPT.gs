@@ -933,6 +933,7 @@ function getHiringTracker(ss) {
     obj.actual2 = actualCols[1] !== undefined ? row[actualCols[1]] : '';
     obj.delay2 = delayCols[1] !== undefined ? row[delayCols[1]] : '';
     obj.whatDidTheCandidateSays = getCol('What Did The Candidate Says');
+    obj.followUpHistory = getCol('Follow Up History');
     obj.trackerStatus = getCol('Tracker Status');
     obj.nextCallDate = getCol('Next Call Date');
     
@@ -1032,8 +1033,29 @@ function updateHiringTrackerStep(ss, payload) {
     if (actualCols[0] !== undefined) sheet.getRange(targetRowIdx + 1, actualCols[0] + 1).setValue(timestamp);
     setVal('Social Site Post', payload.socialSitePost);
     setVal('Which', payload.which);
-  } else if (payload.tab === 'call-tracker') {
-    if (actualCols[1] !== undefined) sheet.getRange(targetRowIdx + 1, actualCols[1] + 1).setValue(timestamp);
+  } else if (payload.tab === 'call-tracker' || payload.tab === 'follow-up') {
+    if (payload.trackerStatus !== 'In Progress') {
+      if (actualCols[1] !== undefined) sheet.getRange(targetRowIdx + 1, actualCols[1] + 1).setValue(timestamp);
+    }
+    
+    // Append to Follow Up History if there's a new remark
+    if (payload.whatDidTheCandidateSays) {
+      var historyIdx = headers.findIndex(function(h) { return h.toString().toLowerCase().trim() === 'follow up history'; });
+      if (historyIdx !== -1) {
+        var currentHistory = sheet.getRange(targetRowIdx + 1, historyIdx + 1).getValue();
+        var d = new Date();
+        var formattedDate = [
+          ('0' + d.getDate()).slice(-2),
+          ('0' + (d.getMonth() + 1)).slice(-2),
+          d.getFullYear()
+        ].join('-') + ' ' + ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
+        
+        var newEntry = "[" + formattedDate + "] " + payload.whatDidTheCandidateSays;
+        var newHistory = currentHistory ? currentHistory + "\n" + newEntry : newEntry;
+        sheet.getRange(targetRowIdx + 1, historyIdx + 1).setValue(newHistory);
+      }
+    }
+
     setVal('What Did The Candidate Says', payload.whatDidTheCandidateSays);
     setVal('Tracker Status', payload.trackerStatus);
     setVal('Next Call Date', payload.nextCallDate);

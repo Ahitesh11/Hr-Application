@@ -491,7 +491,7 @@ export const HiringTrackerModule = () => {
                   { label: "Prefer", name: "prefer", type: "select", options: ["Any", "Experience", "Fresher"] },
                   { label: "Number Of Enquiry Need", name: "numberOfEnquiryNeed", type: "number" },
                   { label: "Position Full-Fill Date", name: "positionFullFillDate", type: "date" },
-                  { label: "Department", name: "department", type: "select", options: ["Accounts & Finance", "Admin", "Housekeeping", "Human Resources (HR)", "IT", "Maintenance", "Management", "Marketing", "Production", "Projects", "Purchase", "Reception", "Sales", "Stores / Inventory", "Technical"] },
+                  { label: "Department", name: "department", type: "select", options: ["Accounts & Finance", "Admin", "Housekeeping", "Human Resources (HR)", "IT", "Maintenance", "Management", "Marketing", "Production", "Projects", "Purchase", "Reception", "Sales", "Stores / Inventory", "Technical","Lab"] },
                   { label: "Experience", name: "experience", type: "text" },
                 ].map((field) => (
                   <div key={field.name}>

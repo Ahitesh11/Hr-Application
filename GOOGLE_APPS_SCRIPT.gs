@@ -1056,9 +1056,33 @@ function updateHiringTrackerStep(ss, payload) {
       }
     }
 
+    if (payload.candidatePhoto && payload.candidatePhoto.toString().startsWith('data:')) {
+      var ext = payload.candidatePhoto.indexOf('application/pdf') > -1 ? '.pdf' : '.png';
+      var fn = 'Photo_' + (payload.candidateName || payload.indentNumber) + '_' + new Date().getTime() + ext;
+      payload.candidatePhoto = saveImageToDrive(payload.candidatePhoto, fn, "1XI0dY2IrEc8y4OaO-KJioW2QLhPJHsmd");
+    }
+    if (payload.resumeCopy && payload.resumeCopy.toString().startsWith('data:')) {
+      var ext = payload.resumeCopy.indexOf('application/pdf') > -1 ? '.pdf' : '.png';
+      var fn = 'Resume_' + (payload.candidateName || payload.indentNumber) + '_' + new Date().getTime() + ext;
+      payload.resumeCopy = saveImageToDrive(payload.resumeCopy, fn, "1XI0dY2IrEc8y4OaO-KJioW2QLhPJHsmd");
+    }
+
     setVal('What Did The Candidate Says', payload.whatDidTheCandidateSays);
     setVal('Tracker Status', payload.trackerStatus);
     setVal('Next Call Date', payload.nextCallDate);
+    
+    if(payload.candidateName !== undefined) setVal('Candidate Name', payload.candidateName);
+    if(payload.dob !== undefined) setVal('DOB', payload.dob);
+    if(payload.candidatePhoneNumber !== undefined) setVal('Candidate Phone Number', payload.candidatePhoneNumber);
+    if(payload.previousCompanyName !== undefined) setVal('Previous Company Name', payload.previousCompanyName);
+    if(payload.jobExperience !== undefined) setVal('Job Experience', payload.jobExperience);
+    if(payload.reasonForLeaving !== undefined) setVal('Reason Of Leaving Previous Company', payload.reasonForLeaving);
+    if(payload.maritalStatus !== undefined) setVal('Marital Status', payload.maritalStatus);
+    if(payload.presentAddress !== undefined) setVal('Present Address', payload.presentAddress);
+    if(payload.candidatePhoto !== undefined) setVal('Candidate Photo', payload.candidatePhoto);
+    if(payload.resumeCopy !== undefined) setVal('Resume Copy', payload.resumeCopy);
+    if(payload.interviewScheduleDate !== undefined) setVal('Interview Schedule Date', payload.interviewScheduleDate);
+
   } else if (payload.tab === 'interview') {
     if (actualCols[2] !== undefined) sheet.getRange(targetRowIdx + 1, actualCols[2] + 1).setValue(timestamp);
     setVal('Interview Status', payload.interviewStatus);

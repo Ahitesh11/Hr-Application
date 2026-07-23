@@ -24,7 +24,18 @@ const emptyUpdateForm = {
   trackerStatus: "",
   nextCallDate: "",
   interviewStatus: "",
-  followUpHistory: ""
+  followUpHistory: "",
+  candidateName: "",
+  dob: "",
+  candidatePhoneNumber: "",
+  previousCompanyName: "",
+  jobExperience: "",
+  reasonForLeaving: "",
+  maritalStatus: "",
+  candidatePhoto: "",
+  presentAddress: "",
+  resumeCopy: "",
+  interviewScheduleDate: ""
 };
 
 type TabId = "social-site" | "call-tracker" | "follow-up" | "interview" | "history";
@@ -56,6 +67,23 @@ export const HiringTrackerModule = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>, fieldName: 'candidatePhoto' | 'resumeCopy') => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("File is too large. Please select a file under 5MB.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const base64 = event.target?.result as string;
+      setUpdateData(prev => ({ ...prev, [fieldName]: base64 }));
+    };
+    reader.readAsDataURL(file);
   };
 
   useEffect(() => {
@@ -112,7 +140,18 @@ export const HiringTrackerModule = () => {
       trackerStatus: item.trackerStatus || "",
       nextCallDate: item.nextCallDate || "",
       interviewStatus: item.interviewStatus || "",
-      followUpHistory: item.followUpHistory || item.whatDidTheCandidateSays || ""
+      followUpHistory: item.followUpHistory || item.whatDidTheCandidateSays || "",
+      candidateName: item.candidateName || "",
+      dob: item.dob || "",
+      candidatePhoneNumber: item.candidatePhoneNumber || "",
+      previousCompanyName: item.previousCompanyName || "",
+      jobExperience: item.jobExperience || "",
+      reasonForLeaving: item.reasonForLeaving || "",
+      maritalStatus: item.maritalStatus || "",
+      candidatePhoto: item.candidatePhoto || "",
+      presentAddress: item.presentAddress || "",
+      resumeCopy: item.resumeCopy || "",
+      interviewScheduleDate: item.interviewScheduleDate || ""
     });
     setIsUpdateModalOpen(true);
   };
@@ -511,7 +550,7 @@ export const HiringTrackerModule = () => {
       {/* Update Step Modal */}
       {isUpdateModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm overflow-y-auto">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden flex flex-col">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden flex flex-col max-h-[90vh]">
             <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50 shrink-0">
               <h2 className="text-lg font-black text-slate-800">Update Step</h2>
               <button onClick={() => setIsUpdateModalOpen(false)} className="p-2 hover:bg-slate-200 rounded-full text-slate-500 transition-colors">
@@ -519,7 +558,7 @@ export const HiringTrackerModule = () => {
               </button>
             </div>
             
-            <form id="update-form" onSubmit={handleUpdateSubmit} className="p-6 space-y-5">
+            <form id="update-form" onSubmit={handleUpdateSubmit} className="flex-1 overflow-y-auto p-6 space-y-5 custom-scrollbar">
               
               {/* Common Details for context */}
               <div className="bg-indigo-50 p-3 rounded-lg border border-indigo-100 mb-2">
@@ -568,16 +607,6 @@ export const HiringTrackerModule = () => {
                     </div>
                   )}
                   <div className="sm:col-span-2">
-                    <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1.5">Add New Remark</label>
-                    <textarea
-                      value={updateData.whatDidTheCandidateSays}
-                      onChange={(e) => setUpdateData({ ...updateData, whatDidTheCandidateSays: e.target.value })}
-                      required
-                      rows={3}
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none transition-all"
-                    />
-                  </div>
-                  <div>
                     <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1.5">Tracker Status</label>
                     <div className="relative">
                       <select
@@ -587,7 +616,6 @@ export const HiringTrackerModule = () => {
                         className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium appearance-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none transition-all"
                       >
                         <option value="">-- Select Status --</option>
-                        {/* <option value="Pending">Pending</option> */}
                         <option value="In Progress">In Progress</option>
                         <option value="Done">Done</option>
                         <option value="Rejected">Rejected</option>
@@ -595,6 +623,19 @@ export const HiringTrackerModule = () => {
                       <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                     </div>
                   </div>
+
+                  {updateData.trackerStatus && (
+                    <div className="sm:col-span-2">
+                      <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1.5">Add New Remark</label>
+                      <textarea
+                        value={updateData.whatDidTheCandidateSays}
+                        onChange={(e) => setUpdateData({ ...updateData, whatDidTheCandidateSays: e.target.value })}
+                        required
+                        rows={3}
+                        className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none transition-all"
+                      />
+                    </div>
+                  )}
                   {updateData.trackerStatus === "In Progress" && (
                     <div>
                       <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1.5">Next Call Date</label>
@@ -604,6 +645,153 @@ export const HiringTrackerModule = () => {
                         onChange={(e) => setUpdateData({ ...updateData, nextCallDate: e.target.value })}
                         className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none transition-all"
                       />
+                    </div>
+                  )}
+
+                  {updateData.trackerStatus === "Done" && (
+                    <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-5 bg-emerald-50/50 p-4 rounded-xl border border-emerald-100 mt-2">
+                      <div className="sm:col-span-2">
+                        <h3 className="text-sm font-black text-emerald-800 border-b border-emerald-200 pb-2">Candidate Details</h3>
+                      </div>
+                      
+                      <div>
+                        <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1.5">Candidate Name</label>
+                        <input
+                          type="text"
+                          value={updateData.candidateName}
+                          onChange={(e) => setUpdateData({ ...updateData, candidateName: e.target.value })}
+                          required
+                          className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 outline-none transition-all"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1.5">DOB</label>
+                        <input
+                          type="date"
+                          value={updateData.dob}
+                          onChange={(e) => setUpdateData({ ...updateData, dob: e.target.value })}
+                          className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 outline-none transition-all"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1.5">Phone Number</label>
+                        <input
+                          type="tel"
+                          value={updateData.candidatePhoneNumber}
+                          onChange={(e) => setUpdateData({ ...updateData, candidatePhoneNumber: e.target.value })}
+                          required
+                          className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 outline-none transition-all"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1.5">Marital Status</label>
+                        <div className="relative">
+                          <select
+                            value={updateData.maritalStatus}
+                            onChange={(e) => setUpdateData({ ...updateData, maritalStatus: e.target.value })}
+                            className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-medium appearance-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 outline-none transition-all"
+                          >
+                            <option value="">-- Select --</option>
+                            <option value="Single">Single</option>
+                            <option value="Married">Married</option>
+                          </select>
+                          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1.5">Previous Company Name</label>
+                        <input
+                          type="text"
+                          value={updateData.previousCompanyName}
+                          onChange={(e) => setUpdateData({ ...updateData, previousCompanyName: e.target.value })}
+                          className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 outline-none transition-all"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1.5">Job Experience</label>
+                        <input
+                          type="text"
+                          value={updateData.jobExperience}
+                          onChange={(e) => setUpdateData({ ...updateData, jobExperience: e.target.value })}
+                          className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 outline-none transition-all"
+                        />
+                      </div>
+
+                      <div className="sm:col-span-2">
+                        <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1.5">Reason Of Leaving Previous Company</label>
+                        <input
+                          type="text"
+                          value={updateData.reasonForLeaving}
+                          onChange={(e) => setUpdateData({ ...updateData, reasonForLeaving: e.target.value })}
+                          className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 outline-none transition-all"
+                        />
+                      </div>
+
+                      <div className="sm:col-span-2">
+                        <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1.5">Present Address</label>
+                        <textarea
+                          value={updateData.presentAddress}
+                          onChange={(e) => setUpdateData({ ...updateData, presentAddress: e.target.value })}
+                          rows={2}
+                          className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 outline-none transition-all"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1.5">Candidate Photo (Image/PDF)</label>
+                        {updateData.candidatePhoto && !updateData.candidatePhoto.startsWith("data:") ? (
+                          <div className="flex items-center justify-between px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl">
+                            <a href={updateData.candidatePhoto} target="_blank" rel="noreferrer" className="text-xs font-bold text-indigo-600 hover:underline truncate max-w-[200px]">View Uploaded Photo</a>
+                            <button type="button" onClick={() => setUpdateData({ ...updateData, candidatePhoto: "" })} className="text-xs text-red-500 font-bold hover:underline">Remove</button>
+                          </div>
+                        ) : (
+                          <input
+                            type="file"
+                            accept="image/*,application/pdf"
+                            onChange={(e) => handleFileUpload(e, 'candidatePhoto')}
+                            className="w-full px-3.5 py-2 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 outline-none transition-all file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100"
+                          />
+                        )}
+                        {updateData.candidatePhoto && updateData.candidatePhoto.startsWith("data:") && (
+                          <p className="text-[10px] text-emerald-600 font-bold mt-1 ml-1">✓ File selected and ready to upload</p>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1.5">Resume Copy (Image/PDF)</label>
+                        {updateData.resumeCopy && !updateData.resumeCopy.startsWith("data:") ? (
+                          <div className="flex items-center justify-between px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl">
+                            <a href={updateData.resumeCopy} target="_blank" rel="noreferrer" className="text-xs font-bold text-indigo-600 hover:underline truncate max-w-[200px]">View Uploaded Resume</a>
+                            <button type="button" onClick={() => setUpdateData({ ...updateData, resumeCopy: "" })} className="text-xs text-red-500 font-bold hover:underline">Remove</button>
+                          </div>
+                        ) : (
+                          <input
+                            type="file"
+                            accept="image/*,application/pdf"
+                            onChange={(e) => handleFileUpload(e, 'resumeCopy')}
+                            className="w-full px-3.5 py-2 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 outline-none transition-all file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100"
+                          />
+                        )}
+                        {updateData.resumeCopy && updateData.resumeCopy.startsWith("data:") && (
+                          <p className="text-[10px] text-emerald-600 font-bold mt-1 ml-1">✓ File selected and ready to upload</p>
+                        )}
+                      </div>
+
+                      <div className="sm:col-span-2">
+                        <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1.5">Interview Schedule Date</label>
+                        <input
+                          type="date"
+                          value={updateData.interviewScheduleDate}
+                          onChange={(e) => setUpdateData({ ...updateData, interviewScheduleDate: e.target.value })}
+                          className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 outline-none transition-all"
+                        />
+                      </div>
+
                     </div>
                   )}
                 </>

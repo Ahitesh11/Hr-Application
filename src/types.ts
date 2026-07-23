@@ -215,5 +215,17 @@ export interface HiringTracker {
   delay3?: string;
   interviewStatus?: string;
   followUpHistory?: string;
+  
+  candidateName?: string;
+  dob?: string;
+  candidatePhoneNumber?: string;
+  previousCompanyName?: string;
+  jobExperience?: string;
+  reasonForLeaving?: string;
+  maritalStatus?: string;
+  candidatePhoto?: string;
+  presentAddress?: string;
+  resumeCopy?: string;
+  interviewScheduleDate?: string;
   _row?: number;
 }

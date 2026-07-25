@@ -19,7 +19,10 @@ import {
   UserCheck,
   Search,
   Loader2,
-  Bell
+  Bell,
+  Banknote,
+  FileText,
+  FileSignature
 } from "lucide-react";
 import { cn } from "../lib/utils";
 
@@ -106,6 +109,8 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
     { id: "upcoming-increment",        label: "Upcoming Increment",         icon: Bell,       roles: ["Admin"] },
     { id: "hiring-tracker",            label: "Hiring Tracker",             icon: Search,     roles: ["Admin"] },
     { id: "joining",                   label: "Joining",                    icon: UserPlus,   roles: ["Admin"] },
+    { id: "loan-application",          label: "Loan Application",           icon: Banknote,   roles: ["Staf", "Admin", "HOD"] },
+    { id: "formats",                   label: "Formats",                    icon: FileText,   roles: ["Staf", "Admin", "HOD"] },
   ];
 
   const filteredMenuItems = menuItems.filter(item => item.roles.includes(user?.role || "Staf"));

@@ -14,6 +14,8 @@ import { JoiningModule } from "./components/JoiningModule";
 import { LeaveReportModule } from "./components/LeaveReportModule";
 import { UpcomingIncrementModule } from "./components/UpcomingIncrementModule";
 import { HiringTrackerModule } from "./components/HiringTrackerModule";
+import { LoanApplicationModule } from "./components/LoanApplicationModule";
+import { FormatsModule } from "./components/FormatsModule";
 import { Loader2 } from "lucide-react";
 
 const AppContent = () => {
@@ -63,6 +65,10 @@ const AppContent = () => {
         return <LeaveReportModule />;
       case "hiring-tracker":
         return <HiringTrackerModule />;
+      case "loan-application":
+        return <LoanApplicationModule />;
+      case "formats":
+        return <FormatsModule />;
       default:
         return <DashboardHome onNavigate={setActiveTab} />;
     }

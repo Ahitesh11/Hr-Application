@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Plus, Search, FileDown, Loader2, ChevronRight, User, TrendingUp, Calendar, CheckCircle, Building2, FileText, X, DollarSign, Clock, BarChart3, RefreshCw } from "lucide-react";
+import { Check, X, Search, FileText, Upload, Download, Trash2, Edit3, ArrowUpCircle, Filter, Plus, FileSpreadsheet, Loader2, Save, ChevronRight, User, TrendingUp, Calendar, Building2, DollarSign, Clock, BarChart3, RefreshCw } from "lucide-react";
+import { logoBase64 } from "../lib/logoBase64";
 import { api } from "../services/api";
 import { SalaryIncrementFms } from "../types";
 import { cn } from "../lib/utils";
@@ -291,10 +292,15 @@ export const SalaryIncrementModule: React.FC = () => {
     const drawTitleBar = () => {
       doc.setFillColor(...headerColor);
       doc.rect(0, 0, pageW, 18, "F");
+      
+      // Add Logo (white background or transparent, usually PNG works)
+      // Base64 needs to be valid format for jsPDF
+      try { doc.addImage(logoBase64, "PNG", 14, 2, 14, 14); } catch(e){}
+
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(13);
       doc.setFont("helvetica", "bold");
-      doc.text("Salary Increment Report", 14, 12);
+      doc.text("Salary Increment Report", 32, 12);
       doc.setFontSize(8);
       doc.setFont("helvetica", "normal");
       doc.text(`Generated: ${format(new Date(), "dd MMM yyyy HH:mm")}`, pageW - 70, 12);

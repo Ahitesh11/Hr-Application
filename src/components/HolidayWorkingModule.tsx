@@ -86,7 +86,7 @@ export const HolidayWorkingModule: React.FC = () => {
     (item.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.employeeId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.holidayWorkingNo?.toLowerCase().includes(searchTerm.toLowerCase())) &&
-    item.planned && item.planned.trim() !== ""
+    item.planned1 && item.planned1.trim() !== ""
   );
 
   return (

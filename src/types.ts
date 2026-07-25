@@ -229,3 +229,34 @@ export interface HiringTracker {
   interviewScheduleDate?: string;
   _row?: number;
 }
+
+export interface LoanApplicationFms {
+  timestamp?: string;
+  loanNo?: string;
+  employeeId: string;
+  employeeName: string;
+  designation: string;
+  workLocation: string;
+  requestAmount: string;
+  monthlyDeductionAmount: string;
+  reason: string;
+  companyName: string;
+  
+  planned1?: string;
+  actual1?: string;
+  delay1?: string;
+  status1?: string;
+  approvedAmount?: string;
+  
+  planned2?: string;
+  actual2?: string;
+  delay2?: string;
+  paymentForm?: string;
+  
+  planned3?: string;
+  actual3?: string;
+  delay3?: string;
+  status2?: string;
+  
+  _row?: number;
+}

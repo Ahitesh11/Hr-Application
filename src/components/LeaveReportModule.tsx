@@ -6,6 +6,7 @@ import {
   Download, Printer, Search, Filter, TrendingUp,
   Loader2, AlertCircle, FileText, ChevronDown, BarChart2, BookOpen, X, Save,
 } from "lucide-react";
+import { logoBase64 } from "../lib/logoBase64";
 import { cn } from "../lib/utils";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -269,10 +270,11 @@ export const LeaveReportModule: React.FC = () => {
   /* ── PDF export ── */
   const exportPDF = () => {
     const doc = new jsPDF({orientation:"landscape"});
+    try { doc.addImage(logoBase64, "PNG", 14, 5, 12, 12); } catch(e){}
     doc.setFontSize(14);
-    doc.text(`Leave Balance Report (Accrual) — ${MONTHS[selMonth]} ${selYear}`, 14, 14);
+    doc.text(`Leave Balance Report (Accrual) — ${MONTHS[selMonth]} ${selYear}`, 30, 14);
     doc.setFontSize(8);
-    doc.text(`EL: +${EL_PER_MONTH}/month  CL: +${CL_PER_MONTH}/month  |  Generated: ${new Date().toLocaleString()}`, 14, 20);
+    doc.text(`EL: +${EL_PER_MONTH}/month  CL: +${CL_PER_MONTH}/month  |  Generated: ${new Date().toLocaleString()}`, 30, 20);
 
     autoTable(doc, {
       startY: 25,

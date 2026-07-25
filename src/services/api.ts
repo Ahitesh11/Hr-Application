@@ -1,4 +1,4 @@
-import { User, PunchMissFms, LeaveFms, HolidayWorkingFms, Attendance, SalaryRecord, SalaryIncrementFms } from "../types";
+import { User, PunchMissFms, LeaveFms, HolidayWorkingFms, Attendance, SalaryRecord, SalaryIncrementFms, LoanApplicationFms } from "../types";
 
 const GAS_URL = import.meta.env.VITE_GAS_WEB_APP_URL || "";
 
@@ -237,5 +237,36 @@ export const api = {
     if (useMock) return true;
     const res = await callGas("updateHiringTrackerStep", data);
     return !!(res && res.success);
+  },
+
+  getLoanApplications: async (employeeId?: string): Promise<LoanApplicationFms[]> => {
+    if (useMock) return [];
+    const res = await callGas("getLoanApplications", { employeeId });
+    return Array.isArray(res) ? res : [];
+  },
+
+  submitLoanApplication: async (data: Partial<LoanApplicationFms>): Promise<boolean> => {
+    if (useMock) return true;
+    const res = await callGas("submitLoanApplication", data);
+    return !!(res && res.success);
+  },
+
+  getOfferLetters: async (): Promise<any[]> => {
+    if (useMock) return [];
+    const res = await callGas("getOfferLetters", {});
+    return Array.isArray(res) ? res : [];
+  },
+
+
+  submitOfferLetter: async (data: Record<string, any>): Promise<any> => {
+    if (useMock) return { success: true };
+    const res = await callGas("submitOfferLetter", data);
+    return res;
+  },
+
+  submitDocument: async (data: Record<string, any>): Promise<any> => {
+    if (useMock) return { success: true };
+    const res = await callGas("submitDocument", data);
+    return res;
   },
 };

@@ -244,6 +244,7 @@ export const JoiningModule = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitResult, setSubmitResult] = useState<"success" | "error" | null>(null);
   const [joiningList, setJoiningList] = useState<any[]>([]);
+  const [presentEmployeesList, setPresentEmployeesList] = useState<any[]>([]);
   const [livingList, setLivingList] = useState<any[]>([]);
   const [hiringTrackerList, setHiringTrackerList] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -366,9 +367,10 @@ export const JoiningModule = () => {
   const loadJoining = async () => {
     setIsLoading(true);
     try {
-      const [res, hrRes] = await Promise.all([
+      const [res, hrRes, peRes] = await Promise.all([
         api.getJoining(),
-        api.getHiringTracker()
+        api.getHiringTracker(),
+        api.getPresentEmployees()
       ]);
       const raw = Array.isArray(res) ? res : [];
       // Remove completely empty records
@@ -379,6 +381,7 @@ export const JoiningModule = () => {
       );
       setJoiningList(nonEmpty);
       setHiringTrackerList(Array.isArray(hrRes) ? hrRes : []);
+      setPresentEmployeesList(Array.isArray(peRes) ? peRes : []);
     } finally {
       setIsLoading(false);
     }
@@ -440,11 +443,11 @@ export const JoiningModule = () => {
     key.replace(/([A-Z])/g, " $1").replace(/^./, s => s.toUpperCase()).trim();
 
   const livingEmployeeIds = new Set(
-    livingList.map((r: any) => r.pmmplAc).filter(Boolean)
+    livingList.map((r: any) => r.pmmplAc || r.employeeId || r.employeeCode).filter(Boolean)
   );
 
-  const filtered = joiningList
-    .filter((r: any) => !livingEmployeeIds.has(r.pmmplAc))
+  const filtered = presentEmployeesList
+    .filter((r: any) => !livingEmployeeIds.has(r.pmmplAc || r.employeeId || r.employeeCode))
     .filter((r: any) => {
       if (!search) return true;
       const q = search.toLowerCase();
@@ -452,6 +455,24 @@ export const JoiningModule = () => {
         ([k, v]) => !FILE_KEYS.has(k) && !SKIP_KEYS.has(k) && String(v).toLowerCase().includes(q)
       );
     });
+
+  // Discover which columns actually have data for present employees
+  const presentDisplayColumns: string[] = (() => {
+    if (presentEmployeesList.length === 0) return [];
+    const counts: Record<string, number> = {};
+    presentEmployeesList.slice(0, 30).forEach((r: any) => {
+      Object.entries(r).forEach(([k, v]) => {
+        if (!SKIP_KEYS.has(k) && !FILE_KEYS.has(k) && v && String(v).trim()) {
+          counts[k] = (counts[k] || 0) + 1;
+        }
+      });
+    });
+    return Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .map(([k]) => k)
+      .filter(k => k !== "timestamp")
+      .slice(0, 8);
+  })();
 
   return (
     <div className="space-y-6">
@@ -753,21 +774,21 @@ export const JoiningModule = () => {
                 Records will appear here once new joining forms are submitted.
               </p>
             </div>
-          ) : displayColumns.length === 0 ? (
+          ) : presentDisplayColumns.length === 0 ? (
             <div className="py-20 flex flex-col items-center gap-3">
               <AlertCircle className="w-10 h-10 text-slate-200" />
               <p className="text-slate-400 font-bold">Data loaded but all fields appear empty</p>
               <p className="text-slate-300 text-sm text-center max-w-xs">
-                Check the "Joining" sheet in Google Sheets — ensure headers are in the correct row and cells have data.
+                Check the "Present Employees" sheet in Google Sheets — ensure headers are in the correct row and cells have data.
               </p>
             </div>
           ) : (
             <div className="overflow-x-auto overflow-y-auto" style={{ maxHeight: "560px" }}>
-              <table className="w-full text-left" style={{ minWidth: `${(displayColumns.length + 2) * 140}px` }}>
+              <table className="w-full text-left" style={{ minWidth: `${(presentDisplayColumns.length + 2) * 140}px` }}>
                 <thead className="bg-pink-50 border-b border-pink-100 sticky top-0 z-10">
                   <tr>
                     <th className="px-4 py-3.5 text-[10px] font-bold text-pink-500 uppercase tracking-wider whitespace-nowrap">#</th>
-                    {displayColumns.map(col => (
+                    {presentDisplayColumns.map(col => (
                       <th key={col} className="px-4 py-3.5 text-[10px] font-bold text-pink-500 uppercase tracking-wider whitespace-nowrap">
                         {toLabel(col)}
                       </th>
@@ -777,12 +798,12 @@ export const JoiningModule = () => {
                 </thead>
                 <tbody className="divide-y divide-pink-50">
                   {filtered.map((r: any, idx: number) => {
-                    const firstCol = displayColumns[0];
+                    const firstCol = presentDisplayColumns[0];
                     const firstVal = r[firstCol] || "?";
                     return (
                       <tr key={idx} className="hover:bg-pink-50/40 transition-colors">
                         <td className="px-4 py-3.5 text-xs text-slate-400 font-bold">{idx + 1}</td>
-                        {displayColumns.map((col, ci) => (
+                        {presentDisplayColumns.map((col, ci) => (
                           <td key={col} className="px-4 py-3.5 max-w-[200px]">
                             {ci === 0 ? (
                               <div className="flex items-center gap-2">
@@ -807,6 +828,7 @@ export const JoiningModule = () => {
                             <button
                               onClick={() => { setLivingTarget(r); setLivingForm(emptyLivingForm); setLivingSubmitResult(null); }}
                               className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold text-pink-700 bg-pink-50 border border-pink-100 rounded-lg hover:bg-pink-100 transition-all"
+
                             >
                               <LogOut className="w-3 h-3" /> Living
                             </button>
@@ -1050,10 +1072,10 @@ export const JoiningModule = () => {
             <div className="px-6 py-4 border-b border-pink-100 flex items-center justify-between bg-gradient-to-r from-pink-50 to-pink-50">
               <div>
                 <h3 className="text-base font-bold text-slate-900">
-                  {viewRecord.nameAsPerAadhar || viewRecord[displayColumns[0]] || "Record Detail"}
+                  {viewRecord.nameAsPerAadhar || viewRecord.employeeName || viewRecord.name || viewRecord[presentDisplayColumns[0]] || "Record Detail"}
                 </h3>
                 <p className="text-xs text-pink-600 font-bold">
-                  {viewRecord.pmmplAc || viewRecord[displayColumns[1]] || ""}
+                  {viewRecord.pmmplAc || viewRecord.employeeId || viewRecord.employeeCode || viewRecord[presentDisplayColumns[1]] || ""}
                 </p>
               </div>
               <button onClick={() => setViewRecord(null)} className="p-2 hover:bg-pink-100 rounded-xl transition-colors">

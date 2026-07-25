@@ -528,12 +528,24 @@ function getJoiningData(ss) {
   const sheet = ss.getSheetByName('Joining');
   if (!sheet) return [];
 
-  const HEADER_ROW = 7; // 1-based
   const data = sheet.getDataRange().getDisplayValues();
-  const headers = data[HEADER_ROW - 1]; // 0-based index = 6
+  
+  // Dynamically find header row
+  let headerIndex = 6;
+  for (let i = 0; i < Math.min(20, data.length); i++) {
+    if (data[i].some(cell => {
+      const val = cell.toString().toLowerCase();
+      return val.includes('pmmpl-ac') || val.includes('name as per aadhar') || val.includes('employee id');
+    })) {
+      headerIndex = i;
+      break;
+    }
+  }
+
+  const headers = data[headerIndex];
   const results = [];
 
-  for (let i = HEADER_ROW; i < data.length; i++) {
+  for (let i = headerIndex + 1; i < data.length; i++) {
     const row = data[i];
     // Skip completely empty rows
     if (row.every(cell => cell === '' || cell === null)) continue;

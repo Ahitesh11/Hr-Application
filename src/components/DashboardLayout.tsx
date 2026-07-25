@@ -103,14 +103,14 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
     { id: "hod-approvals", label: "HOD Approvals",       icon: CheckCircle,     roles: ["Admin", "HOD"] },
     { id: "hr-approvals",  label: "HR Approvals",        icon: Users,           roles: ["Admin"] },
     { id: "leave-report",  label: "Leave Report",        icon: TrendingUp,      roles: ["Admin"] },
-    { id: "attendance",    label: "Attendance",          icon: Users,           roles: ["Staf", "Admin", "HOD"] },
-    { id: "salary",        label: "Salary Records",      icon: CreditCard,      roles: ["Staf", "Admin", "HOD"] },
+    { id: "attendance",    label: "Attendance",          icon: Users,           roles: ["Admin"] },
+    { id: "salary",        label: "Salary Records",      icon: CreditCard,      roles: ["Admin"] },
     { id: "salary-increment",          label: "Salary Increment",          icon: TrendingUp, roles: ["Admin"] },
     { id: "upcoming-increment",        label: "Upcoming Increment",         icon: Bell,       roles: ["Admin"] },
     { id: "hiring-tracker",            label: "Hiring Tracker",             icon: Search,     roles: ["Admin"] },
     { id: "joining",                   label: "Joining",                    icon: UserPlus,   roles: ["Admin"] },
-    { id: "loan-application",          label: "Loan Application",           icon: Banknote,   roles: ["Staf", "Admin", "HOD"] },
-    { id: "formats",                   label: "Formats",                    icon: FileText,   roles: ["Staf", "Admin", "HOD"] },
+    { id: "loan-application",          label: "Loan Application",           icon: Banknote,   roles: ["Admin"] },
+    { id: "formats",                   label: "Formats",                    icon: FileText,   roles: ["Admin"] },
   ];
 
   const filteredMenuItems = menuItems.filter(item => item.roles.includes(user?.role || "Staf"));

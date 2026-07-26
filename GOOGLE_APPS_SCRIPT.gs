@@ -94,6 +94,12 @@ function doPost(e) {
       case 'getAttendance':
         result = getData(ss, 'Attendance', request.employeeId);
         break;
+      case 'getOutsiderAttendance':
+        result = getData(ss, 'Outsider Attendance', request.employeeId);
+        break;
+      case 'submitOutsiderAttendance':
+        result = submitOutsiderAttendance(ss, request);
+        break;
       case 'getSalaryRecords':
         result = getData(ss, 'Salary Paid Records', request.employeeId);
         break;
@@ -1288,5 +1294,52 @@ function generateDocumentPDF(payload) {
     return file.getUrl();
   } catch (err) {
     return "Error: " + err.message;
+  }
+}
+
+// -------------------------------------------------------------
+// Outsider Attendance
+// -------------------------------------------------------------
+function submitOutsiderAttendance(ss, request) {
+  try {
+    const sheet = ss.getSheetByName('Outsider Attendance');
+    if (!sheet) return { success: false, error: 'Sheet "Outsider Attendance" not found' };
+
+    let imageLink = "";
+    if (request.image) {
+      try {
+        const fileBase64 = request.image;
+        const base64Data = fileBase64.split(',')[1] || fileBase64;
+        const blob = Utilities.newBlob(Utilities.base64Decode(base64Data), "image/jpeg", "Attendance_" + request.employeeId + "_" + new Date().getTime() + ".jpg");
+        const folder = DriveApp.getFolderById(IMAGE_FOLDER_ID);
+        const file = folder.createFile(blob);
+        file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+        imageLink = file.getUrl();
+      } catch (err) {
+        console.error("Image upload failed:", err);
+      }
+    }
+
+    const row = [
+      new Date().toLocaleString("en-IN"), // Timestamp
+      request.date || "", // Date
+      request.time || "", // Time
+      request.employeeId || "", // Emp Id
+      request.name || "", // Name
+      request.status || "", // Status
+      imageLink, // Image Link
+      request.latitude || "", // Latitude
+      request.longitude || "", // Longitude
+      request.address || "", // Address
+      request.mapLink || "", // Map Link
+      request.leaveStartDate || "", // Leave Start Date
+      request.leaveEndDate || "", // Leave End Date
+      request.reason || "" // Reason
+    ];
+
+    sheet.appendRow(row);
+    return { success: true, message: "Attendance recorded successfully" };
+  } catch (err) {
+    return { success: false, error: err.message };
   }
 }

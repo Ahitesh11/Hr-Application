@@ -251,6 +251,24 @@ export const api = {
     return !!(res && res.success);
   },
 
+  updateLoanApplicationStep: async (data: Record<string, any>): Promise<boolean> => {
+    if (useMock) return true;
+    const res = await callGas("updateLoanApplicationStep", data);
+    return !!(res && res.success);
+  },
+
+  getOutsiderAttendance: async (employeeId?: string): Promise<any[]> => {
+    if (useMock) return [];
+    const res = await callGas("getOutsiderAttendance", { employeeId });
+    return Array.isArray(res) ? res : [];
+  },
+
+  submitOutsiderAttendance: async (data: Record<string, any>): Promise<boolean> => {
+    if (useMock) return true;
+    const res = await callGas("submitOutsiderAttendance", data);
+    return !!(res && res.success);
+  },
+
   getOfferLetters: async (): Promise<any[]> => {
     if (useMock) return [];
     const res = await callGas("getOfferLetters", {});

@@ -22,7 +22,8 @@ import {
   Bell,
   Banknote,
   FileText,
-  FileSignature
+  FileSignature,
+  MapPin
 } from "lucide-react";
 import { cn } from "../lib/utils";
 
@@ -97,6 +98,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
 
   const menuItems = [
     { id: "dashboard",     label: "Dashboard",          icon: LayoutDashboard, roles: ["Staf", "Admin", "HOD"] },
+    { id: "outsider-attendance", label: "Field Attendance",   icon: MapPin,          roles: ["Staf", "Admin", "HOD"] },
     { id: "punch-miss",    label: "Punch Miss",          icon: Clock,           roles: ["Staf", "Admin", "HOD"] },
     { id: "leave",         label: "Leave",               icon: Calendar,        roles: ["Staf", "Admin", "HOD"] },
     { id: "holiday",       label: "Holiday Working",     icon: Briefcase,       roles: ["Staf", "Admin", "HOD"] },

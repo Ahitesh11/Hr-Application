@@ -16,6 +16,7 @@ import { UpcomingIncrementModule } from "./components/UpcomingIncrementModule";
 import { HiringTrackerModule } from "./components/HiringTrackerModule";
 import { LoanApplicationModule } from "./components/LoanApplicationModule";
 import { FormatsModule } from "./components/FormatsModule";
+import { OutsiderAttendanceModule } from "./components/OutsiderAttendanceModule";
 import { Loader2 } from "lucide-react";
 
 const AppContent = () => {
@@ -41,6 +42,8 @@ const AppContent = () => {
     switch (activeTab) {
       case "dashboard":
         return <DashboardHome onNavigate={setActiveTab} />;
+      case "outsider-attendance":
+        return <OutsiderAttendanceModule />;
       case "punch-miss":
         return <PunchMissModule />;
       case "leave":

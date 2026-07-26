@@ -22,11 +22,13 @@ type StatusType = "IN" | "OUT" | "MID" | "Leave";
 
 export const OutsiderAttendanceModule: React.FC = () => {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState<"mark" | "history">("mark");
+  const [activeTab, setActiveTab] = useState<"mark" | "history" | "hr-approvals">("mark");
   const [status, setStatus] = useState<StatusType | "">("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
+
+  const [hrApprovalData, setHrApprovalData] = useState<{status: string, remarks: string, item: any | null}>({status: 'Approved', remarks: '', item: null});
 
   const [image, setImage] = useState<string>("");
   const [location, setLocation] = useState<{
@@ -47,7 +49,7 @@ export const OutsiderAttendanceModule: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (activeTab === "history") {
+    if (activeTab === "history" || activeTab === "hr-approvals") {
       loadHistory();
     }
   }, [activeTab]);
@@ -55,12 +57,39 @@ export const OutsiderAttendanceModule: React.FC = () => {
   const loadHistory = async () => {
     setIsLoadingHistory(true);
     try {
-      const res = await api.getOutsiderAttendance(user?.role === "Admin" ? undefined : user?.employeeId);
+      const res = await api.getOutsiderAttendance(user?.role === "Admin" || (user?.role as string) === "HR" ? undefined : user?.employeeId);
       setHistory(res || []);
     } catch (e) {
       console.error("Failed to load history", e);
     } finally {
       setIsLoadingHistory(false);
+    }
+  };
+
+  const handleHrSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!hrApprovalData.item) return;
+
+    setIsSubmitting(true);
+    try {
+      const success = await api.updateOutsiderAttendanceHRStatus({
+        timestamp: hrApprovalData.item.timestamp || hrApprovalData.item.Timestamp,
+        hrStatus: hrApprovalData.status,
+        hrRemarks: hrApprovalData.remarks
+      });
+
+      if (success) {
+        setSuccessMsg("Status updated successfully!");
+        setHrApprovalData({status: 'Approved', remarks: '', item: null});
+        loadHistory();
+        setTimeout(() => setSuccessMsg(""), 3000);
+      } else {
+        setErrorMsg("Failed to update status.");
+      }
+    } catch (err) {
+      setErrorMsg("An unexpected error occurred.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -213,6 +242,17 @@ export const OutsiderAttendanceModule: React.FC = () => {
           >
             History
           </button>
+          {(user?.role === "Admin" || (user?.role as string) === "HR") && (
+            <button
+              onClick={() => setActiveTab("hr-approvals")}
+              className={cn(
+                "px-6 py-2 rounded-xl text-sm font-bold transition-all",
+                activeTab === "hr-approvals" ? "bg-white text-blue-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
+              )}
+            >
+              HR Approvals
+            </button>
+          )}
         </div>
       </div>
 
@@ -560,6 +600,172 @@ export const OutsiderAttendanceModule: React.FC = () => {
               </table>
             </div>
           )}
+        </div>
+      )}
+
+      {activeTab === "hr-approvals" && (
+        <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+          {isLoadingHistory ? (
+            <div className="py-20 flex flex-col items-center gap-3">
+              <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+              <p className="text-sm font-medium text-slate-500">Loading records...</p>
+            </div>
+          ) : history.length === 0 ? (
+            <div className="py-20 flex flex-col items-center gap-3">
+              <History className="w-12 h-12 text-slate-200" />
+              <p className="text-base font-bold text-slate-600">No Records Found</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead className="bg-slate-50 border-b border-slate-100">
+                  <tr>
+                    {["Date", "Time", "Name", "Status", "Photo/Loc", "HR Status", "Action"].map(h => (
+                      <th key={h} className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-50">
+                  {history.map((row, idx) => {
+                    const statusVal = row.status || row.Status;
+                    const dateVal = row.date || row.Date || row.timestamp;
+                    const hrStatus = row.hrStatus || row['HR Status'];
+                    const hrRemarks = row.hrRemarks || row['HR Remarks'];
+                    const isLeave = statusVal === "Leave";
+                    
+                    return (
+                      <tr key={idx} className="hover:bg-slate-50/50 transition-colors">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center gap-2">
+                            <Calendar className="w-4 h-4 text-slate-400" />
+                            <span className="text-sm font-medium text-slate-700">{dateVal}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center gap-2">
+                            <Clock className="w-4 h-4 text-slate-400" />
+                            <span className="text-sm text-slate-600">{row.time || row.Time || "—"}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div>
+                            <p className="text-sm font-bold text-slate-900">{row.name || row.Name || "—"}</p>
+                            <p className="text-xs text-slate-500 font-medium">ID: {row.employeeId || row['Emp Id'] || "—"}</p>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={cn(
+                            "px-3 py-1 text-xs font-bold rounded-lg border",
+                            statusVal === "IN" ? "bg-emerald-50 text-emerald-600 border-emerald-100" :
+                            statusVal === "OUT" ? "bg-red-50 text-red-600 border-red-100" :
+                            statusVal === "MID" ? "bg-blue-50 text-blue-600 border-blue-100" :
+                            "bg-orange-50 text-orange-600 border-orange-100"
+                          )}>
+                            {statusVal}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 min-w-[200px]">
+                          {!isLeave ? (
+                            <div className="flex items-center gap-3">
+                              {(row.imageLink || row['Image Link']) ? (
+                                <a href={row.imageLink || row['Image Link']} target="_blank" rel="noreferrer" className="shrink-0 w-8 h-8 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center hover:border-blue-400 hover:text-blue-500 transition-all text-slate-400">
+                                  <ImageIcon className="w-4 h-4" />
+                                </a>
+                              ) : <span className="text-xs text-slate-400">No Img</span>}
+                              
+                              <div className="flex-1">
+                                <p className="text-xs text-slate-600 font-medium line-clamp-1">{row.address || row.Address || "—"}</p>
+                                {(row.mapLink || row['Map Link']) && (
+                                  <a href={row.mapLink || row['Map Link']} target="_blank" rel="noreferrer" className="text-[10px] font-bold text-blue-500 hover:underline inline-flex items-center gap-1">
+                                    <MapPin className="w-3 h-3" /> View Map
+                                  </a>
+                                )}
+                              </div>
+                            </div>
+                          ) : (
+                            <div>
+                              <p className="text-xs font-bold text-orange-600 mb-1">
+                                {row.leaveStartDate || row['Leave Start Date']} to {row.leaveEndDate || row['Leave End Date'] || "—"}
+                              </p>
+                              <p className="text-[10px] text-slate-500 line-clamp-1">{row.reason || row.Reason || "—"}</p>
+                            </div>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {hrStatus ? (
+                            <div>
+                              <span className={cn(
+                                "px-3 py-1 text-xs font-bold rounded-full",
+                                hrStatus === "Approved" ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"
+                              )}>
+                                {hrStatus}
+                              </span>
+                              {hrRemarks && <p className="text-[10px] text-slate-500 mt-1 max-w-[150px] truncate" title={hrRemarks}>{hrRemarks}</p>}
+                            </div>
+                          ) : (
+                            <span className="text-xs font-bold text-slate-400">Pending</span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                           <button
+                             onClick={() => setHrApprovalData({status: 'Approved', remarks: hrRemarks || '', item: row})}
+                             className="px-4 py-2 bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 text-xs font-bold rounded-xl transition-all"
+                           >
+                             Update
+                           </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* HR Approval Modal */}
+      {hrApprovalData.item && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+              <h3 className="font-bold text-slate-800">Update HR Status</h3>
+              <button onClick={() => setHrApprovalData({status: 'Approved', remarks: '', item: null})} className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-400">
+                <XCircle className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleHrSubmit} className="p-6 space-y-6">
+              <div>
+                <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-3">Status</label>
+                <div className="grid grid-cols-2 gap-3">
+                  <button type="button" onClick={() => setHrApprovalData(p => ({...p, status: 'Approved'}))} className={cn("py-3 rounded-2xl font-bold text-sm transition-all border-2", hrApprovalData.status === 'Approved' ? "bg-emerald-50 border-emerald-500 text-emerald-700" : "bg-slate-50 border-transparent text-slate-500")}>
+                    Approve
+                  </button>
+                  <button type="button" onClick={() => setHrApprovalData(p => ({...p, status: 'Rejected'}))} className={cn("py-3 rounded-2xl font-bold text-sm transition-all border-2", hrApprovalData.status === 'Rejected' ? "bg-red-50 border-red-500 text-red-700" : "bg-slate-50 border-transparent text-slate-500")}>
+                    Reject
+                  </button>
+                </div>
+              </div>
+              
+              <div>
+                <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1.5">Remarks (Optional)</label>
+                <textarea 
+                  value={hrApprovalData.remarks}
+                  onChange={e => setHrApprovalData(p => ({...p, remarks: e.target.value}))}
+                  rows={3}
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm outline-none focus:border-blue-500 transition-all resize-none"
+                  placeholder="Add any remarks here..."
+                />
+              </div>
+
+              <button type="submit" disabled={isSubmitting} className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold transition-all shadow-lg shadow-blue-600/20 disabled:opacity-50">
+                {isSubmitting ? <><Loader2 className="w-5 h-5 animate-spin inline mr-2" /> Saving...</> : "Save Status"}
+              </button>
+            </form>
+          </div>
         </div>
       )}
     </div>

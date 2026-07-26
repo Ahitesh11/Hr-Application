@@ -269,6 +269,12 @@ export const api = {
     return !!(res && res.success);
   },
 
+  updateOutsiderAttendanceHRStatus: async (data: Record<string, any>): Promise<boolean> => {
+    if (useMock) return true;
+    const res = await callGas("updateOutsiderAttendanceHRStatus", data);
+    return !!(res && res.success);
+  },
+
   getOfferLetters: async (): Promise<any[]> => {
     if (useMock) return [];
     const res = await callGas("getOfferLetters", {});

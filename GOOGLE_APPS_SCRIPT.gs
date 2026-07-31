@@ -36,15 +36,26 @@ const SHEETS = {
 // Helper to find the header row dynamically
 function getHeaderInfo(sheet) {
   const data = sheet.getDataRange().getValues();
-  const commonHeaders = ['timestamp', 'year', 'employee id', 'emp id', 'leave no', 'pm no', 'pmmpl', 'name as per aadhar', 'joining'];
-  for (let i = 0; i < data.length; i++) {
+  const commonHeaders = ['timestamp', 'employee id', 'emp id', 'leave no', 'pm no', 'pmmpl', 'name as per aadhar'];
+  
+  for (let i = 0; i < Math.min(20, data.length); i++) {
+    // A real header row usually has multiple columns, skip title rows
+    const nonEmptyCells = data[i].filter(c => c !== '' && c !== null);
+    if (nonEmptyCells.length < 3) continue;
+
     if (data[i].some(cell => {
       const val = cell.toString().toLowerCase();
-      return commonHeaders.some(h => val.includes(h));
+      return commonHeaders.some(h => val === h || val.includes(h));
     })) {
       return { index: i, headers: data[i] };
     }
   }
+  
+  // Fallback for Joining which has headers on row 7 (index 6)
+  if (sheet.getName() === 'Joining' && data.length > 6) {
+    return { index: 6, headers: data[6] };
+  }
+  
   return { index: 0, headers: data[0] }; // Fallback to first row
 }
 

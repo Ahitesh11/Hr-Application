@@ -1,0 +1,20 @@
+/**
+ * This backend's own HTTP response envelope — distinct from GasResponse.
+ * Every route handler should resolve to one of these shapes.
+ */
+
+export interface ApiSuccessResponse<T = unknown> {
+  success: true;
+  data: T;
+}
+
+export interface ApiErrorResponse {
+  success: false;
+  error: {
+    message: string;
+    code?: string;
+    details?: unknown;
+  };
+}
+
+export type ApiResponse<T = unknown> = ApiSuccessResponse<T> | ApiErrorResponse;

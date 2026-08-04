@@ -41,4 +41,8 @@ export class ApiError extends Error {
   static internal(message = "Internal server error", details?: unknown): ApiError {
     return new ApiError(500, message, { code: "INTERNAL_ERROR", details, isOperational: false });
   }
+
+  static notImplemented(message = "Not implemented"): ApiError {
+    return new ApiError(501, message, { code: "NOT_IMPLEMENTED" });
+  }
 }

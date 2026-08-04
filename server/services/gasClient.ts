@@ -76,4 +76,13 @@ export function getGasClient(): GasClient {
   return instance;
 }
 
+/** Normalizes a GAS "get*" response into an array, surfacing a failed operation result as a real error. */
+export function unwrapGasList<T extends GasRecord = GasRecord>(response: GasResponse<T>): T[] {
+  if (Array.isArray(response)) return response;
+  if (response && typeof response === "object" && response.success === false) {
+    throw ApiError.internal(response.error ?? "GAS operation failed");
+  }
+  return [];
+}
+
 export type { GasClient };

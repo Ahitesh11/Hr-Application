@@ -11,7 +11,7 @@ export interface GasRequest {
 /** A single row/record returned by a GAS "get*" action. Left untyped on purpose — callers narrow per use case. */
 export type GasRecord = Record<string, unknown>;
 
-/** The envelope GAS returns for submit*/update*/login/test actions. */
+/** The envelope GAS returns for submit/update/login/test actions. */
 export interface GasOperationResult {
   success: boolean;
   error?: string;

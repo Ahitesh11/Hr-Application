@@ -1,4 +1,5 @@
 import { logger } from "../utils/logger";
+import { executeTool, ToolCallRequest, ToolCallResult } from "./toolExecutor";
 
 /** Identity of the employee making the request — passed by the controller, verified upstream. */
 export interface AgentUserContext {
@@ -7,9 +8,17 @@ export interface AgentUserContext {
   role?: string;
 }
 
+/** A single turn in the conversation. Populated once Phase 9 wires real multi-turn chat. */
+export interface AgentMessage {
+  role: "user" | "model";
+  content: string;
+}
+
 export interface AgentChatInput {
   message: string;
   context: AgentUserContext;
+  /** Prior turns in this conversation, oldest first. Optional — empty/omitted for a first message. */
+  history?: AgentMessage[];
 }
 
 export interface AgentChatOutput {
@@ -17,17 +26,26 @@ export interface AgentChatOutput {
 }
 
 /**
- * Placeholder entry point for the AI agent. Intentionally does nothing yet:
- * no Gemini call, no tool calling, no GAS access. This exists only to
- * establish the shape (message + user context in, reply out) that the
- * controller/route layer and, later, the real tool-calling loop will use.
+ * Placeholder entry point for free-form natural-language chat. Understanding
+ * a message well enough to choose the right tool requires calling Gemini's
+ * function-calling API — that's Phase 9. This intentionally still returns a
+ * fixed placeholder reply rather than faking that understanding.
+ *
+ * Tool execution itself is no longer a placeholder — see runTool() below,
+ * which Phase 9's Gemini loop will call once it decides which tool to run.
  */
 export async function handleAgentMessage(input: AgentChatInput): Promise<AgentChatOutput> {
-  logger.info("Agent message received (agent logic not yet implemented)", {
+  logger.info("Agent message received (NL understanding not yet implemented)", {
     employeeId: input.context.employeeId,
   });
 
   return {
-    reply: "The AI agent is not implemented yet. This is a placeholder response.",
+    reply:
+      "The AI agent can't understand free-form messages yet — that requires Gemini function calling (Phase 9). Tool execution itself is ready.",
   };
+}
+
+/** Runs one already-chosen tool. Real implementation — delegates to the tool executor. */
+export async function runTool(request: ToolCallRequest, context: AgentUserContext): Promise<ToolCallResult> {
+  return executeTool(request, context);
 }

@@ -40,16 +40,9 @@ const urgencyLabel = (days: number) => {
 type MainTab = "upcoming" | "history";
 
 // ── component ────────────────────────────────────────────────────────────────
-// Standard probation window — matches the "Probation Period: Three months" default used elsewhere
-// in the app (Offer/Appointment letters). Employees who haven't crossed this yet since their
-// joining date aren't shown as increment-eligible.
-const PROBATION_DAYS = 90;
-
 export const UpcomingIncrementModule = () => {
   const [actualRows, setActualRows]   = useState<any[]>([]);   // Actual Salary Increment sheet
-  const [activeEmps, setActiveEmps]   = useState<any[]>([]);
-  const [joinings,   setJoinings]     = useState<any[]>([]);
-  const [presentEmps, setPresentEmps] = useState<any[]>([]);
+  const [presentEmps, setPresentEmps] = useState<any[]>([]);   // Present Employees sheet — sole source for the Upcoming tab
   const [livingIds,  setLivingIds]    = useState<Set<string>>(new Set());
   const [isLoading,  setIsLoading]    = useState(true);
 
@@ -62,25 +55,23 @@ export const UpcomingIncrementModule = () => {
   const fetchAll = async () => {
     setIsLoading(true);
     try {
-      const [actual, emps, join, present, living] = await Promise.all([
+      const [actual, present, living] = await Promise.all([
         api.getActualSalaryIncrements(),
-        api.getActiveEmployees(),
-        api.getJoining(),
         api.getPresentEmployees(),
         api.getLivingHistory(),
       ]);
-      setActualRows((actual || []).map(normActual));
-      setActiveEmps(emps    || []);
-      setJoinings(join      || []);
-      setPresentEmps(present || []);
-      // getActiveEmployees() already excludes exited employees, but the "recurring" increment
-      // bucket below is built straight from the Actual Salary Increment sheet (not activeEmps),
-      // so an employee who has since left still surfaced there — filter it directly here too.
-      setLivingIds(new Set(
+      // The Actual Salary Increment sheet has no exit filter — an employee's rows stay there
+      // forever even after they leave. Strip those out here so the History tab (which reads
+      // actualRows directly) excludes them too.
+      const exitedIds = new Set(
         (living || [])
           .map((l: any) => (l.pmmplAc || l.employeeId || l.employeeCode || "").toString().trim())
           .filter(Boolean)
-      ));
+      );
+      const normalizedActual = (actual || []).map(normActual);
+      setActualRows(normalizedActual.filter(r => !exitedIds.has(r.employeeId.trim())));
+      setPresentEmps(present || []);
+      setLivingIds(exitedIds);
     } catch {
       // silent
     } finally {
@@ -93,115 +84,82 @@ export const UpcomingIncrementModule = () => {
   const today = useMemo(() => new Date(), []);
 
   // ── UPCOMING rows ─────────────────────────────────────────────────────────
+  // One row per "Present Employees" record — that sheet is the single source of truth here, so
+  // the row count always matches its row count exactly. Due date = "Next Increment Date" column
+  // + 365 days; if that's blank for an employee, falls back to their Joining Date + 365 days.
   const upcomingRows = useMemo(() => {
     type Row = {
       employeeId: string; name: string; designation: string; company: string;
       currentSalary: string; lastIncAmt: string; lastIncDate: string; joiningDate: string;
-      nextDueDate: Date; daysLeft: number; nextMonths: string; rowType: "recurring"|"first";
+      baseDate: string; nextDueDate: Date | null; daysLeft: number | null; rowType: "recurring"|"first";
     };
-    const rows: Row[] = [];
 
-    // 1. Per employee: latest actual increment with months > 0
-    const byEmp = new Map<string, any>();
+    // Latest actual increment per employee — display-only enrichment (Last Inc. Amt/Date columns),
+    // does not affect which employees appear or how their due date is computed.
+    const latestActualByEmp = new Map<string, any>();
     for (const r of actualRows) {
-      const months = parseInt(r.nextIncrementNoOfMonth || "0", 10);
-      if (isNaN(months) || months <= 0) continue;
       const id = r.employeeId.trim();
-      if (!id || livingIds.has(id)) continue; // exited employees — no longer increment-eligible
-      const existing = byEmp.get(id);
+      if (!id) continue;
+      const existing = latestActualByEmp.get(id);
       if (!existing) {
-        byEmp.set(id, r);
+        latestActualByEmp.set(id, r);
       } else {
         const tA = parseDate(existing.dateOfIncrement)?.getTime() || 0;
         const tB = parseDate(r.dateOfIncrement)?.getTime() || 0;
-        if (tB > tA) byEmp.set(id, r);
+        if (tB > tA) latestActualByEmp.set(id, r);
       }
     }
 
-    for (const r of byEmp.values()) {
-      const months = parseInt(r.nextIncrementNoOfMonth, 10);
-      const base   = parseDate(r.dateOfIncrement);
-      if (!base) continue;
-      const nextDueDate = addMonths(base, months);
-      const newSal = (Number(r.currentSalary) || 0) + (Number(r.incrementAmount) || 0);
-      rows.push({
-        employeeId:   r.employeeId,
-        name:         r.name,
-        designation:  "",
-        company:      "",
-        currentSalary: newSal ? String(newSal) : r.currentSalary,
-        lastIncAmt:   r.incrementAmount,
-        lastIncDate:  r.dateOfIncrement,
-        joiningDate:  "",
-        nextDueDate,
-        daysLeft:     differenceInDays(nextDueDate, today),
-        nextMonths:   r.nextIncrementNoOfMonth,
-        rowType:      "recurring",
-      } as Row);
-    }
+    const rows: Row[] = presentEmps.map((p: any) => {
+      const code = (p.employeeCode || p.employeeId || p.pmmplAc || "").toString().trim();
+      const rawJoiningDate = (p.dateOfJoining || "").toString();
+      const rawNextIncDate = (p.nextIncrementDate || "").toString();
 
-    // 2. Active employees NOT in byEmp → dateOfJoining + 365
-    const doneIds = new Set(byEmp.keys());
+      const nextIncDate = parseDate(rawNextIncDate);
+      const joiningDate = parseDate(rawJoiningDate);
+      const baseDate = nextIncDate || joiningDate;
+      const nextDueDate = baseDate ? addDays(baseDate, 365) : null;
 
-    const joiningMap  = new Map<string, any>();
-    for (const j of joinings) {
-      const code = (j.pmmplAc || j.employeeId || j.employeeCode || "").trim();
-      if (code) joiningMap.set(code, j);
-    }
-    const presentMap  = new Map<string, any>();
-    for (const p of presentEmps) {
-      const code = (p.employeeId || p.employeeCode || p.pmmplAc || "").trim();
-      if (code) presentMap.set(code, p);
-    }
+      const lastActual = latestActualByEmp.get(code);
 
-    for (const emp of activeEmps) {
-      const code = (emp.employeeId || emp.employeeCode || emp.pmmplAc || "").trim();
-      if (!code || doneIds.has(code) || livingIds.has(code)) continue;
-      const joining = joiningMap.get(code);
-      const rawDate = joining?.dateOfJoining || joining?.["Date Of Joining"] || emp.dateOfJoining || "";
-      const joiningDate = parseDate(rawDate);
-      if (!joiningDate) continue;
-      // Still within probation — not increment-eligible yet, so don't show them as "first
-      // increment due/upcoming" at all (matches the Offer/Appointment letter default of a
-      // three-month probation period).
-      if (differenceInDays(today, joiningDate) < PROBATION_DAYS) continue;
-      const present   = presentMap.get(code);
-      // Present Employees has no "Current Salary" column — only "Salary" (the live figure, same
-      // one Payroll uses) and "Joining Salary" (historical). The old lookup here always missed.
-      const rawSalary = String(present?.salary || joining?.salary || joining?.["Salary"] || "");
-      const nextDueDate = addDays(joiningDate, 365);
-      rows.push({
+      return {
         employeeId:   code,
-        name:         emp.name || emp.employeeName || "",
-        designation:  emp.designation || "",
-        company:      emp.companyName || joining?.companyName || "",
-        currentSalary: rawSalary.replace(/,/g, ""),
-        lastIncAmt:   "",
-        lastIncDate:  "",
-        joiningDate:  rawDate,
+        name:         p.employeeName || p.name || "",
+        designation:  p.designation || "",
+        company:      p.company || "",
+        currentSalary: String(p.salary || "").replace(/,/g, ""),
+        lastIncAmt:   lastActual?.incrementAmount || "",
+        lastIncDate:  lastActual?.dateOfIncrement || "",
+        joiningDate:  rawJoiningDate,
+        // Whichever date the due-date math actually used — Next Increment Date when set, else
+        // Joining Date — shown directly so it's clear what "Next Due Date" was computed from.
+        baseDate:     nextIncDate ? rawNextIncDate : rawJoiningDate,
         nextDueDate,
-        daysLeft:     differenceInDays(nextDueDate, today),
-        nextMonths:   "12",
-        rowType:      "first",
-      } as Row);
-    }
+        daysLeft:     nextDueDate ? differenceInDays(nextDueDate, today) : null,
+        rowType:      nextIncDate ? "recurring" : "first",
+      } as Row;
+    })
+    // Present Employees already excludes exited staff in practice (confirmed: zero overlap with
+    // Living History) — this is a defensive safety net only, so it doesn't reduce the row count
+    // under normal data hygiene.
+    .filter(r => !livingIds.has(r.employeeId));
 
-    return rows.sort((a, b) => a.daysLeft - b.daysLeft);
-  }, [actualRows, activeEmps, joinings, presentEmps, livingIds, today]);
+    return rows.sort((a, b) => (a.daysLeft ?? Infinity) - (b.daysLeft ?? Infinity));
+  }, [actualRows, presentEmps, livingIds, today]);
 
   const upCounts = useMemo(() => ({
     total:   upcomingRows.length,
-    overdue: upcomingRows.filter(r => r.daysLeft < 0).length,
-    soon:    upcomingRows.filter(r => r.daysLeft >= 0 && r.daysLeft <= 30).length,
-    up90:    upcomingRows.filter(r => r.daysLeft > 30 && r.daysLeft <= 90).length,
+    overdue: upcomingRows.filter(r => r.daysLeft !== null && r.daysLeft < 0).length,
+    soon:    upcomingRows.filter(r => r.daysLeft !== null && r.daysLeft >= 0 && r.daysLeft <= 30).length,
+    up90:    upcomingRows.filter(r => r.daysLeft !== null && r.daysLeft > 30 && r.daysLeft <= 90).length,
     first:   upcomingRows.filter(r => r.rowType === "first").length,
   }), [upcomingRows]);
 
   const filteredUpcoming = useMemo(() => {
     let rows = upcomingRows;
-    if (upFilter === "overdue")       rows = rows.filter(r => r.daysLeft < 0);
-    else if (upFilter === "soon")     rows = rows.filter(r => r.daysLeft >= 0 && r.daysLeft <= 30);
-    else if (upFilter === "upcoming") rows = rows.filter(r => r.daysLeft > 30 && r.daysLeft <= 90);
+    if (upFilter === "overdue")       rows = rows.filter(r => r.daysLeft !== null && r.daysLeft < 0);
+    else if (upFilter === "soon")     rows = rows.filter(r => r.daysLeft !== null && r.daysLeft >= 0 && r.daysLeft <= 30);
+    else if (upFilter === "upcoming") rows = rows.filter(r => r.daysLeft !== null && r.daysLeft > 30 && r.daysLeft <= 90);
     else if (upFilter === "first")    rows = rows.filter(r => r.rowType === "first");
     if (upSearch) {
       const q = upSearch.toLowerCase();
@@ -364,7 +322,7 @@ export const UpcomingIncrementModule = () => {
               <table className="w-full text-sm border-collapse min-w-max">
                 <thead className="sticky top-0 z-20 bg-slate-50 border-b border-slate-200">
                   <tr className="bg-gradient-to-r from-violet-600 to-violet-500 text-white">
-                    {["Employee","Designation","Company","Current Salary","Last Inc. Amt","Last Inc. / Joining Date","Next Due Date","Days Left","Type","Status"]
+                    {["Employee","Designation","Company","Current Salary","Last Inc. Amt","Next Inc. / Joining Date","Next Due Date","Days Left","Type","Status"]
                       .map(h => <th key={h} className="px-4 py-3.5 text-[10px] font-black uppercase tracking-wider text-left whitespace-nowrap">{h}</th>)}
                   </tr>
                 </thead>
@@ -380,11 +338,13 @@ export const UpcomingIncrementModule = () => {
                       <p className="text-sm font-bold text-slate-400">No records</p>
                     </td></tr>
                   ) : filteredUpcoming.map((item, idx) => {
-                    const { label, cls } = urgencyLabel(item.daysLeft);
-                    const dispDate = item.rowType === "recurring" ? item.lastIncDate : item.joiningDate;
+                    const { label, cls } = item.daysLeft !== null
+                      ? urgencyLabel(item.daysLeft)
+                      : { label: "No Date", cls: "bg-slate-100 text-slate-500 border-slate-200" };
+                    const dispDate = item.baseDate;
                     return (
                       <tr key={idx} className={cn("transition-colors",
-                        item.daysLeft < 0 ? "bg-red-50/30 hover:bg-red-50/50"
+                        item.daysLeft !== null && item.daysLeft < 0 ? "bg-red-50/30 hover:bg-red-50/50"
                           : idx % 2 === 0 ? "bg-white hover:bg-violet-50/20"
                           : "bg-slate-50/30 hover:bg-violet-50/20"
                       )}>
@@ -421,7 +381,8 @@ export const UpcomingIncrementModule = () => {
                         </td>
                         <td className="px-4 py-3 whitespace-nowrap">
                           <span className={cn("text-xs font-bold",
-                            item.daysLeft < 0 ? "text-red-600" : item.daysLeft <= 30 ? "text-orange-600"
+                            item.daysLeft === null ? "text-slate-400"
+                            : item.daysLeft < 0 ? "text-red-600" : item.daysLeft <= 30 ? "text-orange-600"
                             : item.daysLeft <= 90 ? "text-yellow-700" : "text-slate-700"
                           )}>
                             {item.nextDueDate && !isNaN(item.nextDueDate.getTime())
@@ -431,12 +392,13 @@ export const UpcomingIncrementModule = () => {
                         </td>
                         <td className="px-4 py-3 text-center">
                           <span className={cn("text-xs font-black px-2.5 py-1 rounded-xl",
-                            item.daysLeft < 0 ? "bg-red-100 text-red-700"
+                            item.daysLeft === null ? "bg-slate-100 text-slate-500"
+                            : item.daysLeft < 0 ? "bg-red-100 text-red-700"
                             : item.daysLeft <= 30 ? "bg-orange-100 text-orange-700"
                             : item.daysLeft <= 90 ? "bg-yellow-100 text-yellow-700"
                             : "bg-emerald-100 text-emerald-700"
                           )}>
-                            {item.daysLeft < 0 ? `${Math.abs(item.daysLeft)}d ago` : `${item.daysLeft}d`}
+                            {item.daysLeft === null ? "—" : item.daysLeft < 0 ? `${Math.abs(item.daysLeft)}d ago` : `${item.daysLeft}d`}
                           </span>
                         </td>
                         <td className="px-4 py-3 text-center">

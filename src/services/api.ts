@@ -293,4 +293,19 @@ export const api = {
     const res = await callGas("submitDocument", data);
     return res;
   },
+
+  getPayroll: async (): Promise<SalaryRecord[]> => {
+    if (useMock) return [];
+    const res = await callGas("getPayroll", {});
+    return Array.isArray(res) ? res : [];
+  },
+
+  generatePayroll: async (year: string, month: string): Promise<{ ok: boolean; rows: SalaryRecord[]; warnings: string[]; error?: string }> => {
+    if (useMock) return { ok: true, rows: [], warnings: [] };
+    const res = await callGas("generatePayroll", { year, month });
+    if (res && res.success) {
+      return { ok: true, rows: Array.isArray(res.rows) ? res.rows : [], warnings: Array.isArray(res.warnings) ? res.warnings : [] };
+    }
+    return { ok: false, rows: [], warnings: [], error: res?.error || "GAS returned failure — check deployment" };
+  },
 };

@@ -23,7 +23,8 @@ import {
   Banknote,
   FileText,
   FileSignature,
-  MapPin
+  MapPin,
+  Wallet
 } from "lucide-react";
 import { cn } from "../lib/utils";
 
@@ -107,6 +108,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
     { id: "leave-report",  label: "Leave Report",        icon: TrendingUp,      roles: ["Admin"] },
     { id: "attendance",    label: "Attendance",          icon: Users,           roles: ["Admin"] },
     { id: "salary",        label: "Salary Records",      icon: CreditCard,      roles: ["Admin"] },
+    { id: "payroll",       label: "Payroll",              icon: Wallet,          roles: ["Admin"] },
     { id: "salary-increment",          label: "Salary Increment",          icon: TrendingUp, roles: ["Admin"] },
     { id: "upcoming-increment",        label: "Upcoming Increment",         icon: Bell,       roles: ["Admin"] },
     { id: "hiring-tracker",            label: "Hiring Tracker",             icon: Search,     roles: ["Admin"] },

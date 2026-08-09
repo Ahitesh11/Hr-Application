@@ -8,6 +8,7 @@ import { LeaveModule } from "./components/LeaveModule";
 import { HolidayWorkingModule } from "./components/HolidayWorkingModule";
 import { AttendanceModule } from "./components/AttendanceModule";
 import { SalaryModule } from "./components/SalaryModule";
+import { PayrollModule } from "./components/PayrollModule";
 import { SalaryIncrementModule } from "./components/SalaryIncrementModule";
 import { ApprovalModule } from "./components/ApprovalModule";
 import { JoiningModule } from "./components/JoiningModule";
@@ -58,6 +59,8 @@ const AppContent = () => {
         return <AttendanceModule />;
       case "salary":
         return <SalaryModule />;
+      case "payroll":
+        return <PayrollModule />;
       case "salary-increment":
         return <SalaryIncrementModule />;
       case "upcoming-increment":

@@ -31,8 +31,9 @@ export const DocumentGeneratorModule = () => {
   const [documentType, setDocumentType] = useState("Offer Letter");
   
   const [employees, setEmployees] = useState<any[]>([]);
-  const [filteredEmployees, setFilteredEmployees] = useState<any[]>([]);
-  const [search, setSearch] = useState("");
+  const [candidates, setCandidates] = useState<any[]>([]);
+  const [selectedEmployeeKey, setSelectedEmployeeKey] = useState("");
+  const [selectedIndentKey, setSelectedIndentKey] = useState("");
   
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -76,8 +77,14 @@ export const DocumentGeneratorModule = () => {
     const fetchEmployees = async () => {
       setIsLoading(true);
       try {
-        const data = await api.getPresentEmployees();
-        setEmployees(data || []);
+        const [empData, hiringData] = await Promise.all([
+          api.getPresentEmployees(),
+          api.getHiringTracker(),
+        ]);
+        setEmployees(empData || []);
+        // Candidates not yet joined (no employee record yet) — searchable by Indent No. so an
+        // Offer Letter can be generated before their joining date.
+        setCandidates((hiringData || []).filter((c: any) => c.indentNumber));
       } catch (err) {
         console.error(err);
       } finally {
@@ -87,34 +94,56 @@ export const DocumentGeneratorModule = () => {
     fetchEmployees();
   }, []);
 
-  useEffect(() => {
-    if (!search.trim()) {
-      setFilteredEmployees([]);
-      return;
-    }
-    const q = search.toLowerCase();
-    const matches = employees.filter(e => {
-      const name = (e.nameAsPerAadhar || e.name || e.employeeName || "").toLowerCase();
-      const id = (e.candidateId || e.employeeId || "").toLowerCase();
-      return name.includes(q) || id.includes(q);
-    }).slice(0, 5);
-    setFilteredEmployees(matches);
-  }, [search, employees]);
+  const employeeKey = (e: any) => (e.employeeId || e.candidateId || e.empCode || e.employeeCode || "").toString();
+
+  const handleEmployeeDropdownChange = (key: string) => {
+    setSelectedEmployeeKey(key);
+    setSelectedIndentKey("");
+    if (!key) return;
+    const emp = employees.find(e => employeeKey(e) === key);
+    if (emp) handleSelectEmployee(emp);
+  };
+
+  const handleCandidateDropdownChange = (indentNumber: string) => {
+    setSelectedIndentKey(indentNumber);
+    setSelectedEmployeeKey("");
+    if (!indentNumber) return;
+    const cand = candidates.find(c => c.indentNumber === indentNumber);
+    if (cand) handleSelectEmployee({ ...cand, _source: "candidate" as const });
+  };
 
   const handleSelectEmployee = (emp: any) => {
-    setFormData({
-      candidateId: emp.employeeId || emp.candidateId || emp.empCode || emp.employeeCode || "",
-      fullName: emp.nameAsPerAadhar || emp.name || emp.employeeName || "",
-      department: emp.companyName || emp.department || "",
-      designation: emp.designation || "",
-      mobileNumber: emp.mobileNumber || emp.contactNo || "",
-      emailId: emp.mailId || emp.emailId || emp.email || "",
-    });
-    setDynamicFields(prev => ({
-      ...prev,
-      dateOfJoining: emp.dateOfJoining || "",
-      placeOfPosting: emp.placeOfPosting || emp.workLocation || "",
-    }));
+    if (emp._source === "candidate") {
+      // Pre-joining candidate from the Hiring Tracker — identified by Indent No. since they don't
+      // have an Employee ID yet.
+      setFormData({
+        candidateId: emp.indentNumber || "",
+        fullName: emp.candidateName || "",
+        department: emp.company || "",
+        designation: emp.post || "",
+        mobileNumber: emp.candidatePhoneNumber || "",
+        emailId: "",
+      });
+      setDynamicFields(prev => ({
+        ...prev,
+        dateOfJoining: "",
+        placeOfPosting: emp.department || "",
+      }));
+    } else {
+      setFormData({
+        candidateId: emp.employeeId || emp.candidateId || emp.empCode || emp.employeeCode || "",
+        fullName: emp.nameAsPerAadhar || emp.name || emp.employeeName || "",
+        department: emp.companyName || emp.department || "",
+        designation: emp.designation || "",
+        mobileNumber: emp.mobileNumber || emp.contactNo || "",
+        emailId: emp.mailId || emp.emailId || emp.email || "",
+      });
+      setDynamicFields(prev => ({
+        ...prev,
+        dateOfJoining: emp.dateOfJoining || "",
+        placeOfPosting: emp.placeOfPosting || emp.workLocation || "",
+      }));
+    }
     setCurrentStep(2);
   };
 
@@ -319,7 +348,8 @@ export const DocumentGeneratorModule = () => {
 
   const resetForm = () => {
     setCurrentStep(1);
-    setSearch("");
+    setSelectedEmployeeKey("");
+    setSelectedIndentKey("");
     setSubmitResult({ status: null });
     setFormData({
       candidateId: "",
@@ -441,47 +471,58 @@ export const DocumentGeneratorModule = () => {
                   </select>
                 </div>
 
-                <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-2">Select Employee / Candidate</label>
-                <div className="relative mb-6">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
-                  <input
-                    type="text"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    placeholder="Search by name or ID..."
-                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all font-medium"
-                  />
-                  {isLoading && (
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                      <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
-                    </div>
-                  )}
+                <div className="mb-6">
+                  <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-2">
+                    Select Employee <span className="normal-case font-medium text-slate-400">(already joined)</span>
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={selectedEmployeeKey}
+                      onChange={(e) => handleEmployeeDropdownChange(e.target.value)}
+                      className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50 font-medium appearance-none"
+                    >
+                      <option value="">{isLoading ? "Loading employees…" : "-- Select Employee --"}</option>
+                      {employees.map((e, i) => {
+                        const key = employeeKey(e);
+                        const name = e.nameAsPerAadhar || e.name || e.employeeName || "Unnamed";
+                        return (
+                          <option key={key || i} value={key}>
+                            {name} — {key} ({e.designation || e.companyName || e.department || ""})
+                          </option>
+                        );
+                      })}
+                    </select>
+                    {isLoading && (
+                      <div className="absolute right-10 top-1/2 -translate-y-1/2">
+                        <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                <div className="space-y-2">
-                  {!search && !isLoading && (
-                    <div className="text-center py-8 text-slate-400 text-sm">
-                      Start typing to search
-                    </div>
-                  )}
-                  {search && filteredEmployees.length === 0 && !isLoading && (
-                    <div className="text-center py-8 text-slate-400 text-sm">
-                      No matching employees found
-                    </div>
-                  )}
-                  {filteredEmployees.map((e, i) => (
-                    <button
-                      key={i}
-                      onClick={() => handleSelectEmployee(e)}
-                      className="w-full flex items-center justify-between p-4 bg-white border border-slate-200 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition-all group text-left"
+                <div className="mb-6">
+                  <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-2">
+                    Select Candidate <span className="normal-case font-medium text-amber-600">(pre-joining, by Indent No.)</span>
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={selectedIndentKey}
+                      onChange={(e) => handleCandidateDropdownChange(e.target.value)}
+                      className="w-full px-4 py-3.5 bg-amber-50 border border-amber-200 rounded-xl text-slate-800 focus:outline-none focus:border-amber-500 focus:ring-4 focus:ring-amber-50 font-medium appearance-none"
                     >
-                      <div>
-                        <p className="font-bold text-slate-800 group-hover:text-blue-700">{e.nameAsPerAadhar || e.name || e.employeeName}</p>
-                        <p className="text-xs text-slate-500">{e.designation} • {e.companyName || e.department}</p>
+                      <option value="">{isLoading ? "Loading candidates…" : "-- Select Candidate --"}</option>
+                      {candidates.map((c, i) => (
+                        <option key={c.indentNumber || i} value={c.indentNumber}>
+                          {c.candidateName || "Unnamed"} — {c.indentNumber} ({c.post || ""} • {c.company || ""})
+                        </option>
+                      ))}
+                    </select>
+                    {isLoading && (
+                      <div className="absolute right-10 top-1/2 -translate-y-1/2">
+                        <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
                       </div>
-                      <span className="text-xs font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded-md">{e.employeeId || e.candidateId}</span>
-                    </button>
-                  ))}
+                    )}
+                  </div>
                 </div>
 
                 {formData.fullName && (

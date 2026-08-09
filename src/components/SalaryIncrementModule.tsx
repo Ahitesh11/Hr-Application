@@ -107,18 +107,23 @@ export const SalaryIncrementModule: React.FC = () => {
         return tB - tA;
       })[0];
 
-    // Present Employees sheet → Current Salary
+    // Present Employees sheet → live/current Salary. Present Employees has no "Current Salary"
+    // column at all (only "Salary" and "Joining Salary") — the old lookup for "current salary"
+    // never matched anything, so this always fell through to the stale joining-date figure.
+    // "Salary" is the same column Payroll already relies on as the authoritative live salary.
     const presentEmp = allPresentEmps.find(
       p => p.employeeId === code || p.employeeCode === code || p.pmmplAc === code
     );
-    const rawCurrentSalary = presentEmp
-      ? Object.entries(presentEmp).find(
-          ([k]) => k.replace(/\s+/g, " ").trim().toLowerCase() === "current salary"
-        )?.[1] as string || ""
-      : "";
+    const rawLiveSalary = presentEmp?.salary || "";
 
     const rawJoiningDate = joining?.dateOfJoining || joining?.["Date Of Joining"] || "";
     const rawJoiningSalary = joining?.salary || joining?.["Salary"] || "";
+
+    // Both "Current Salary" and "Joining Salary" (which this form uses to mean "Previous Salary" —
+    // the salary immediately before this new increment) come from the same live figure. Falls back
+    // to their last recorded increment, then their original hire-date salary, only if Present
+    // Employees has nothing.
+    const liveSalary = cleanNum(rawLiveSalary || lastIncrement?.currentSalaryAfterIncrement || rawJoiningSalary);
 
     if (emp) {
       setNewEntry(prev => ({
@@ -129,9 +134,9 @@ export const SalaryIncrementModule: React.FC = () => {
         hod: emp.hod || "",
         joiningCompanyName: emp.companyName || "",
         dateOfJoining: toIsoDate(rawJoiningDate),
-        joiningSalary: cleanNum(rawJoiningSalary),
+        joiningSalary: liveSalary,
         department: joining?.department || joining?.["Department"] || "",
-        currentSalary: cleanNum(rawCurrentSalary || lastIncrement?.currentSalaryAfterIncrement || rawJoiningSalary),
+        currentSalary: liveSalary,
         lastIncrementAmount: cleanNum(lastIncrement?.incrementAmount || ""),
         lastIncrementDate: toIsoDate(lastIncrement?.dateOfIncrement || ""),
       }));
@@ -149,9 +154,9 @@ export const SalaryIncrementModule: React.FC = () => {
             hod: empData.hod || "",
             joiningCompanyName: empData.companyName || empData.joiningCompanyName || "",
             dateOfJoining: toIsoDate(rawJoiningDate),
-            joiningSalary: cleanNum(rawJoiningSalary),
+            joiningSalary: liveSalary,
             department: joining?.department || joining?.["Department"] || "",
-            currentSalary: cleanNum(rawCurrentSalary || lastIncrement?.currentSalaryAfterIncrement || rawJoiningSalary),
+            currentSalary: liveSalary,
             lastIncrementAmount: cleanNum(lastIncrement?.incrementAmount || ""),
             lastIncrementDate: toIsoDate(lastIncrement?.dateOfIncrement || ""),
           }));
@@ -346,7 +351,7 @@ export const SalaryIncrementModule: React.FC = () => {
         { header: "Designation",     dataKey: "designation"        },
         { header: "Dept",            dataKey: "department"         },
         { header: "Joining Date",    dataKey: "dateOfJoining"      },
-        { header: "Joining Sal.",    dataKey: "joiningSalary"      },
+        { header: "Prev. Sal.",      dataKey: "joiningSalary"      },
         { header: "Current Sal.",    dataKey: "currentSalary"      },
         { header: "Last Inc.Amt",    dataKey: "lastIncrementAmount"},
         { header: "Last Inc.Date",   dataKey: "lastIncrementDate"  },
@@ -584,7 +589,7 @@ export const SalaryIncrementModule: React.FC = () => {
                 <th className="px-4 py-3.5 text-[10px] font-black uppercase tracking-wider text-left whitespace-nowrap">Designation</th>
                 <th className="px-4 py-3.5 text-[10px] font-black uppercase tracking-wider text-left whitespace-nowrap">Dept</th>
                 <th className="px-4 py-3.5 text-[10px] font-black uppercase tracking-wider text-left whitespace-nowrap">Joining Date</th>
-                <th className="px-4 py-3.5 text-[10px] font-black uppercase tracking-wider text-right whitespace-nowrap">Joining Salary</th>
+                <th className="px-4 py-3.5 text-[10px] font-black uppercase tracking-wider text-right whitespace-nowrap">Previous Salary</th>
                 <th className="px-4 py-3.5 text-[10px] font-black uppercase tracking-wider text-right whitespace-nowrap">Current Salary</th>
                 <th className="px-4 py-3.5 text-[10px] font-black uppercase tracking-wider text-right whitespace-nowrap">Last Inc. Amt</th>
                 <th className="px-4 py-3.5 text-[10px] font-black uppercase tracking-wider text-left whitespace-nowrap">Last Inc. Date</th>
@@ -966,7 +971,7 @@ export const SalaryIncrementModule: React.FC = () => {
                       {/* Joining Salary */}
                       <div className="space-y-1.5">
                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
-                          <DollarSign className="w-3 h-3 text-emerald-500" /> Joining Salary <span className="text-red-400">*</span>
+                          <DollarSign className="w-3 h-3 text-emerald-500" /> Previous Salary <span className="text-red-400">*</span>
                         </label>
                         <div className="relative">
                           <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">₹</span>

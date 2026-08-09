@@ -40,11 +40,17 @@ const urgencyLabel = (days: number) => {
 type MainTab = "upcoming" | "history";
 
 // ── component ────────────────────────────────────────────────────────────────
+// Standard probation window — matches the "Probation Period: Three months" default used elsewhere
+// in the app (Offer/Appointment letters). Employees who haven't crossed this yet since their
+// joining date aren't shown as increment-eligible.
+const PROBATION_DAYS = 90;
+
 export const UpcomingIncrementModule = () => {
   const [actualRows, setActualRows]   = useState<any[]>([]);   // Actual Salary Increment sheet
   const [activeEmps, setActiveEmps]   = useState<any[]>([]);
   const [joinings,   setJoinings]     = useState<any[]>([]);
   const [presentEmps, setPresentEmps] = useState<any[]>([]);
+  const [livingIds,  setLivingIds]    = useState<Set<string>>(new Set());
   const [isLoading,  setIsLoading]    = useState(true);
 
   const [mainTab,     setMainTab]     = useState<MainTab>("upcoming");
@@ -56,16 +62,25 @@ export const UpcomingIncrementModule = () => {
   const fetchAll = async () => {
     setIsLoading(true);
     try {
-      const [actual, emps, join, present] = await Promise.all([
+      const [actual, emps, join, present, living] = await Promise.all([
         api.getActualSalaryIncrements(),
         api.getActiveEmployees(),
         api.getJoining(),
         api.getPresentEmployees(),
+        api.getLivingHistory(),
       ]);
       setActualRows((actual || []).map(normActual));
       setActiveEmps(emps    || []);
       setJoinings(join      || []);
       setPresentEmps(present || []);
+      // getActiveEmployees() already excludes exited employees, but the "recurring" increment
+      // bucket below is built straight from the Actual Salary Increment sheet (not activeEmps),
+      // so an employee who has since left still surfaced there — filter it directly here too.
+      setLivingIds(new Set(
+        (living || [])
+          .map((l: any) => (l.pmmplAc || l.employeeId || l.employeeCode || "").toString().trim())
+          .filter(Boolean)
+      ));
     } catch {
       // silent
     } finally {
@@ -92,7 +107,7 @@ export const UpcomingIncrementModule = () => {
       const months = parseInt(r.nextIncrementNoOfMonth || "0", 10);
       if (isNaN(months) || months <= 0) continue;
       const id = r.employeeId.trim();
-      if (!id) continue;
+      if (!id || livingIds.has(id)) continue; // exited employees — no longer increment-eligible
       const existing = byEmp.get(id);
       if (!existing) {
         byEmp.set(id, r);
@@ -141,17 +156,19 @@ export const UpcomingIncrementModule = () => {
 
     for (const emp of activeEmps) {
       const code = (emp.employeeId || emp.employeeCode || emp.pmmplAc || "").trim();
-      if (!code || doneIds.has(code)) continue;
+      if (!code || doneIds.has(code) || livingIds.has(code)) continue;
       const joining = joiningMap.get(code);
       const rawDate = joining?.dateOfJoining || joining?.["Date Of Joining"] || emp.dateOfJoining || "";
       const joiningDate = parseDate(rawDate);
       if (!joiningDate) continue;
+      // Still within probation — not increment-eligible yet, so don't show them as "first
+      // increment due/upcoming" at all (matches the Offer/Appointment letter default of a
+      // three-month probation period).
+      if (differenceInDays(today, joiningDate) < PROBATION_DAYS) continue;
       const present   = presentMap.get(code);
-      const rawSalary = present
-        ? (Object.entries(present).find(([k]) =>
-            k.replace(/\s+/g, " ").trim().toLowerCase() === "current salary"
-          )?.[1] as string || "")
-        : (joining?.salary || joining?.["Salary"] || "");
+      // Present Employees has no "Current Salary" column — only "Salary" (the live figure, same
+      // one Payroll uses) and "Joining Salary" (historical). The old lookup here always missed.
+      const rawSalary = String(present?.salary || joining?.salary || joining?.["Salary"] || "");
       const nextDueDate = addDays(joiningDate, 365);
       rows.push({
         employeeId:   code,
@@ -170,7 +187,7 @@ export const UpcomingIncrementModule = () => {
     }
 
     return rows.sort((a, b) => a.daysLeft - b.daysLeft);
-  }, [actualRows, activeEmps, joinings, presentEmps, today]);
+  }, [actualRows, activeEmps, joinings, presentEmps, livingIds, today]);
 
   const upCounts = useMemo(() => ({
     total:   upcomingRows.length,

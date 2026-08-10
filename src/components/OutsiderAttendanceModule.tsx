@@ -212,9 +212,9 @@ export const OutsiderAttendanceModule: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-3xl border border-blue-100 shadow-sm p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white rounded-3xl border border-pink-100 shadow-sm p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <div className="p-3 bg-blue-600 rounded-2xl">
+          <div className="p-3 bg-pink-600 rounded-2xl">
             <MapPin className="w-6 h-6 text-white" />
           </div>
           <div>
@@ -228,7 +228,7 @@ export const OutsiderAttendanceModule: React.FC = () => {
             onClick={() => setActiveTab("mark")}
             className={cn(
               "px-6 py-2 rounded-xl text-sm font-bold transition-all",
-              activeTab === "mark" ? "bg-white text-blue-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
+              activeTab === "mark" ? "bg-white text-pink-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
             )}
           >
             Mark Attendance
@@ -237,7 +237,7 @@ export const OutsiderAttendanceModule: React.FC = () => {
             onClick={() => setActiveTab("history")}
             className={cn(
               "px-6 py-2 rounded-xl text-sm font-bold transition-all",
-              activeTab === "history" ? "bg-white text-blue-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
+              activeTab === "history" ? "bg-white text-pink-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
             )}
           >
             History
@@ -247,7 +247,7 @@ export const OutsiderAttendanceModule: React.FC = () => {
               onClick={() => setActiveTab("hr-approvals")}
               className={cn(
                 "px-6 py-2 rounded-xl text-sm font-bold transition-all",
-                activeTab === "hr-approvals" ? "bg-white text-blue-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
+                activeTab === "hr-approvals" ? "bg-white text-pink-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
               )}
             >
               HR Approvals
@@ -258,7 +258,7 @@ export const OutsiderAttendanceModule: React.FC = () => {
 
       {activeTab === "mark" && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <form onSubmit={handleSubmit} className="bg-white rounded-3xl border border-blue-100 shadow-sm p-6 lg:p-8 space-y-6">
+          <form onSubmit={handleSubmit} className="bg-white rounded-3xl border border-pink-100 shadow-sm p-6 lg:p-8 space-y-6">
             
             {errorMsg && (
               <div className="p-4 bg-red-50 border border-red-100 rounded-2xl flex items-start gap-3">
@@ -297,7 +297,7 @@ export const OutsiderAttendanceModule: React.FC = () => {
                         isActive 
                           ? s.base === "emerald" ? "bg-emerald-50 border-emerald-500 text-emerald-700 shadow-emerald-500/20 shadow-lg scale-[1.02]" :
                             s.base === "red" ? "bg-red-50 border-red-500 text-red-700 shadow-red-500/20 shadow-lg scale-[1.02]" :
-                            s.base === "blue" ? "bg-blue-50 border-blue-500 text-blue-700 shadow-blue-500/20 shadow-lg scale-[1.02]" :
+                            s.base === "blue" ? "bg-pink-50 border-pink-500 text-pink-700 shadow-pink-500/20 shadow-lg scale-[1.02]" :
                             "bg-orange-50 border-orange-500 text-orange-700 shadow-orange-500/20 shadow-lg scale-[1.02]"
                           : "bg-slate-50 border-transparent text-slate-500 hover:bg-slate-100 hover:border-slate-300 hover:shadow-md"
                       )}
@@ -308,7 +308,7 @@ export const OutsiderAttendanceModule: React.FC = () => {
                         isActive 
                           ? s.base === "emerald" ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]" :
                             s.base === "red" ? "bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]" :
-                            s.base === "blue" ? "bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]" :
+                            s.base === "blue" ? "bg-pink-500 shadow-[0_0_8px_rgba(97,128,22,0.8)]" :
                             "bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.8)]"
                           : "opacity-0 scale-0"
                       )} />
@@ -373,7 +373,7 @@ export const OutsiderAttendanceModule: React.FC = () => {
                   />
                   
                   {image ? (
-                    <div className="relative group rounded-3xl overflow-hidden border-2 border-blue-200 bg-slate-50 aspect-video sm:aspect-[4/3] flex items-center justify-center">
+                    <div className="relative group rounded-3xl overflow-hidden border-2 border-pink-200 bg-slate-50 aspect-video sm:aspect-[4/3] flex items-center justify-center">
                       <img src={image} alt="Captured" className="w-full h-full object-cover" />
                       <div className="absolute inset-0 bg-slate-900/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                         <button 
@@ -389,7 +389,7 @@ export const OutsiderAttendanceModule: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      className="w-full aspect-video sm:aspect-[4/3] bg-blue-50 hover:bg-blue-100 border-2 border-dashed border-blue-200 hover:border-blue-400 rounded-3xl flex flex-col items-center justify-center gap-3 transition-all text-blue-600"
+                      className="w-full aspect-video sm:aspect-[4/3] bg-pink-50 hover:bg-pink-100 border-2 border-dashed border-pink-200 hover:border-pink-400 rounded-3xl flex flex-col items-center justify-center gap-3 transition-all text-pink-600"
                     >
                       <Camera className="w-10 h-10" />
                       <span className="font-bold text-sm">Tap to Open Camera</span>
@@ -411,7 +411,7 @@ export const OutsiderAttendanceModule: React.FC = () => {
                         <p className="text-xs text-emerald-700 font-medium leading-relaxed mb-2">
                           {location.address}
                         </p>
-                        <a href={location.mapLink} target="_blank" rel="noreferrer" className="text-xs font-bold text-blue-600 hover:underline">
+                        <a href={location.mapLink} target="_blank" rel="noreferrer" className="text-xs font-bold text-pink-600 hover:underline">
                           View on Map
                         </a>
                       </div>
@@ -440,7 +440,7 @@ export const OutsiderAttendanceModule: React.FC = () => {
               className={cn(
                 "w-full py-4 rounded-2xl font-bold text-white shadow-lg transition-all flex items-center justify-center gap-2",
                 isSubmitting ? "opacity-70 cursor-not-allowed" : "hover:-translate-y-1 hover:shadow-xl",
-                status === "Leave" ? "bg-orange-500 shadow-orange-500/20" : "bg-blue-600 shadow-blue-600/20"
+                status === "Leave" ? "bg-orange-500 shadow-orange-500/20" : "bg-pink-600 shadow-pink-600/20"
               )}
             >
               {isSubmitting ? (
@@ -453,13 +453,13 @@ export const OutsiderAttendanceModule: React.FC = () => {
           </form>
 
           <div className="hidden lg:flex flex-col gap-6">
-            <div className="bg-gradient-to-br from-indigo-600 via-blue-600 to-indigo-800 rounded-[2rem] p-8 text-white shadow-2xl shadow-blue-900/20 relative overflow-hidden group">
+            <div className="bg-gradient-to-br from-pink-600 via-pink-600 to-pink-800 rounded-[2rem] p-8 text-white shadow-2xl shadow-pink-900/20 relative overflow-hidden group">
               {/* Animated background elements */}
               <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 group-hover:rotate-12 transition-all duration-700">
                 <MapPin className="w-48 h-48" />
               </div>
               <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all duration-700" />
-              <div className="absolute -top-24 -right-24 w-64 h-64 bg-blue-400/20 rounded-full blur-3xl group-hover:bg-blue-400/30 transition-all duration-700" />
+              <div className="absolute -top-24 -right-24 w-64 h-64 bg-pink-400/20 rounded-full blur-3xl group-hover:bg-pink-400/30 transition-all duration-700" />
               
               <div className="relative z-10">
                 <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/20 text-xs font-bold tracking-wider uppercase mb-6 backdrop-blur-md">
@@ -468,28 +468,28 @@ export const OutsiderAttendanceModule: React.FC = () => {
                 </div>
                 
                 <h3 className="text-3xl font-extrabold mb-3 tracking-tight">Outsider Attendance</h3>
-                <p className="text-blue-100/90 text-sm font-medium max-w-[85%] mb-10 leading-relaxed">
+                <p className="text-pink-100/90 text-sm font-medium max-w-[85%] mb-10 leading-relaxed">
                   As a field worker, your location and photo are required to mark attendance securely. Please allow camera and location permissions when prompted.
                 </p>
                 
                 <div className="space-y-4">
                   <div className="flex items-center gap-4 bg-white/10 hover:bg-white/15 rounded-2xl p-5 backdrop-blur-md border border-white/10 hover:border-white/20 transition-all duration-300 group/item cursor-default">
-                    <div className="p-3 bg-blue-500/30 rounded-xl group-hover/item:scale-110 transition-transform duration-300">
-                      <Clock className="w-6 h-6 text-blue-100" />
+                    <div className="p-3 bg-pink-500/30 rounded-xl group-hover/item:scale-110 transition-transform duration-300">
+                      <Clock className="w-6 h-6 text-pink-100" />
                     </div>
                     <div>
                       <h4 className="font-bold text-sm text-white mb-0.5">Timely Punches</h4>
-                      <p className="text-xs text-blue-200/80 font-medium">Always punch IN before starting work</p>
+                      <p className="text-xs text-pink-200/80 font-medium">Always punch IN before starting work</p>
                     </div>
                   </div>
                   
                   <div className="flex items-center gap-4 bg-white/10 hover:bg-white/15 rounded-2xl p-5 backdrop-blur-md border border-white/10 hover:border-white/20 transition-all duration-300 group/item cursor-default">
-                    <div className="p-3 bg-indigo-500/30 rounded-xl group-hover/item:scale-110 transition-transform duration-300">
-                      <MapPin className="w-6 h-6 text-blue-100" />
+                    <div className="p-3 bg-pink-500/30 rounded-xl group-hover/item:scale-110 transition-transform duration-300">
+                      <MapPin className="w-6 h-6 text-pink-100" />
                     </div>
                     <div>
                       <h4 className="font-bold text-sm text-white mb-0.5">Accurate GPS</h4>
-                      <p className="text-xs text-blue-200/80 font-medium">Your live location is mapped automatically</p>
+                      <p className="text-xs text-pink-200/80 font-medium">Your live location is mapped automatically</p>
                     </div>
                   </div>
                 </div>
@@ -503,7 +503,7 @@ export const OutsiderAttendanceModule: React.FC = () => {
         <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
           {isLoadingHistory ? (
             <div className="py-20 flex flex-col items-center gap-3">
-              <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+              <Loader2 className="w-8 h-8 animate-spin text-pink-500" />
               <p className="text-sm font-medium text-slate-500">Loading your attendance history...</p>
             </div>
           ) : history.length === 0 ? (
@@ -552,7 +552,7 @@ export const OutsiderAttendanceModule: React.FC = () => {
                             "px-3 py-1 text-xs font-bold rounded-lg border",
                             statusVal === "IN" ? "bg-emerald-50 text-emerald-600 border-emerald-100" :
                             statusVal === "OUT" ? "bg-red-50 text-red-600 border-red-100" :
-                            statusVal === "MID" ? "bg-blue-50 text-blue-600 border-blue-100" :
+                            statusVal === "MID" ? "bg-pink-50 text-pink-600 border-pink-100" :
                             "bg-orange-50 text-orange-600 border-orange-100"
                           )}>
                             {statusVal}
@@ -564,7 +564,7 @@ export const OutsiderAttendanceModule: React.FC = () => {
                               href={row.imageLink || row['Image Link']} 
                               target="_blank" 
                               rel="noreferrer"
-                              className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center hover:border-blue-400 hover:text-blue-500 transition-all text-slate-400"
+                              className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center hover:border-pink-400 hover:text-pink-500 transition-all text-slate-400"
                             >
                               <ImageIcon className="w-5 h-5" />
                             </a>
@@ -579,7 +579,7 @@ export const OutsiderAttendanceModule: React.FC = () => {
                                 {row.address || row.Address || "—"}
                               </p>
                               {(row.mapLink || row['Map Link']) && (
-                                <a href={row.mapLink || row['Map Link']} target="_blank" rel="noreferrer" className="text-[10px] font-bold text-blue-500 hover:underline inline-flex items-center gap-1">
+                                <a href={row.mapLink || row['Map Link']} target="_blank" rel="noreferrer" className="text-[10px] font-bold text-pink-500 hover:underline inline-flex items-center gap-1">
                                   <MapPin className="w-3 h-3" /> View Map
                                 </a>
                               )}
@@ -607,7 +607,7 @@ export const OutsiderAttendanceModule: React.FC = () => {
         <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
           {isLoadingHistory ? (
             <div className="py-20 flex flex-col items-center gap-3">
-              <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+              <Loader2 className="w-8 h-8 animate-spin text-pink-500" />
               <p className="text-sm font-medium text-slate-500">Loading records...</p>
             </div>
           ) : history.length === 0 ? (
@@ -660,7 +660,7 @@ export const OutsiderAttendanceModule: React.FC = () => {
                             "px-3 py-1 text-xs font-bold rounded-lg border",
                             statusVal === "IN" ? "bg-emerald-50 text-emerald-600 border-emerald-100" :
                             statusVal === "OUT" ? "bg-red-50 text-red-600 border-red-100" :
-                            statusVal === "MID" ? "bg-blue-50 text-blue-600 border-blue-100" :
+                            statusVal === "MID" ? "bg-pink-50 text-pink-600 border-pink-100" :
                             "bg-orange-50 text-orange-600 border-orange-100"
                           )}>
                             {statusVal}
@@ -670,7 +670,7 @@ export const OutsiderAttendanceModule: React.FC = () => {
                           {!isLeave ? (
                             <div className="flex items-center gap-3">
                               {(row.imageLink || row['Image Link']) ? (
-                                <a href={row.imageLink || row['Image Link']} target="_blank" rel="noreferrer" className="shrink-0 w-8 h-8 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center hover:border-blue-400 hover:text-blue-500 transition-all text-slate-400">
+                                <a href={row.imageLink || row['Image Link']} target="_blank" rel="noreferrer" className="shrink-0 w-8 h-8 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center hover:border-pink-400 hover:text-pink-500 transition-all text-slate-400">
                                   <ImageIcon className="w-4 h-4" />
                                 </a>
                               ) : <span className="text-xs text-slate-400">No Img</span>}
@@ -678,7 +678,7 @@ export const OutsiderAttendanceModule: React.FC = () => {
                               <div className="flex-1">
                                 <p className="text-xs text-slate-600 font-medium line-clamp-1">{row.address || row.Address || "—"}</p>
                                 {(row.mapLink || row['Map Link']) && (
-                                  <a href={row.mapLink || row['Map Link']} target="_blank" rel="noreferrer" className="text-[10px] font-bold text-blue-500 hover:underline inline-flex items-center gap-1">
+                                  <a href={row.mapLink || row['Map Link']} target="_blank" rel="noreferrer" className="text-[10px] font-bold text-pink-500 hover:underline inline-flex items-center gap-1">
                                     <MapPin className="w-3 h-3" /> View Map
                                   </a>
                                 )}
@@ -711,7 +711,7 @@ export const OutsiderAttendanceModule: React.FC = () => {
                         <td className="px-6 py-4 whitespace-nowrap">
                            <button
                              onClick={() => setHrApprovalData({status: 'Approved', remarks: hrRemarks || '', item: row})}
-                             className="px-4 py-2 bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 text-xs font-bold rounded-xl transition-all"
+                             className="px-4 py-2 bg-slate-100 hover:bg-pink-50 hover:text-pink-600 text-slate-600 text-xs font-bold rounded-xl transition-all"
                            >
                              Update
                            </button>
@@ -756,12 +756,12 @@ export const OutsiderAttendanceModule: React.FC = () => {
                   value={hrApprovalData.remarks}
                   onChange={e => setHrApprovalData(p => ({...p, remarks: e.target.value}))}
                   rows={3}
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm outline-none focus:border-blue-500 transition-all resize-none"
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm outline-none focus:border-pink-500 transition-all resize-none"
                   placeholder="Add any remarks here..."
                 />
               </div>
 
-              <button type="submit" disabled={isSubmitting} className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold transition-all shadow-lg shadow-blue-600/20 disabled:opacity-50">
+              <button type="submit" disabled={isSubmitting} className="w-full py-3.5 bg-pink-600 hover:bg-pink-700 text-white rounded-2xl font-bold transition-all shadow-lg shadow-pink-600/20 disabled:opacity-50">
                 {isSubmitting ? <><Loader2 className="w-5 h-5 animate-spin inline mr-2" /> Saving...</> : "Save Status"}
               </button>
             </form>

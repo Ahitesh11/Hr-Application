@@ -148,7 +148,7 @@ export const PayrollModule: React.FC = () => {
                 type="number"
                 value={year}
                 onChange={e => setYear(e.target.value)}
-                className="w-24 px-3 py-2 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-sm font-bold"
+                className="w-24 px-3 py-2 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-pink-500 text-sm font-bold"
               />
             </div>
             <div>
@@ -156,7 +156,7 @@ export const PayrollModule: React.FC = () => {
               <select
                 value={month}
                 onChange={e => setMonth(e.target.value)}
-                className="px-3 py-2 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-sm font-bold"
+                className="px-3 py-2 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-pink-500 text-sm font-bold"
               >
                 {MONTHS.map(m => <option key={m} value={m}>{m}</option>)}
               </select>
@@ -185,7 +185,7 @@ export const PayrollModule: React.FC = () => {
                 placeholder="Search by name or code..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all text-sm"
+                className="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-pink-500 outline-none transition-all text-sm"
               />
             </div>
             <div>
@@ -193,7 +193,7 @@ export const PayrollModule: React.FC = () => {
               <select
                 value={companyFilter}
                 onChange={e => setCompanyFilter(e.target.value)}
-                className="px-3 py-2 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-sm font-bold"
+                className="px-3 py-2 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-pink-500 text-sm font-bold"
               >
                 {companies.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
@@ -237,7 +237,7 @@ export const PayrollModule: React.FC = () => {
               {isLoading && rows.length === 0 ? (
                 <tr>
                   <td colSpan={COLUMNS.length} className="px-3 py-12 text-center">
-                    <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-2" />
+                    <Loader2 className="w-8 h-8 animate-spin text-pink-600 mx-auto mb-2" />
                     <p className="text-slate-500">Loading payroll...</p>
                   </td>
                 </tr>
@@ -262,7 +262,7 @@ export const PayrollModule: React.FC = () => {
                           {COLUMNS.map(c => (
                             <td
                               key={c.key as string}
-                              className={`px-3 py-3 ${c.money ? "text-right text-slate-700" : "text-slate-600"} ${c.key === "employeeName" ? "font-bold text-slate-900" : ""} ${c.key === "payment" ? "font-black text-blue-600" : ""}`}
+                              className={`px-3 py-3 ${c.money ? "text-right text-slate-700" : "text-slate-600"} ${c.key === "employeeName" ? "font-bold text-slate-900" : ""} ${c.key === "payment" ? "font-black text-pink-600" : ""}`}
                             >
                               {cell(c, (item as any)[c.key])}
                             </td>

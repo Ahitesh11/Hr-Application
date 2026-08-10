@@ -99,12 +99,12 @@ export const HolidayWorkingModule: React.FC = () => {
             placeholder="Search by name, ID or HW No..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+            className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-pink-500 outline-none transition-all"
           />
         </div>
         <button
           onClick={() => setIsFormOpen(true)}
-          className="w-full md:w-auto flex items-center justify-center gap-2 px-6 py-2 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all active:scale-[0.98]"
+          className="w-full md:w-auto flex items-center justify-center gap-2 px-6 py-2 bg-pink-600 text-white font-semibold rounded-xl hover:bg-pink-700 shadow-lg shadow-pink-100 transition-all active:scale-[0.98]"
         >
           <Plus className="w-5 h-5" />
           New HW Request
@@ -113,7 +113,7 @@ export const HolidayWorkingModule: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
-          <div className="p-3 bg-blue-50 rounded-xl text-blue-600">
+          <div className="p-3 bg-pink-50 rounded-xl text-pink-600">
             <Briefcase className="w-6 h-6" />
           </div>
           <div>
@@ -163,7 +163,7 @@ export const HolidayWorkingModule: React.FC = () => {
               {isLoading ? (
                 <tr>
                   <td colSpan={7} className="px-6 py-12 text-center">
-                    <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-2" />
+                    <Loader2 className="w-8 h-8 animate-spin text-pink-600 mx-auto mb-2" />
                     <p className="text-slate-500">Loading data...</p>
                   </td>
                 </tr>
@@ -200,7 +200,7 @@ export const HolidayWorkingModule: React.FC = () => {
                           {item.status2 === "Work Done" && item.status3 === "Pending" && (
                             <button
                               onClick={() => handleUpdateStep(item.holidayWorkingNo, 2)}
-                              className="px-3 py-1 bg-indigo-600 text-white text-xs font-bold rounded hover:bg-indigo-700 font-bold"
+                              className="px-3 py-1 bg-pink-600 text-white text-xs font-bold rounded hover:bg-pink-700 font-bold"
                             >
                               HR OK
                             </button>
@@ -232,7 +232,7 @@ export const HolidayWorkingModule: React.FC = () => {
                   <select
                     value={formData.status1}
                     onChange={(e) => setFormData({ ...formData, status1: e.target.value })}
-                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-pink-500 outline-none"
                     required
                   >
                     <option value="Holiday Working">Holiday Working</option>
@@ -247,7 +247,7 @@ export const HolidayWorkingModule: React.FC = () => {
                     type="date"
                     value={formData.workingDateFrom}
                     onChange={(e) => setFormData({ ...formData, workingDateFrom: e.target.value })}
-                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-pink-500 outline-none"
                     required
                   />
                 </div>
@@ -257,7 +257,7 @@ export const HolidayWorkingModule: React.FC = () => {
                     type="date"
                     value={formData.workingDateTo}
                     onChange={(e) => setFormData({ ...formData, workingDateTo: e.target.value })}
-                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-pink-500 outline-none"
                     required
                   />
                 </div>
@@ -270,7 +270,7 @@ export const HolidayWorkingModule: React.FC = () => {
                   step="0.5"
                   value={formData.numberOfDays}
                   onChange={(e) => setFormData({ ...formData, numberOfDays: parseFloat(e.target.value) })}
-                  className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                  className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-pink-500 outline-none"
                   required
                 />
               </div>
@@ -279,7 +279,7 @@ export const HolidayWorkingModule: React.FC = () => {
                 <textarea
                   value={formData.workDoneReason}
                   onChange={(e) => setFormData({ ...formData, workDoneReason: e.target.value })}
-                  className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none min-h-[80px]"
+                  className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-pink-500 outline-none min-h-[80px]"
                   placeholder="What work will be done?"
                   required
                 />
@@ -295,7 +295,7 @@ export const HolidayWorkingModule: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="flex-1 py-2.5 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all flex items-center justify-center gap-2"
+                  className="flex-1 py-2.5 bg-pink-600 text-white font-semibold rounded-lg hover:bg-pink-700 shadow-lg shadow-pink-100 transition-all flex items-center justify-center gap-2"
                 >
                   {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Submit Request"}
                 </button>

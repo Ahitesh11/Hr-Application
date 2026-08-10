@@ -253,8 +253,8 @@ export const LoanApplicationModule: React.FC = () => {
       <div className="bg-white border-b border-slate-200 px-6 pt-5 shrink-0 z-10 relative">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center shrink-0">
-              <Banknote className="w-5 h-5 text-blue-600" />
+            <div className="w-10 h-10 bg-pink-100 rounded-xl flex items-center justify-center shrink-0">
+              <Banknote className="w-5 h-5 text-pink-600" />
             </div>
             <div>
               <h1 className="text-xl font-black text-slate-800 leading-tight">Loan Applications</h1>
@@ -265,7 +265,7 @@ export const LoanApplicationModule: React.FC = () => {
           <div className="flex flex-col sm:flex-row items-center gap-3">
             <button
               onClick={() => setIsFormOpen(true)}
-              className="flex items-center justify-center gap-2 px-6 py-2 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all active:scale-[0.98]"
+              className="flex items-center justify-center gap-2 px-6 py-2 bg-pink-600 text-white font-semibold rounded-xl hover:bg-pink-700 shadow-lg shadow-pink-100 transition-all active:scale-[0.98]"
             >
               <Plus className="w-4 h-4" />
               New Application
@@ -277,7 +277,7 @@ export const LoanApplicationModule: React.FC = () => {
                 placeholder="Search Loan No, Name..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 bg-slate-100 border-none rounded-xl text-sm font-medium text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-blue-500 transition-all"
+                className="w-full pl-9 pr-4 py-2 bg-slate-100 border-none rounded-xl text-sm font-medium text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-pink-500 transition-all"
               />
             </div>
           </div>
@@ -296,10 +296,10 @@ export const LoanApplicationModule: React.FC = () => {
           </button>
           <button
             onClick={() => setActiveTab("make-payment")}
-            className={cn("py-3 font-bold text-sm border-b-2 transition-colors flex items-center gap-1.5 whitespace-nowrap", activeTab === "make-payment" ? "border-purple-600 text-purple-600" : "border-transparent text-slate-500 hover:text-slate-700")}
+            className={cn("py-3 font-bold text-sm border-b-2 transition-colors flex items-center gap-1.5 whitespace-nowrap", activeTab === "make-payment" ? "border-pink-600 text-pink-600" : "border-transparent text-slate-500 hover:text-slate-700")}
           >
             2nd Tab: Make Payment
-            <span className={cn("px-2 py-0.5 rounded-full text-[10px]", activeTab === "make-payment" ? "bg-purple-100 text-purple-700" : "bg-slate-100 text-slate-500")}>
+            <span className={cn("px-2 py-0.5 rounded-full text-[10px]", activeTab === "make-payment" ? "bg-pink-100 text-pink-700" : "bg-slate-100 text-slate-500")}>
               {getTabCount("make-payment")}
             </span>
           </button>
@@ -329,7 +329,7 @@ export const LoanApplicationModule: React.FC = () => {
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 h-full flex flex-col overflow-hidden">
           {isLoading ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-4">
-              <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+              <Loader2 className="w-8 h-8 animate-spin text-pink-600" />
               <p className="text-slate-500 font-medium">Loading data...</p>
             </div>
           ) : filteredData.length === 0 ? (
@@ -366,7 +366,7 @@ export const LoanApplicationModule: React.FC = () => {
                     
                     {activeTab === "history" && (
                       <>
-                        <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase border-b border-r border-slate-100 bg-purple-50/30">Payment Form</th>
+                        <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase border-b border-r border-slate-100 bg-pink-50/30">Payment Form</th>
                         <th className="px-4 py-3 text-[11px] font-bold text-slate-500 uppercase border-b border-r border-slate-100 bg-emerald-50/30">Status 2</th>
                       </>
                     )}
@@ -383,7 +383,7 @@ export const LoanApplicationModule: React.FC = () => {
                       <td className="px-4 py-3 border-r border-slate-100 font-medium">{item.employeeName}</td>
                       <td className="px-4 py-3 border-r border-slate-100">{item.designation}</td>
                       <td className="px-4 py-3 border-r border-slate-100">{item.workLocation}</td>
-                      <td className="px-4 py-3 border-r border-slate-100 font-bold text-blue-600">{item.requestAmount}</td>
+                      <td className="px-4 py-3 border-r border-slate-100 font-bold text-pink-600">{item.requestAmount}</td>
                       <td className="px-4 py-3 border-r border-slate-100">{item.monthlyDeductionAmount}</td>
                       <td className="px-4 py-3 border-r border-slate-100 max-w-[200px] truncate" title={item.reason}>{item.reason}</td>
                       <td className="px-4 py-3 border-r border-slate-100">{item.companyName}</td>
@@ -417,12 +417,12 @@ export const LoanApplicationModule: React.FC = () => {
                       {activeTab !== "history" && (
                         <td className="px-4 py-3 text-center sticky right-0 bg-white shadow-[-4px_0_12px_rgba(0,0,0,0.03)]">
                           {activeTab === "mgmt-approval" && (user?.role === "Admin" || user?.role === "HOD") && (
-                            <button onClick={() => { setSelectedRowId(item.loanNo || ""); setSelectedRowIndex(item._row); setStep1ModalOpen(true); }} className="px-3 py-1.5 bg-blue-100 text-blue-700 text-[10px] font-bold rounded-lg hover:bg-blue-200">
+                            <button onClick={() => { setSelectedRowId(item.loanNo || ""); setSelectedRowIndex(item._row); setStep1ModalOpen(true); }} className="px-3 py-1.5 bg-pink-100 text-pink-700 text-[10px] font-bold rounded-lg hover:bg-pink-200">
                               Approve
                             </button>
                           )}
                           {activeTab === "make-payment" && (user?.role === "Admin") && (
-                            <button onClick={() => { setSelectedRowId(item.loanNo || ""); setSelectedRowIndex(item._row); setStep2ModalOpen(true); }} className="px-3 py-1.5 bg-purple-100 text-purple-700 text-[10px] font-bold rounded-lg hover:bg-purple-200">
+                            <button onClick={() => { setSelectedRowId(item.loanNo || ""); setSelectedRowIndex(item._row); setStep2ModalOpen(true); }} className="px-3 py-1.5 bg-pink-100 text-pink-700 text-[10px] font-bold rounded-lg hover:bg-pink-200">
                               Make Payment
                             </button>
                           )}
@@ -469,7 +469,7 @@ export const LoanApplicationModule: React.FC = () => {
                       }}
                       onFocus={() => setIsDropdownOpen(true)}
                       onBlur={() => setTimeout(() => setIsDropdownOpen(false), 200)}
-                      className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none pr-10"
+                      className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-pink-500 outline-none pr-10"
                       placeholder="Search ID or Name..."
                       required
                     />
@@ -490,7 +490,7 @@ export const LoanApplicationModule: React.FC = () => {
                             return (
                               <div
                                 key={i}
-                                className="px-4 py-2 text-sm text-slate-700 hover:bg-blue-50 cursor-pointer border-b border-slate-50 last:border-none"
+                                className="px-4 py-2 text-sm text-slate-700 hover:bg-pink-50 cursor-pointer border-b border-slate-50 last:border-none"
                                 onMouseDown={(e) => {
                                   e.preventDefault();
                                   setEmpSearch(`${id} - ${emp.employeeName || emp.nameAsPerAadhar || emp.name}`);
@@ -512,7 +512,7 @@ export const LoanApplicationModule: React.FC = () => {
                     type="text"
                     value={formData.employeeName}
                     onChange={(e) => setFormData({...formData, employeeName: e.target.value})}
-                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-pink-500 outline-none"
                     required
                   />
                 </div>
@@ -522,7 +522,7 @@ export const LoanApplicationModule: React.FC = () => {
                     type="text"
                     value={formData.designation}
                     onChange={(e) => setFormData({...formData, designation: e.target.value})}
-                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-pink-500 outline-none"
                     required
                   />
                 </div>
@@ -532,7 +532,7 @@ export const LoanApplicationModule: React.FC = () => {
                     type="text"
                     value={formData.companyName}
                     onChange={(e) => setFormData({...formData, companyName: e.target.value})}
-                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-pink-500 outline-none"
                     required
                   />
                 </div>
@@ -543,7 +543,7 @@ export const LoanApplicationModule: React.FC = () => {
                   type="text"
                   value={formData.workLocation}
                   onChange={(e) => setFormData({...formData, workLocation: e.target.value})}
-                  className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                  className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-pink-500 outline-none"
                   required
                 />
               </div>
@@ -554,7 +554,7 @@ export const LoanApplicationModule: React.FC = () => {
                     type="number"
                     value={formData.requestAmount}
                     onChange={(e) => setFormData({...formData, requestAmount: e.target.value})}
-                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-pink-500 outline-none"
                     required
                   />
                 </div>
@@ -564,7 +564,7 @@ export const LoanApplicationModule: React.FC = () => {
                     type="number"
                     value={formData.monthlyDeductionAmount}
                     onChange={(e) => setFormData({...formData, monthlyDeductionAmount: e.target.value})}
-                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-pink-500 outline-none"
                     required
                   />
                 </div>
@@ -574,13 +574,13 @@ export const LoanApplicationModule: React.FC = () => {
                 <textarea
                   value={formData.reason}
                   onChange={(e) => setFormData({...formData, reason: e.target.value})}
-                  className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none min-h-[100px]"
+                  className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-pink-500 outline-none min-h-[100px]"
                   required
                 />
               </div>
               <div className="pt-4 flex gap-3">
                 <button type="button" onClick={() => setIsFormOpen(false)} className="flex-1 py-2.5 bg-slate-100 text-slate-700 font-semibold rounded-lg hover:bg-slate-200 transition-all">Cancel</button>
-                <button type="submit" disabled={isLoading} className="flex-1 py-2.5 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-all flex items-center justify-center gap-2">
+                <button type="submit" disabled={isLoading} className="flex-1 py-2.5 bg-pink-600 text-white font-semibold rounded-lg hover:bg-pink-700 transition-all flex items-center justify-center gap-2">
                   {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Submit"}
                 </button>
               </div>
@@ -618,7 +618,7 @@ export const LoanApplicationModule: React.FC = () => {
               </div>
               <div className="pt-4 flex gap-3">
                 <button type="button" onClick={() => setStep1ModalOpen(false)} className="flex-1 py-2 bg-slate-100 text-slate-700 font-semibold rounded-lg">Cancel</button>
-                <button type="submit" disabled={isLoading} className="flex-1 py-2 bg-blue-600 text-white font-semibold rounded-lg flex justify-center">
+                <button type="submit" disabled={isLoading} className="flex-1 py-2 bg-pink-600 text-white font-semibold rounded-lg flex justify-center">
                   {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Save"}
                 </button>
               </div>
@@ -662,7 +662,7 @@ export const LoanApplicationModule: React.FC = () => {
               </div>
               <div className="pt-4 flex gap-3">
                 <button type="button" onClick={() => setStep2ModalOpen(false)} className="flex-1 py-3 bg-slate-100 text-slate-700 font-semibold rounded-lg hover:bg-slate-200 transition-colors">Cancel</button>
-                <button type="submit" disabled={isLoading} className="flex-1 py-3 bg-blue-600 text-white font-semibold rounded-lg flex justify-center hover:bg-blue-700 transition-colors">
+                <button type="submit" disabled={isLoading} className="flex-1 py-3 bg-pink-600 text-white font-semibold rounded-lg flex justify-center hover:bg-pink-700 transition-colors">
                   {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Confirm Submission"}
                 </button>
               </div>

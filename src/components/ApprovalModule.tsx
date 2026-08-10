@@ -262,7 +262,7 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
             className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all whitespace-nowrap"
             style={
               activeSubTab === tab.id
-                ? { background: "#2563eb", color: "white", boxShadow: "0 2px 8px rgba(37,99,235,0.25)" }
+                ? { background: "#4d6515", color: "white", boxShadow: "0 2px 8px rgba(77,101,21,0.25)" }
                 : { background: "#f1f5f9", color: "#64748b" }
             }
           >
@@ -284,7 +284,7 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
         <button
           onClick={fetchData}
           disabled={isLoading}
-          className="px-4 py-2 bg-blue-50 text-blue-600 rounded-xl font-bold text-xs hover:bg-blue-100 transition-all disabled:opacity-50 flex items-center gap-1.5"
+          className="px-4 py-2 bg-pink-50 text-pink-600 rounded-xl font-bold text-xs hover:bg-pink-100 transition-all disabled:opacity-50 flex items-center gap-1.5"
           title="Refresh Requests"
         >
           <Loader2 className={cn("w-4 h-4", isLoading && "animate-spin")} />
@@ -300,7 +300,7 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
           placeholder="Search by name, ID or No..."
           value={searchTerm}
           onChange={e => { setSearchTerm(e.target.value); }}
-          className="w-full pl-9 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:border-blue-400 transition-all"
+          className="w-full pl-9 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:border-pink-400 transition-all"
         />
       </div>
 
@@ -308,7 +308,7 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
         {isLoading ? (
           <div className="p-12 text-center">
-            <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-2" />
+            <Loader2 className="w-8 h-8 animate-spin text-pink-600 mx-auto mb-2" />
             <p className="text-slate-500">Loading pending requests...</p>
           </div>
         ) : (
@@ -411,7 +411,7 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
                       {/* Employee cell */}
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white text-xs font-extrabold shrink-0">
+                          <div className="w-8 h-8 rounded-lg bg-pink-600 flex items-center justify-center text-white text-xs font-extrabold shrink-0">
                             {(item.name || "?").charAt(0).toUpperCase()}
                           </div>
                           <div>
@@ -421,7 +421,7 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
                         </div>
                       </td>
                       <td className="px-4 py-3 text-xs text-slate-600 max-w-[140px] truncate" title={item.reason}>{item.reason}</td>
-                      <td className="px-4 py-3 text-xs font-bold text-blue-600 whitespace-nowrap">{item.punchMissTime}</td>
+                      <td className="px-4 py-3 text-xs font-bold text-pink-600 whitespace-nowrap">{item.punchMissTime}</td>
                       <td className="px-4 py-3">
                         <div className="flex justify-center">
                           {item.image ? (
@@ -429,7 +429,7 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
                               {item.image.startsWith('data:image') ? (
                                 <img src={item.image} className="w-full h-full object-cover" />
                               ) : (
-                                <Image className="w-4 h-4 text-blue-500 mx-auto mt-2.5" />
+                                <Image className="w-4 h-4 text-pink-500 mx-auto mt-2.5" />
                               )}
                             </div>
                           ) : <span className="text-[10px] text-slate-400 italic">-</span>}
@@ -440,7 +440,7 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
                         <button
                           onClick={() => setSelectedRequest({ sheet: "Punch Miss Fms", id: item.pmNo, step: 1, rowIndex: item._row })}
                           className="px-3 py-1.5 text-white text-[10px] font-extrabold rounded-lg transition-all active:scale-95"
-                          style={{ background: "linear-gradient(135deg, #2563eb, #4f46e5)", boxShadow: "0 2px 8px rgba(37,99,235,0.3)" }}
+                          style={{ background: "linear-gradient(135deg, #4d6515, #3a4e0f)", boxShadow: "0 2px 8px rgba(77,101,21,0.3)" }}
                         >
                           Action
                         </button>
@@ -466,7 +466,7 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
                       {/* Employee cell */}
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white text-xs font-extrabold shrink-0">
+                          <div className="w-8 h-8 rounded-lg bg-pink-600 flex items-center justify-center text-white text-xs font-extrabold shrink-0">
                             {(item.nameOfEmployee || "?").charAt(0).toUpperCase()}
                           </div>
                           <div>
@@ -486,7 +486,7 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
                           </div>
                           <span
                             className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-extrabold w-fit"
-                            style={{ background: "#eff6ff", color: "#2563eb" }}
+                            style={{ background: "#f3f5e7", color: "#4d6515" }}
                           >
                             {item.noOfDays} Day(s)
                           </span>
@@ -499,7 +499,7 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
                               {item.medicalCertificate.startsWith('data:image') ? (
                                 <img src={item.medicalCertificate} className="w-full h-full object-cover" />
                               ) : (
-                                <Image className="w-4 h-4 text-blue-500 mx-auto mt-2.5" />
+                                <Image className="w-4 h-4 text-pink-500 mx-auto mt-2.5" />
                               )}
                             </div>
                           ) : <span className="text-[10px] text-slate-400 italic">-</span>}
@@ -517,7 +517,7 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
                         <button
                           onClick={() => setSelectedRequest({ sheet: "Leave Fms", id: item.leaveNo, step: role === "HOD" ? 1 : 2, rowIndex: item._row })}
                           className="px-3 py-1.5 text-white text-[10px] font-extrabold rounded-lg transition-all active:scale-95"
-                          style={{ background: "linear-gradient(135deg, #2563eb, #4f46e5)", boxShadow: "0 2px 8px rgba(37,99,235,0.3)" }}
+                          style={{ background: "linear-gradient(135deg, #4d6515, #3a4e0f)", boxShadow: "0 2px 8px rgba(77,101,21,0.3)" }}
                         >
                           Action
                         </button>
@@ -532,7 +532,7 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
                   ) : getFilteredSalaryHod().map((item, idx) => (
                     <tr
                       key={idx}
-                      className={cn("transition-colors hover:bg-orange-50/40", idx % 2 === 0 ? "bg-white" : "bg-slate-50/40")}
+                      className={cn("transition-colors hover:bg-pink-50/40", idx % 2 === 0 ? "bg-white" : "bg-slate-50/40")}
                       style={{ borderBottom: "1px solid #f1f5f9" }}
                     >
                       <td className="px-4 py-3 whitespace-nowrap">
@@ -540,7 +540,7 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center text-white text-xs font-extrabold shrink-0">
+                          <div className="w-8 h-8 rounded-lg bg-pink-500 flex items-center justify-center text-white text-xs font-extrabold shrink-0">
                             {(item.employeeName || "?").charAt(0).toUpperCase()}
                           </div>
                           <div>
@@ -554,7 +554,7 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
                       <td className="px-4 py-3 text-xs text-slate-500 whitespace-nowrap">{item.department || "—"}</td>
                       <td className="px-4 py-3 text-xs text-slate-500 whitespace-nowrap">{item.dateOfJoining || "—"}</td>
                       <td className="px-4 py-3 text-right">
-                        <span className="text-xs font-black text-blue-600">₹{item.currentSalary || "—"}</span>
+                        <span className="text-xs font-black text-pink-600">₹{item.currentSalary || "—"}</span>
                       </td>
                       <td className="px-4 py-3 text-right">
                         <span className="text-xs font-bold text-slate-500">₹{item.lastIncrementAmount || "—"}</span>
@@ -569,7 +569,7 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
                         <button
                           onClick={() => setSelectedRequest({ sheet: "Salary Increment", id: item.uniqueNo, step: 1, rowIndex: item._row })}
                           className="px-3 py-1.5 text-white text-[10px] font-extrabold rounded-lg transition-all active:scale-95 whitespace-nowrap"
-                          style={{ background: "linear-gradient(135deg, #f97316, #ea580c)", boxShadow: "0 2px 8px rgba(249,115,22,0.3)" }}
+                          style={{ background: "linear-gradient(135deg, #4d6515, #3a4e0f)", boxShadow: "0 2px 8px rgba(77,101,21,0.3)" }}
                         >
                           Review
                         </button>
@@ -592,7 +592,7 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
                       {/* Employee cell */}
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white text-xs font-extrabold shrink-0">
+                          <div className="w-8 h-8 rounded-lg bg-pink-600 flex items-center justify-center text-white text-xs font-extrabold shrink-0">
                             {(item.name || "?").charAt(0).toUpperCase()}
                           </div>
                           <div>
@@ -617,7 +617,7 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
                         <button
                           onClick={() => setSelectedRequest({ sheet: "Holiday Working Fms", id: item.holidayWorkingNo, step: role === "HOD" ? 1 : 2, rowIndex: item._row })}
                           className="px-3 py-1.5 text-white text-[10px] font-extrabold rounded-lg transition-all active:scale-95"
-                          style={{ background: "linear-gradient(135deg, #2563eb, #4f46e5)", boxShadow: "0 2px 8px rgba(37,99,235,0.3)" }}
+                          style={{ background: "linear-gradient(135deg, #4d6515, #3a4e0f)", boxShadow: "0 2px 8px rgba(77,101,21,0.3)" }}
                         >
                           Action
                         </button>
@@ -638,7 +638,7 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
             <p className="text-slate-500 text-sm mb-6 font-bold uppercase">{selectedRequest.sheet} Step {selectedRequest.step}</p>
 
             {selectedRequest.sheet === "Leave Fms" && (
-              <div className="mb-6 p-4 bg-blue-50/50 rounded-2xl border border-blue-100 animate-in fade-in slide-in-from-top-4 duration-500">
+              <div className="mb-6 p-4 bg-pink-50/50 rounded-2xl border border-pink-100 animate-in fade-in slide-in-from-top-4 duration-500">
                 {(() => {
                   const req = leaveData.find(l => l.leaveNo === selectedRequest.id);
                   if (!req) return null;
@@ -655,9 +655,9 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
 
                   return (
                     <div className="space-y-4 text-left">
-                      <div className="flex items-center justify-between border-b border-blue-100 pb-2">
+                      <div className="flex items-center justify-between border-b border-pink-100 pb-2">
                         <p className="text-sm font-bold text-slate-900">{req.nameOfEmployee}</p>
-                        <span className="px-2 py-0.5 bg-blue-600 text-white text-[10px] font-bold rounded-full uppercase">{req.typeOfLeave} Request</span>
+                        <span className="px-2 py-0.5 bg-pink-600 text-white text-[10px] font-bold rounded-full uppercase">{req.typeOfLeave} Request</span>
                       </div>
                       <div className="grid grid-cols-3 gap-2">
                         {[
@@ -667,7 +667,7 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
                         ].map((item) => (
                           <div key={item.label} className={cn(
                             "p-2 rounded-xl text-center transition-all",
-                            req.typeOfLeave === item.label ? "bg-blue-600 text-white shadow-lg shadow-blue-200 scale-105" : "bg-white text-slate-600 border border-blue-50"
+                            req.typeOfLeave === item.label ? "bg-pink-600 text-white shadow-lg shadow-pink-200 scale-105" : "bg-white text-slate-600 border border-pink-50"
                           )}>
                             <p className="text-[10px] font-bold uppercase opacity-80 mb-0.5">{item.label}</p>
                             <p className="text-sm font-black leading-none mb-1">{item.stat.total - item.stat.taken} <span className="text-[8px] opacity-70">Left</span></p>
@@ -704,7 +704,7 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
                           const val = e.target.value;
                           setExtraFields((prev: any) => val ? { ...prev, noOfDays: parseFloat(val) } : (() => { const { noOfDays, ...rest } = prev; return rest; })());
                         }}
-                        className="w-full border border-slate-200 p-2 rounded-xl text-sm text-center font-bold outline-none focus:border-blue-400 bg-white"
+                        className="w-full border border-slate-200 p-2 rounded-xl text-sm text-center font-bold outline-none focus:border-pink-400 bg-white"
                       />
                     </div>
                   </div>

@@ -374,8 +374,8 @@ export const DocumentGeneratorModule = () => {
         
         {submitResult.link && !submitResult.link.includes("Error") ? (
           <div className="mb-8 p-4 bg-white border border-slate-200 rounded-xl flex items-center gap-3">
-            <FileText className="w-5 h-5 text-blue-600" />
-            <a href={submitResult.link} target="_blank" rel="noopener noreferrer" className="text-blue-600 font-bold hover:underline">
+            <FileText className="w-5 h-5 text-pink-600" />
+            <a href={submitResult.link} target="_blank" rel="noopener noreferrer" className="text-pink-600 font-bold hover:underline">
               View PDF Document
             </a>
           </div>
@@ -387,7 +387,7 @@ export const DocumentGeneratorModule = () => {
 
         <button
           onClick={resetForm}
-          className="px-6 py-2.5 bg-blue-600 text-white font-bold rounded-xl shadow-lg hover:bg-blue-700 hover:shadow-blue-200 transition-all"
+          className="px-6 py-2.5 bg-pink-600 text-white font-bold rounded-xl shadow-lg hover:bg-pink-700 hover:shadow-pink-200 transition-all"
         >
           Create Another Document
         </button>
@@ -420,7 +420,7 @@ export const DocumentGeneratorModule = () => {
       {/* Header */}
       <div className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between shrink-0">
         <div>
-          <h1 className="text-xl font-extrabold text-blue-900 mb-1">Generate Document</h1>
+          <h1 className="text-xl font-extrabold text-pink-900 mb-1">Generate Document</h1>
           <p className="text-sm text-slate-500">Create beautiful, standardized documents instantly</p>
         </div>
         <div className="flex items-center gap-2">
@@ -429,7 +429,7 @@ export const DocumentGeneratorModule = () => {
             {[1, 2, 3, 4].map(s => (
               <div 
                 key={s} 
-                className={cn("h-1.5 rounded-full transition-all", s <= currentStep ? "bg-blue-600 w-8" : "bg-slate-200 w-4")}
+                className={cn("h-1.5 rounded-full transition-all", s <= currentStep ? "bg-pink-600 w-8" : "bg-slate-200 w-4")}
               />
             ))}
           </div>
@@ -443,7 +443,7 @@ export const DocumentGeneratorModule = () => {
           <div className="flex-1 p-6 md:p-10">
             {/* Step Header */}
             <div className="flex items-center gap-4 mb-8">
-              <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+              <div className="w-12 h-12 rounded-xl bg-pink-50 text-pink-600 flex items-center justify-center shrink-0">
                 {React.createElement(STEPS[currentStep - 1].icon, { className: "w-6 h-6" })}
               </div>
               <div>
@@ -465,7 +465,7 @@ export const DocumentGeneratorModule = () => {
                   <select 
                     value={documentType}
                     onChange={(e) => setDocumentType(e.target.value)}
-                    className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50 font-bold"
+                    className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-50 font-bold"
                   >
                     {DOCUMENT_TYPES.map(t => <option key={t.id} value={t.id}>{t.label}</option>)}
                   </select>
@@ -479,7 +479,7 @@ export const DocumentGeneratorModule = () => {
                     <select
                       value={selectedEmployeeKey}
                       onChange={(e) => handleEmployeeDropdownChange(e.target.value)}
-                      className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50 font-medium appearance-none"
+                      className="w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:border-pink-500 focus:ring-4 focus:ring-pink-50 font-medium appearance-none"
                     >
                       <option value="">{isLoading ? "Loading employees…" : "-- Select Employee --"}</option>
                       {employees.map((e, i) => {
@@ -526,9 +526,9 @@ export const DocumentGeneratorModule = () => {
                 </div>
 
                 {formData.fullName && (
-                  <div className="mt-6 p-4 bg-blue-50 border border-blue-100 rounded-xl flex items-center justify-between">
-                    <span className="text-sm font-medium text-blue-800">Selected: <strong>{formData.fullName}</strong></span>
-                    <button onClick={() => setFormData(prev => ({...prev, fullName: ""}))} className="text-xs font-bold text-blue-600 hover:underline">Change</button>
+                  <div className="mt-6 p-4 bg-pink-50 border border-pink-100 rounded-xl flex items-center justify-between">
+                    <span className="text-sm font-medium text-pink-800">Selected: <strong>{formData.fullName}</strong></span>
+                    <button onClick={() => setFormData(prev => ({...prev, fullName: ""}))} className="text-xs font-bold text-pink-600 hover:underline">Change</button>
                   </div>
                 )}
               </div>
@@ -600,7 +600,7 @@ export const DocumentGeneratorModule = () => {
                       <input 
                         value={dynamicFields.reason}
                         onChange={(e) => setDynamicFields(prev => ({...prev, reason: e.target.value}))}
-                        className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none"
+                        className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:border-pink-400 focus:ring-2 focus:ring-pink-100 outline-none"
                       />
                     </div>
                   </>
@@ -623,7 +623,7 @@ export const DocumentGeneratorModule = () => {
                     <textarea
                       value={htmlBody}
                       onChange={(e) => setHtmlBody(e.target.value)}
-                      className="flex-1 w-full bg-slate-50 border border-slate-200 rounded-xl p-4 font-mono text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-200 custom-scrollbar"
+                      className="flex-1 w-full bg-slate-50 border border-slate-200 rounded-xl p-4 font-mono text-sm resize-none focus:outline-none focus:ring-2 focus:ring-pink-200 custom-scrollbar"
                     />
                   </div>
                   
@@ -648,7 +648,7 @@ export const DocumentGeneratorModule = () => {
             {/* Step 4 Content (Submit) */}
             {currentStep === 4 && (
               <div className="flex flex-col items-center justify-center py-12">
-                <div className="w-20 h-20 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-6 shadow-inner">
+                <div className="w-20 h-20 bg-pink-50 text-pink-600 rounded-full flex items-center justify-center mb-6 shadow-inner">
                   <FileText className="w-10 h-10" />
                 </div>
                 <h3 className="text-2xl font-black text-slate-800 mb-2">Ready to Generate!</h3>
@@ -660,14 +660,14 @@ export const DocumentGeneratorModule = () => {
                 <div className="flex flex-col sm:flex-row gap-4">
                   <button
                     onClick={handlePreview}
-                    className="flex items-center justify-center gap-2 px-8 py-4 bg-white border-2 border-slate-200 text-slate-700 rounded-2xl font-bold text-lg hover:border-blue-400 hover:text-blue-600 transition-all transform hover:-translate-y-1 shadow-sm"
+                    className="flex items-center justify-center gap-2 px-8 py-4 bg-white border-2 border-slate-200 text-slate-700 rounded-2xl font-bold text-lg hover:border-pink-400 hover:text-pink-600 transition-all transform hover:-translate-y-1 shadow-sm"
                   >
                     <FileText className="w-6 h-6" /> Preview / Print PDF
                   </button>
                   <button
                     onClick={handleSubmit}
                     disabled={isSubmitting}
-                    className="flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl font-bold text-lg hover:shadow-xl hover:shadow-blue-200 transition-all disabled:opacity-70 disabled:cursor-not-allowed transform hover:-translate-y-1"
+                    className="flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-pink-600 to-pink-600 text-white rounded-2xl font-bold text-lg hover:shadow-xl hover:shadow-pink-200 transition-all disabled:opacity-70 disabled:cursor-not-allowed transform hover:-translate-y-1"
                   >
                     {isSubmitting ? (
                       <><Loader2 className="w-6 h-6 animate-spin" /> Generating...</>
@@ -703,8 +703,8 @@ export const DocumentGeneratorModule = () => {
                 className={cn(
                   "flex items-center gap-2 px-6 py-2.5 text-white rounded-xl font-bold shadow-lg transition-all",
                   currentStep === 1 && !formData.fullName 
-                    ? "bg-blue-300 cursor-not-allowed shadow-none" 
-                    : "bg-blue-600 hover:bg-blue-700 shadow-blue-200"
+                    ? "bg-pink-300 cursor-not-allowed shadow-none" 
+                    : "bg-pink-600 hover:bg-pink-700 shadow-pink-200"
                 )}
               >
                 {currentStep === 3 ? "Review Final Document" : "Next Step"}
@@ -725,7 +725,7 @@ const Field = ({ label, type = "text", value, onChange }: { label: string, type?
       type={type}
       value={value}
       onChange={e => onChange(e.target.value)}
-      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all"
+      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:border-pink-400 focus:ring-2 focus:ring-pink-100 outline-none transition-all"
     />
   </div>
 );

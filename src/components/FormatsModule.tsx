@@ -14,7 +14,7 @@ export const FormatsModule: React.FC = () => {
         <button
           onClick={() => setActiveTab('generate')}
           className={`flex items-center gap-2 pb-4 -mb-4 font-bold text-sm border-b-2 transition-all ${
-            activeTab === 'generate' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-800'
+            activeTab === 'generate' ? 'border-pink-600 text-pink-600' : 'border-transparent text-slate-500 hover:text-slate-800'
           }`}
         >
           <FileText className="w-4 h-4" /> Generate Document
@@ -22,7 +22,7 @@ export const FormatsModule: React.FC = () => {
         <button
           onClick={() => setActiveTab('templates')}
           className={`flex items-center gap-2 pb-4 -mb-4 font-bold text-sm border-b-2 transition-all ${
-            activeTab === 'templates' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-800'
+            activeTab === 'templates' ? 'border-pink-600 text-pink-600' : 'border-transparent text-slate-500 hover:text-slate-800'
           }`}
         >
           <Settings className="w-4 h-4" /> Manage Templates
@@ -30,7 +30,7 @@ export const FormatsModule: React.FC = () => {
         <button
           onClick={() => setActiveTab('records')}
           className={`flex items-center gap-2 pb-4 -mb-4 font-bold text-sm border-b-2 transition-all ${
-            activeTab === 'records' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-800'
+            activeTab === 'records' ? 'border-pink-600 text-pink-600' : 'border-transparent text-slate-500 hover:text-slate-800'
           }`}
         >
           <Archive className="w-4 h-4" /> Records

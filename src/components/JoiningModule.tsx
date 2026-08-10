@@ -544,15 +544,15 @@ export const JoiningModule = () => {
           <form onSubmit={handleSubmit} className="p-8 space-y-8">
 
             {/* Section 1: Basic Info */}
-            <div className="bg-indigo-50 border border-indigo-100 rounded-2xl p-6 mb-8">
-              <h4 className="text-sm font-bold text-indigo-900 mb-4 flex items-center gap-2">
+            <div className="bg-pink-50 border border-pink-100 rounded-2xl p-6 mb-8">
+              <h4 className="text-sm font-bold text-pink-900 mb-4 flex items-center gap-2">
                 <Search className="w-4 h-4" /> Link Approved Indent
               </h4>
-              <p className="text-xs text-indigo-700 mb-4">
+              <p className="text-xs text-pink-700 mb-4">
                 You must select an Indent from the Hiring Tracker with "Selected" or "Hired" interview status to proceed.
               </p>
               <div>
-                <label className="text-xs font-bold text-indigo-800 uppercase tracking-wider block mb-1.5">
+                <label className="text-xs font-bold text-pink-800 uppercase tracking-wider block mb-1.5">
                   Select Indent <span className="text-pink-500 ml-0.5">*</span>
                 </label>
                 <div className="relative max-w-md">
@@ -573,7 +573,7 @@ export const JoiningModule = () => {
                       }
                     }}
                     required
-                    className="w-full px-3.5 py-2.5 bg-white border border-indigo-200 rounded-xl text-sm font-bold text-slate-800 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none transition-all appearance-none shadow-sm"
+                    className="w-full px-3.5 py-2.5 bg-white border border-pink-200 rounded-xl text-sm font-bold text-slate-800 focus:border-pink-400 focus:ring-2 focus:ring-pink-100 outline-none transition-all appearance-none shadow-sm"
                   >
                     <option value="">-- Choose Approved Candidate --</option>
                     {hiringTrackerList
@@ -591,7 +591,7 @@ export const JoiningModule = () => {
                         </option>
                       ))}
                   </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-indigo-400 pointer-events-none" />
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-pink-400 pointer-events-none" />
                 </div>
               </div>
             </div>

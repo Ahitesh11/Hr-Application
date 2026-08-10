@@ -170,12 +170,12 @@ export const LeaveModule: React.FC = () => {
             placeholder="Search by name, ID or Leave No..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+            className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-pink-500 outline-none transition-all"
           />
         </div>
         <button
           onClick={() => setIsFormOpen(true)}
-          className="w-full md:w-auto flex items-center justify-center gap-2 px-6 py-2 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all active:scale-[0.98]"
+          className="w-full md:w-auto flex items-center justify-center gap-2 px-6 py-2 bg-pink-600 text-white font-semibold rounded-xl hover:bg-pink-700 shadow-lg shadow-pink-100 transition-all active:scale-[0.98]"
         >
           <Plus className="w-5 h-5" />
           Apply for Leave
@@ -185,8 +185,8 @@ export const LeaveModule: React.FC = () => {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4"
-          style={{ borderTop: "3px solid #2563eb" }}>
-          <div className="p-3 bg-blue-50 rounded-xl text-blue-600">
+          style={{ borderTop: "3px solid #4d6515" }}>
+          <div className="p-3 bg-pink-50 rounded-xl text-pink-600">
             <Calendar className="w-6 h-6" />
           </div>
           <div>
@@ -195,8 +195,8 @@ export const LeaveModule: React.FC = () => {
           </div>
         </div>
         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4"
-          style={{ borderTop: "3px solid #6366f1" }}>
-          <div className="p-3 bg-indigo-50 rounded-xl text-indigo-600">
+          style={{ borderTop: "3px solid #4d6515" }}>
+          <div className="p-3 bg-pink-50 rounded-xl text-pink-600">
             <User className="w-6 h-6" />
           </div>
           <div className="flex-1">
@@ -264,7 +264,7 @@ export const LeaveModule: React.FC = () => {
               {isLoading ? (
                 <tr>
                   <td colSpan={11} className="px-4 py-12 text-center">
-                    <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-2" />
+                    <Loader2 className="w-8 h-8 animate-spin text-pink-600 mx-auto mb-2" />
                     <p className="text-slate-500">Loading data...</p>
                   </td>
                 </tr>
@@ -292,7 +292,7 @@ export const LeaveModule: React.FC = () => {
                     {/* Employee cell */}
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white text-xs font-extrabold shrink-0">
+                        <div className="w-8 h-8 rounded-lg bg-pink-600 flex items-center justify-center text-white text-xs font-extrabold shrink-0">
                           {(item.nameOfEmployee || "?").charAt(0).toUpperCase()}
                         </div>
                         <div>
@@ -312,7 +312,7 @@ export const LeaveModule: React.FC = () => {
                         </div>
                         <span
                           className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-extrabold w-fit"
-                          style={{ background: "#eff6ff", color: "#2563eb" }}
+                          style={{ background: "#f3f5e7", color: "#4d6515" }}
                         >
                           {item.noOfDays} Day(s)
                         </span>
@@ -328,7 +328,7 @@ export const LeaveModule: React.FC = () => {
                             {item.medicalCertificate.startsWith('data:image') ? (
                               <img src={item.medicalCertificate} alt="Cert" className="w-full h-full object-cover" />
                             ) : (
-                              <Image className="w-4 h-4 text-blue-500" />
+                              <Image className="w-4 h-4 text-pink-500" />
                             )}
                           </div>
                         ) : (
@@ -358,7 +358,7 @@ export const LeaveModule: React.FC = () => {
                             <button
                               onClick={() => handleUpdateStep(item.leaveNo, 2)}
                               className="px-3 py-1.5 text-white text-[10px] font-extrabold rounded-lg transition-all active:scale-95 whitespace-nowrap"
-                              style={{ background: "linear-gradient(135deg, #2563eb, #4f46e5)", boxShadow: "0 2px 8px rgba(37,99,235,0.3)" }}
+                              style={{ background: "linear-gradient(135deg, #4d6515, #3a4e0f)", boxShadow: "0 2px 8px rgba(77,101,21,0.3)" }}
                             >
                               ✓ HR OK
                             </button>
@@ -393,7 +393,7 @@ export const LeaveModule: React.FC = () => {
                       type="text"
                       value={formData.company}
                       onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                      className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                      className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-pink-500 outline-none"
                       required
                     />
                   </div>
@@ -403,7 +403,7 @@ export const LeaveModule: React.FC = () => {
                   <select
                     value={formData.typeOfLeave}
                     onChange={(e) => setFormData({ ...formData, typeOfLeave: e.target.value })}
-                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none appearance-none"
+                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-pink-500 outline-none appearance-none"
                     required
                   >
                     <option value="CL">CL (Casual Leave)</option>
@@ -456,7 +456,7 @@ export const LeaveModule: React.FC = () => {
                     type="date"
                     value={formData.dateRequestedFrom}
                     onChange={(e) => setFormData({ ...formData, dateRequestedFrom: e.target.value })}
-                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-pink-500 outline-none"
                     required
                   />
                 </div>
@@ -466,7 +466,7 @@ export const LeaveModule: React.FC = () => {
                     type="date"
                     value={formData.dateRequestedTo}
                     onChange={(e) => setFormData({ ...formData, dateRequestedTo: e.target.value })}
-                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-pink-500 outline-none"
                     required
                   />
                 </div>
@@ -475,7 +475,7 @@ export const LeaveModule: React.FC = () => {
                 <label className="block text-sm font-medium text-slate-700 mb-1">
                   Number of Days
                   {formData.dateRequestedFrom !== formData.dateRequestedTo && (
-                    <span className="ml-2 text-[10px] font-bold text-blue-500 bg-blue-50 px-2 py-0.5 rounded-full">
+                    <span className="ml-2 text-[10px] font-bold text-pink-500 bg-pink-50 px-2 py-0.5 rounded-full">
                       Auto-calculated · editable
                     </span>
                   )}
@@ -486,7 +486,7 @@ export const LeaveModule: React.FC = () => {
                   step="0.5"
                   value={formData.noOfDays}
                   onChange={(e) => setFormData({ ...formData, noOfDays: parseFloat(e.target.value) })}
-                  className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-slate-900"
+                  className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-pink-500 outline-none text-slate-900"
                   required
                 />
                 <p className="text-[10px] text-slate-400 mt-1">0.5 = half day leave</p>
@@ -498,7 +498,7 @@ export const LeaveModule: React.FC = () => {
                   <textarea
                     value={formData.reasonForRequestedLeave}
                     onChange={(e) => setFormData({ ...formData, reasonForRequestedLeave: e.target.value })}
-                    className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none min-h-[100px]"
+                    className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-pink-500 outline-none min-h-[100px]"
                     placeholder="Explain why you need leave..."
                     required
                   />
@@ -515,7 +515,7 @@ export const LeaveModule: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="flex-1 py-2.5 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all flex items-center justify-center gap-2"
+                  className="flex-1 py-2.5 bg-pink-600 text-white font-semibold rounded-lg hover:bg-pink-700 shadow-lg shadow-pink-100 transition-all flex items-center justify-center gap-2"
                 >
                   {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Submit Application"}
                 </button>

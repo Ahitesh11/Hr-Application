@@ -62,7 +62,7 @@ export const AttendanceModule: React.FC = () => {
             placeholder="Search by name, ID or date..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+            className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-pink-500 outline-none transition-all"
           />
         </div>
         <button className="w-full md:w-auto flex items-center justify-center gap-2 px-6 py-2 bg-slate-100 text-slate-700 font-semibold rounded-xl hover:bg-slate-200 transition-all">
@@ -93,7 +93,7 @@ export const AttendanceModule: React.FC = () => {
               {isLoading ? (
                 <tr>
                   <td colSpan={11} className="px-4 py-12 text-center">
-                    <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-2" />
+                    <Loader2 className="w-8 h-8 animate-spin text-pink-600 mx-auto mb-2" />
                     <p className="text-slate-500">Loading attendance...</p>
                   </td>
                 </tr>

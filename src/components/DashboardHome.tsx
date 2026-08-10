@@ -70,9 +70,9 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({ onNavigate }) => {
 
   const stats = [
     { label: "Approved Punch Miss",  value: approvedPunch.length,   trend: `${punchMissData.filter(d => d.status === "Pending").length} pending`,         icon: Clock,       color: "bg-pink-600"   },
-    { label: "Approved Leaves",      value: approvedLeaves.length,  trend: `${leaveData.filter(d => !d.status2 || d.status2 === "Pending").length} pending`, icon: Calendar,    color: "bg-rose-500" },
-    { label: "Approved Holiday Work",value: approvedHoliday.length, trend: `${holidayData.filter(d => !d.status3 || d.status3 === "Pending").length} pending`,icon: Briefcase,   color: "bg-fuchsia-600"  },
-    { label: "Approved Increments",  value: approvedSalary.length,  trend: `${salaryIncrementData.filter(d => !d.status3 || d.status3 === "Pending").length} pending`,icon: TrendingUp,  color: "bg-purple-600" },
+    { label: "Approved Leaves",      value: approvedLeaves.length,  trend: `${leaveData.filter(d => !d.status2 || d.status2 === "Pending").length} pending`, icon: Calendar,    color: "bg-pink-500" },
+    { label: "Approved Holiday Work",value: approvedHoliday.length, trend: `${holidayData.filter(d => !d.status3 || d.status3 === "Pending").length} pending`,icon: Briefcase,   color: "bg-pink-600"  },
+    { label: "Approved Increments",  value: approvedSalary.length,  trend: `${salaryIncrementData.filter(d => !d.status3 || d.status3 === "Pending").length} pending`,icon: TrendingUp,  color: "bg-pink-600" },
   ];
 
   /* ── Leave balance (own user) ── */
@@ -221,8 +221,8 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({ onNavigate }) => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {[
           { label: "Casual Leave (CL)",  stats: clStats, color: "from-pink-600 to-pink-700",   icon: Calendar },
-          { label: "Earned Leave (EL)",  stats: elStats, color: "from-rose-500 to-rose-600", icon: Calendar },
-          { label: "Medical Leave (ML)", stats: mlStats, color: "from-fuchsia-600 to-fuchsia-700",    icon: Calendar },
+          { label: "Earned Leave (EL)",  stats: elStats, color: "from-pink-500 to-pink-600", icon: Calendar },
+          { label: "Medical Leave (ML)", stats: mlStats, color: "from-pink-600 to-pink-700",    icon: Calendar },
         ].map((item, i) => (
           <div key={i} className="bg-white rounded-3xl border border-pink-100 shadow-sm overflow-hidden hover:shadow-lg transition-all">
             <div className={cn("p-5 text-white bg-gradient-to-br", item.color)}>
@@ -246,8 +246,8 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({ onNavigate }) => {
                 <p className="text-lg font-bold text-slate-700">{item.stats.total}</p>
               </div>
               <div className="text-center border-x border-pink-50">
-                <p className="text-[9px] text-rose-500 font-bold uppercase">Used</p>
-                <p className="text-lg font-bold text-rose-600">{item.stats.approved}</p>
+                <p className="text-[9px] text-pink-500 font-bold uppercase">Used</p>
+                <p className="text-lg font-bold text-pink-600">{item.stats.approved}</p>
               </div>
               <div className="text-center">
                 <p className="text-[9px] text-amber-500 font-bold uppercase">Pending</p>
@@ -342,7 +342,7 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({ onNavigate }) => {
           <div className="bg-white rounded-3xl border border-pink-100 shadow-sm overflow-hidden">
             <div className="p-6 border-b border-pink-50 flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-rose-500 rounded-xl">
+                <div className="p-2.5 bg-pink-500 rounded-xl">
                   <Users className="w-5 h-5 text-white" />
                 </div>
                 <div>
@@ -377,8 +377,8 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({ onNavigate }) => {
                       <th className="px-6 py-3.5 text-[10px] font-bold text-pink-500 uppercase tracking-wider">#</th>
                       <th className="px-6 py-3.5 text-[10px] font-bold text-pink-500 uppercase tracking-wider">Employee</th>
                       <th className="px-6 py-3.5 text-[10px] font-bold text-pink-500 uppercase tracking-wider text-center">CL Used</th>
-                      <th className="px-6 py-3.5 text-[10px] font-bold text-rose-500 uppercase tracking-wider text-center">EL Used</th>
-                      <th className="px-6 py-3.5 text-[10px] font-bold text-fuchsia-500 uppercase tracking-wider text-center">ML Used</th>
+                      <th className="px-6 py-3.5 text-[10px] font-bold text-pink-500 uppercase tracking-wider text-center">EL Used</th>
+                      <th className="px-6 py-3.5 text-[10px] font-bold text-pink-500 uppercase tracking-wider text-center">ML Used</th>
                       <th className="px-6 py-3.5 text-[10px] font-bold text-amber-500 uppercase tracking-wider text-center">Pending Days</th>
                       <th className="px-6 py-3.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider text-center">Total Used</th>
                     </tr>
@@ -408,13 +408,13 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({ onNavigate }) => {
                           </td>
                           <td className="px-6 py-4 text-center">
                             <div className="inline-flex flex-col items-center">
-                              <span className="text-base font-bold text-rose-600">{emp.el}</span>
+                              <span className="text-base font-bold text-pink-600">{emp.el}</span>
                               {emp.elQuota !== null && <span className="text-[9px] text-slate-400">of {emp.elQuota}</span>}
                             </div>
                           </td>
                           <td className="px-6 py-4 text-center">
                             <div className="inline-flex flex-col items-center">
-                              <span className="text-base font-bold text-fuchsia-600">{emp.ml}</span>
+                              <span className="text-base font-bold text-pink-600">{emp.ml}</span>
                               {emp.mlQuota !== null && <span className="text-[9px] text-slate-400">of {emp.mlQuota}</span>}
                             </div>
                           </td>
@@ -430,7 +430,7 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({ onNavigate }) => {
                           <td className="px-6 py-4 text-center">
                             <span className={cn(
                               "inline-flex items-center px-3 py-1 rounded-full text-xs font-bold",
-                              totalUsed > 0 ? "bg-rose-50 text-rose-700 border border-rose-100" : "bg-slate-50 text-slate-400 border border-slate-100"
+                              totalUsed > 0 ? "bg-pink-50 text-pink-700 border border-pink-100" : "bg-slate-50 text-slate-400 border border-slate-100"
                             )}>
                               {totalUsed} Days
                             </span>
@@ -445,8 +445,8 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({ onNavigate }) => {
                         Total ({empSummary.length} employees)
                       </td>
                       <td className="px-6 py-3 text-center text-sm font-extrabold text-pink-600">{empSummary.reduce((s, e) => s + e.cl, 0)}</td>
-                      <td className="px-6 py-3 text-center text-sm font-extrabold text-rose-600">{empSummary.reduce((s, e) => s + e.el, 0)}</td>
-                      <td className="px-6 py-3 text-center text-sm font-extrabold text-fuchsia-600">{empSummary.reduce((s, e) => s + e.ml, 0)}</td>
+                      <td className="px-6 py-3 text-center text-sm font-extrabold text-pink-600">{empSummary.reduce((s, e) => s + e.el, 0)}</td>
+                      <td className="px-6 py-3 text-center text-sm font-extrabold text-pink-600">{empSummary.reduce((s, e) => s + e.ml, 0)}</td>
                       <td className="px-6 py-3 text-center text-sm font-extrabold text-amber-600">{empSummary.reduce((s, e) => s + e.pending, 0)}</td>
                       <td className="px-6 py-3 text-center text-sm font-extrabold text-slate-700">{empSummary.reduce((s, e) => s + e.cl + e.el + e.ml, 0)} Days</td>
                     </tr>
@@ -482,7 +482,7 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({ onNavigate }) => {
                   onClick={() => setHodSection("holiday")}
                   className={cn(
                     "px-4 py-2 rounded-xl text-xs font-bold transition-all",
-                    hodSection === "holiday" ? "bg-fuchsia-600 text-white shadow-md shadow-fuchsia-100" : "bg-fuchsia-50 text-fuchsia-600 hover:bg-fuchsia-100"
+                    hodSection === "holiday" ? "bg-pink-600 text-white shadow-md shadow-pink-100" : "bg-pink-50 text-pink-600 hover:bg-pink-100"
                   )}
                 >
                   Holiday Working ({holidayData.length})
@@ -596,8 +596,8 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({ onNavigate }) => {
                             <span className={cn(
                               "inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold",
                               item.typeOfLeave === "CL" ? "bg-pink-50 text-pink-700 border border-pink-100" :
-                              item.typeOfLeave === "EL" ? "bg-rose-50 text-rose-700 border border-rose-100" :
-                                                          "bg-fuchsia-50 text-fuchsia-700 border border-fuchsia-100"
+                              item.typeOfLeave === "EL" ? "bg-pink-50 text-pink-700 border border-pink-100" :
+                                                          "bg-pink-50 text-pink-700 border border-pink-100"
                             )}>
                               {item.typeOfLeave}
                             </span>
@@ -667,7 +667,7 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({ onNavigate }) => {
           <div className="bg-white rounded-3xl border border-pink-100 shadow-sm overflow-hidden">
             <div className="p-6 border-b border-pink-50 flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-fuchsia-600 rounded-xl">
+                <div className="p-2.5 bg-pink-600 rounded-xl">
                   <Calendar className="w-5 h-5 text-white" />
                 </div>
                 <div>
@@ -704,7 +704,7 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({ onNavigate }) => {
 
             {isLoading ? (
               <div className="py-16 flex flex-col items-center gap-3">
-                <Loader2 className="w-8 h-8 animate-spin text-fuchsia-600" />
+                <Loader2 className="w-8 h-8 animate-spin text-pink-600" />
                 <p className="text-slate-400 text-sm">Loading leave records...</p>
               </div>
             ) : filteredLeaves.length === 0 ? (
@@ -742,8 +742,8 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({ onNavigate }) => {
                           <span className={cn(
                             "inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold",
                             item.typeOfLeave === "CL" ? "bg-pink-50 text-pink-700 border border-pink-100" :
-                            item.typeOfLeave === "EL" ? "bg-rose-50 text-rose-700 border border-rose-100" :
-                                                        "bg-fuchsia-50 text-fuchsia-700 border border-fuchsia-100"
+                            item.typeOfLeave === "EL" ? "bg-pink-50 text-pink-700 border border-pink-100" :
+                                                        "bg-pink-50 text-pink-700 border border-pink-100"
                           )}>
                             {item.typeOfLeave}
                           </span>
@@ -777,7 +777,7 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({ onNavigate }) => {
         {/* ── Activity Feed ── */}
         <div className="lg:col-span-2 bg-white rounded-3xl border border-pink-100 shadow-sm flex flex-col overflow-hidden">
           <div className="px-6 pt-6 pb-4"
-            style={{ background: "linear-gradient(135deg, #fff5f8 0%, #fce7f3 100%)", borderBottom: "1px solid #fce7f3" }}>
+            style={{ background: "linear-gradient(135deg, #f3f5e7 0%, #e3e9c6 100%)", borderBottom: "1px solid #e3e9c6" }}>
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
               <div className="flex items-center gap-3">
                 <div className="p-2.5 bg-pink-600 rounded-xl shadow-lg shadow-pink-100">
@@ -801,8 +801,8 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({ onNavigate }) => {
 
             <div className="flex gap-2">
               {[
-                { id: "leave",   label: "Leave",   icon: Calendar,  count: leaveData.length,     color: "#db2777"   },
-                { id: "punch",   label: "Punch",   icon: Clock,     count: punchMissData.length,  color: "#9333ea" },
+                { id: "leave",   label: "Leave",   icon: Calendar,  count: leaveData.length,     color: "#4d6515"   },
+                { id: "punch",   label: "Punch",   icon: Clock,     count: punchMissData.length,  color: "#4d6515" },
                 { id: "holiday", label: "Holiday", icon: Briefcase, count: holidayData.length,    color: "#d97706"  },
               ].map(tab => {
                 const isActive = activeHistoryTab === tab.id;
@@ -848,9 +848,9 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({ onNavigate }) => {
                     const st = item.status2 || "Pending";
                     const accentColor = st === "Work Done" ? "#10b981" : st === "Rejected" ? "#ef4444" : "#f59e0b";
                     const typeColor =
-                      item.typeOfLeave === "CL" ? { bg: "#fdf2f8", text: "#db2777" } :
-                      item.typeOfLeave === "EL" ? { bg: "#fff1f2", text: "#e11d48" } :
-                                                  { bg: "#fdf4ff", text: "#a21caf" };
+                      item.typeOfLeave === "CL" ? { bg: "#f3f5e7", text: "#4d6515" } :
+                      item.typeOfLeave === "EL" ? { bg: "#f3f5e7", text: "#4d6515" } :
+                                                  { bg: "#f3f5e7", text: "#4d6515" };
                     return (
                       <div key={idx} className="flex items-start gap-4 px-6 py-4 hover:bg-pink-50/40 transition-colors">
                         <div className="w-1 self-stretch rounded-full shrink-0 mt-1" style={{ background: accentColor, minHeight: "40px" }} />
@@ -894,8 +894,8 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({ onNavigate }) => {
                     return (
                       <div key={idx} className="flex items-start gap-4 px-6 py-4 hover:bg-pink-50/40 transition-colors">
                         <div className="w-1 self-stretch rounded-full shrink-0 mt-1" style={{ background: accentColor, minHeight: "40px" }} />
-                        <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 bg-purple-50">
-                          <Clock className="w-4 h-4 text-purple-600" />
+                        <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 bg-pink-50">
+                          <Clock className="w-4 h-4 text-pink-600" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2 mb-1">
@@ -906,7 +906,7 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({ onNavigate }) => {
                             {item.date}
                             {item.punchMissTime && <span className="text-slate-300 mx-1">•</span>}
                             <span className="font-bold text-slate-700">{item.punchMissTime}</span>
-                            {item.inOut && <span className="ml-2 px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-50 text-purple-600">{item.inOut}</span>}
+                            {item.inOut && <span className="ml-2 px-2 py-0.5 rounded-full text-[10px] font-bold bg-pink-50 text-pink-600">{item.inOut}</span>}
                           </p>
                           {item.reason && <p className="text-xs text-slate-400 truncate max-w-xs">{item.reason}</p>}
                         </div>
@@ -958,7 +958,7 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({ onNavigate }) => {
 
           {!isLoading && (
             <div className="px-6 py-3 flex items-center justify-between"
-              style={{ borderTop: "1px solid #fce7f3", background: "#fff5f8" }}>
+              style={{ borderTop: "1px solid #e3e9c6", background: "#f3f5e7" }}>
               <div className="flex items-center gap-3 text-[10px] font-bold text-slate-400">
                 <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-400 inline-block" /> Approved</span>
                 <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-amber-400 inline-block" /> Pending</span>
@@ -991,7 +991,7 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({ onNavigate }) => {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-pink-700 to-rose-600 p-8 rounded-3xl text-white shadow-xl relative overflow-hidden">
+          <div className="bg-gradient-to-br from-pink-700 to-pink-600 p-8 rounded-3xl text-white shadow-xl relative overflow-hidden">
             <div className="relative z-10">
               <h4 className="text-lg font-bold mb-4">Need Help?</h4>
               <p className="text-pink-100 text-sm mb-6 leading-relaxed">

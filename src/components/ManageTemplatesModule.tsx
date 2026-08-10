@@ -81,7 +81,7 @@ export const ManageTemplatesModule = () => {
               <select
                 value={selectedType}
                 onChange={(e) => setSelectedType(e.target.value)}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 bg-slate-50"
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-pink-500 bg-slate-50"
               >
                 {DOCUMENT_TYPES.map(type => (
                   <option key={type} value={type}>{type}</option>
@@ -103,7 +103,7 @@ export const ManageTemplatesModule = () => {
                     onClick={handleSave}
                     className={cn(
                       "flex items-center gap-2 px-4 py-1.5 text-sm rounded-lg border transition-colors",
-                      isSaved ? "bg-green-500 text-white border-green-600" : "bg-blue-600 text-white border-blue-700 hover:bg-blue-700"
+                      isSaved ? "bg-green-500 text-white border-green-600" : "bg-pink-600 text-white border-pink-700 hover:bg-pink-700"
                     )}
                   >
                     {isSaved ? <CheckCircle className="w-4 h-4" /> : <Save className="w-4 h-4" />} 
@@ -131,7 +131,7 @@ export const ManageTemplatesModule = () => {
               <div
                 ref={editorRef}
                 contentEditable
-                className="w-full flex-1 min-h-[500px] p-4 border rounded-lg bg-slate-50 focus:ring-2 focus:ring-blue-500 overflow-y-auto prose prose-sm max-w-none"
+                className="w-full flex-1 min-h-[500px] p-4 border rounded-lg bg-slate-50 focus:ring-2 focus:ring-pink-500 overflow-y-auto prose prose-sm max-w-none"
                 style={{ outline: 'none' }}
                 onBlur={(e) => setTemplateContent(e.currentTarget.innerHTML)}
               />

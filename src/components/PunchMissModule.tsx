@@ -166,7 +166,7 @@ export const PunchMissModule: React.FC = () => {
               placeholder="Search by name, ID or PM No..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+              className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-pink-500 outline-none transition-all"
             />
           </div>
           <button
@@ -181,7 +181,7 @@ export const PunchMissModule: React.FC = () => {
         </div>
         <button
           onClick={() => setIsFormOpen(true)}
-          className="w-full md:w-auto flex items-center justify-center gap-2 px-6 py-2 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all active:scale-[0.98]"
+          className="w-full md:w-auto flex items-center justify-center gap-2 px-6 py-2 bg-pink-600 text-white font-semibold rounded-xl hover:bg-pink-700 shadow-lg shadow-pink-100 transition-all active:scale-[0.98]"
         >
           <Plus className="w-5 h-5" />
           New Punch Miss
@@ -192,7 +192,7 @@ export const PunchMissModule: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         <div className="bg-white p-4 md:p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4"
           style={{ borderTop: "3px solid #2563eb" }}>
-          <div className="p-3 bg-blue-50 rounded-xl text-blue-600">
+          <div className="p-3 bg-pink-50 rounded-xl text-pink-600">
             <Clock className="w-6 h-6" />
           </div>
           <div>
@@ -245,7 +245,7 @@ export const PunchMissModule: React.FC = () => {
               {isLoading ? (
                 <tr>
                   <td colSpan={11} className="px-4 py-12 text-center">
-                    <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-2" />
+                    <Loader2 className="w-8 h-8 animate-spin text-pink-600 mx-auto mb-2" />
                     <p className="text-slate-500">Loading data...</p>
                   </td>
                 </tr>
@@ -280,7 +280,7 @@ export const PunchMissModule: React.FC = () => {
                     {/* Employee cell */}
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white text-xs font-extrabold shrink-0">
+                        <div className="w-8 h-8 rounded-lg bg-pink-600 flex items-center justify-center text-white text-xs font-extrabold shrink-0">
                           {(item.name || "?").charAt(0).toUpperCase()}
                         </div>
                         <div>
@@ -347,7 +347,7 @@ export const PunchMissModule: React.FC = () => {
                   <select
                     value={formData.inOut}
                     onChange={(e) => setFormData({...formData, inOut: e.target.value as any})}
-                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-pink-500 outline-none"
                   >
                     <option value="In">In</option>
                     <option value="Out">Out</option>
@@ -359,7 +359,7 @@ export const PunchMissModule: React.FC = () => {
                     type="date"
                     value={formData.date}
                     onChange={(e) => setFormData({...formData, date: e.target.value})}
-                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-pink-500 outline-none"
                     required
                   />
                 </div>
@@ -371,21 +371,21 @@ export const PunchMissModule: React.FC = () => {
                     type="time"
                     value={formData.punchMissTime}
                     onChange={(e) => setFormData({...formData, punchMissTime: e.target.value})}
-                    className="flex-1 px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="flex-1 px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-pink-500 outline-none"
                     required
                   />
                   <div className="flex rounded-lg overflow-hidden border border-slate-200 shrink-0">
                     <button
                       type="button"
                       onClick={() => setFormData({...formData, ampm: "AM"})}
-                      className={`px-4 py-2 text-sm font-bold transition-colors ${formData.ampm === "AM" ? "bg-blue-600 text-white" : "bg-slate-50 text-slate-500 hover:bg-slate-100"}`}
+                      className={`px-4 py-2 text-sm font-bold transition-colors ${formData.ampm === "AM" ? "bg-pink-600 text-white" : "bg-slate-50 text-slate-500 hover:bg-slate-100"}`}
                     >
                       AM
                     </button>
                     <button
                       type="button"
                       onClick={() => setFormData({...formData, ampm: "PM"})}
-                      className={`px-4 py-2 text-sm font-bold transition-colors ${formData.ampm === "PM" ? "bg-blue-600 text-white" : "bg-slate-50 text-slate-500 hover:bg-slate-100"}`}
+                      className={`px-4 py-2 text-sm font-bold transition-colors ${formData.ampm === "PM" ? "bg-pink-600 text-white" : "bg-slate-50 text-slate-500 hover:bg-slate-100"}`}
                     >
                       PM
                     </button>
@@ -397,7 +397,7 @@ export const PunchMissModule: React.FC = () => {
                 <textarea
                   value={formData.reason}
                   onChange={(e) => setFormData({...formData, reason: e.target.value})}
-                  className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none min-h-[100px]"
+                  className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-pink-500 outline-none min-h-[100px]"
                   placeholder="Explain the reason for missing punch..."
                   required
                 />
@@ -408,7 +408,7 @@ export const PunchMissModule: React.FC = () => {
                   type="file"
                   accept="image/*"
                   onChange={handleImageChange}
-                  className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+                  className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-pink-500 outline-none text-sm"
                 />
                 {formData.image && (
                   <div className="mt-2 relative w-20 h-20 rounded-lg overflow-hidden border border-slate-200">
@@ -427,7 +427,7 @@ export const PunchMissModule: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="flex-1 py-2.5 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all flex items-center justify-center gap-2"
+                  className="flex-1 py-2.5 bg-pink-600 text-white font-semibold rounded-lg hover:bg-pink-700 shadow-lg shadow-pink-100 transition-all flex items-center justify-center gap-2"
                 >
                   {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Submit Request"}
                 </button>

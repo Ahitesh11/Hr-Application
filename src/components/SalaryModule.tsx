@@ -46,7 +46,7 @@ export const SalaryModule: React.FC = () => {
             placeholder="Search by name, ID or month..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+            className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-pink-500 outline-none transition-all"
           />
         </div>
       </div>
@@ -68,7 +68,7 @@ export const SalaryModule: React.FC = () => {
               {isLoading ? (
                 <tr>
                   <td colSpan={6} className="px-3 py-12 text-center">
-                    <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-2" />
+                    <Loader2 className="w-8 h-8 animate-spin text-pink-600 mx-auto mb-2" />
                     <p className="text-slate-500">Loading records...</p>
                   </td>
                 </tr>
@@ -84,7 +84,7 @@ export const SalaryModule: React.FC = () => {
                     <td className="px-3 py-4 font-medium text-slate-900">{item.employeeCode}</td>
                     <td className="px-3 py-4 font-bold text-slate-900">{item.employeeName}</td>
                     <td className="px-3 py-4 text-slate-600 font-bold">{item.noOfDaysPresent} <span className="text-[9px] opacity-60">Days</span></td>
-                    <td className="px-3 py-4 font-black text-blue-600 text-center text-sm">₹{parseFloat(item.payment || "0").toLocaleString()}</td>
+                    <td className="px-3 py-4 font-black text-pink-600 text-center text-sm">₹{parseFloat(item.payment || "0").toLocaleString()}</td>
                     <td className="px-3 py-4 text-slate-500 font-bold italic">{item.month} {item.year}</td>
                     <td className="px-3 py-4 text-center">
                       <button 

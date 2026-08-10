@@ -225,7 +225,7 @@ export const UpcomingIncrementModule = () => {
     { id: "overdue",  label: "Overdue",      count: upCounts.overdue, activeClass: "bg-red-600 text-white" },
     { id: "soon",     label: "Due Soon",     count: upCounts.soon,    activeClass: "bg-orange-500 text-white" },
     { id: "upcoming", label: "Next 90 Days", count: upCounts.up90,    activeClass: "bg-yellow-500 text-white" },
-    { id: "first",    label: "First Inc.",   count: upCounts.first,   activeClass: "bg-violet-600 text-white" },
+    { id: "first",    label: "First Inc.",   count: upCounts.first,   activeClass: "bg-pink-600 text-white" },
   ] as const;
 
   return (
@@ -247,12 +247,12 @@ export const UpcomingIncrementModule = () => {
           onClick={() => setMainTab("upcoming")}
           className={cn(
             "flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-black transition-all",
-            mainTab === "upcoming" ? "bg-white text-violet-700 shadow-sm" : "text-slate-500 hover:text-slate-700"
+            mainTab === "upcoming" ? "bg-white text-pink-700 shadow-sm" : "text-slate-500 hover:text-slate-700"
           )}
         >
           <Bell className="w-4 h-4" /> Upcoming
           <span className={cn("px-2 py-0.5 rounded-full text-[10px] font-black",
-            mainTab === "upcoming" ? "bg-violet-100 text-violet-700" : "bg-slate-200 text-slate-500"
+            mainTab === "upcoming" ? "bg-pink-100 text-pink-700" : "bg-slate-200 text-slate-500"
           )}>{upCounts.total}</span>
         </button>
         <button
@@ -277,7 +277,7 @@ export const UpcomingIncrementModule = () => {
               { label: "Total Employees",  value: upCounts.total,   color: "from-slate-700 to-slate-800" },
               { label: "Overdue",          value: upCounts.overdue, color: "from-red-500 to-red-600" },
               { label: "Due in 30 Days",   value: upCounts.soon,    color: "from-orange-400 to-orange-500" },
-              { label: "First Increment",  value: upCounts.first,   color: "from-violet-500 to-violet-600" },
+              { label: "First Increment",  value: upCounts.first,   color: "from-pink-500 to-pink-600" },
             ].map((s, i) => (
               <div key={i} className={`bg-gradient-to-br ${s.color} rounded-2xl p-4 text-white shadow-lg`}>
                 <div className="flex items-center justify-between mb-2">
@@ -311,7 +311,7 @@ export const UpcomingIncrementModule = () => {
                 <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <input type="text" placeholder="Search employee..."
                   value={upSearch} onChange={e => setUpSearch(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-violet-500 outline-none font-medium" />
+                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-pink-500 outline-none font-medium" />
               </div>
               <button onClick={fetchAll} disabled={isLoading}
                 className="w-9 h-9 bg-slate-50 text-slate-500 rounded-xl hover:bg-slate-100 flex items-center justify-center disabled:opacity-50 ml-auto">
@@ -321,7 +321,7 @@ export const UpcomingIncrementModule = () => {
             <div className="overflow-x-auto overflow-y-auto" style={{ maxHeight: "460px" }}>
               <table className="w-full text-sm border-collapse min-w-max">
                 <thead className="sticky top-0 z-20 bg-slate-50 border-b border-slate-200">
-                  <tr className="bg-gradient-to-r from-violet-600 to-violet-500 text-white">
+                  <tr className="bg-gradient-to-r from-pink-600 to-pink-500 text-white">
                     {["Employee","Designation","Company","Current Salary","Last Inc. Amt","Next Inc. / Joining Date","Next Due Date","Days Left","Type","Status"]
                       .map(h => <th key={h} className="px-4 py-3.5 text-[10px] font-black uppercase tracking-wider text-left whitespace-nowrap">{h}</th>)}
                   </tr>
@@ -329,7 +329,7 @@ export const UpcomingIncrementModule = () => {
                 <tbody className="divide-y divide-slate-100 bg-white">
                   {isLoading ? (
                     <tr><td colSpan={10} className="py-20 text-center">
-                      <Loader2 className="w-8 h-8 animate-spin text-violet-600 mx-auto" />
+                      <Loader2 className="w-8 h-8 animate-spin text-pink-600 mx-auto" />
                       <p className="mt-2 text-sm text-slate-400 font-medium">Loading...</p>
                     </td></tr>
                   ) : filteredUpcoming.length === 0 ? (
@@ -345,14 +345,14 @@ export const UpcomingIncrementModule = () => {
                     return (
                       <tr key={idx} className={cn("transition-colors",
                         item.daysLeft !== null && item.daysLeft < 0 ? "bg-red-50/30 hover:bg-red-50/50"
-                          : idx % 2 === 0 ? "bg-white hover:bg-violet-50/20"
-                          : "bg-slate-50/30 hover:bg-violet-50/20"
+                          : idx % 2 === 0 ? "bg-white hover:bg-pink-50/20"
+                          : "bg-slate-50/30 hover:bg-pink-50/20"
                       )}>
                         <td className="px-4 py-3 whitespace-nowrap">
                           <div className="flex items-center gap-2.5">
                             <div className={cn("w-8 h-8 rounded-xl flex items-center justify-center shrink-0",
-                              item.rowType === "first" ? "bg-violet-100" : "bg-blue-100")}>
-                              <User className={cn("w-4 h-4", item.rowType === "first" ? "text-violet-600" : "text-blue-600")} />
+                              item.rowType === "first" ? "bg-pink-100" : "bg-blue-100")}>
+                              <User className={cn("w-4 h-4", item.rowType === "first" ? "text-pink-600" : "text-blue-600")} />
                             </div>
                             <div>
                               <p className="text-xs font-bold text-slate-900">{item.name || "—"}</p>
@@ -403,7 +403,7 @@ export const UpcomingIncrementModule = () => {
                         </td>
                         <td className="px-4 py-3 text-center">
                           {item.rowType === "first"
-                            ? <span className="text-[10px] font-black px-2 py-1 rounded-lg bg-violet-100 text-violet-700 border border-violet-200">First</span>
+                            ? <span className="text-[10px] font-black px-2 py-1 rounded-lg bg-pink-100 text-pink-700 border border-pink-200">First</span>
                             : <span className="text-[10px] font-black px-2 py-1 rounded-lg bg-blue-100 text-blue-700 border border-blue-200">Recurring</span>
                           }
                         </td>
@@ -434,7 +434,7 @@ export const UpcomingIncrementModule = () => {
             {[
               { label: "Total Records",     value: histStats.total,                                           color: "from-emerald-600 to-emerald-700", icon: <History className="w-5 h-5 opacity-80" /> },
               { label: "This Year",         value: histStats.thisYear,                                        color: "from-blue-500 to-blue-600",     icon: <Calendar className="w-5 h-5 opacity-80" /> },
-              { label: "Unique Employees",  value: histStats.unique,                                          color: "from-violet-500 to-violet-600", icon: <User className="w-5 h-5 opacity-80" /> },
+              { label: "Unique Employees",  value: histStats.unique,                                          color: "from-pink-500 to-pink-600", icon: <User className="w-5 h-5 opacity-80" /> },
               { label: "Total Amount Paid", value: `₹${histStats.totalAmt.toLocaleString("en-IN")}`,          color: "from-orange-400 to-orange-500", icon: <BarChart3 className="w-5 h-5 opacity-80" /> },
             ].map((s, i) => (
               <div key={i} className={`bg-gradient-to-br ${s.color} rounded-2xl p-4 text-white shadow-lg`}>

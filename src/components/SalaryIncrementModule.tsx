@@ -260,21 +260,21 @@ export const SalaryIncrementModule: React.FC = () => {
 
   const tabColorMap: Record<string, string> = {
     hod: "bg-blue-600 text-white shadow-blue-200",
-    mgmt: "bg-orange-500 text-white shadow-orange-200",
-    final: "bg-purple-600 text-white shadow-purple-200",
+    mgmt: "bg-amber-500 text-white shadow-amber-200",
+    final: "bg-pink-600 text-white shadow-pink-200",
     history: "bg-emerald-600 text-white shadow-emerald-200",
   };
   const tabBadgeColorMap: Record<string, string> = {
     hod: "bg-blue-100 text-blue-700",
-    mgmt: "bg-orange-100 text-orange-700",
-    final: "bg-purple-100 text-purple-700",
+    mgmt: "bg-amber-100 text-amber-700",
+    final: "bg-pink-100 text-pink-700",
     history: "bg-emerald-100 text-emerald-700",
   };
 
   const statsCards = [
-    { label: "Total Requests", value: data.length, icon: <BarChart3 className="w-5 h-5" />, color: "from-blue-500 to-blue-600" },
+    { label: "Total Requests", value: data.length, icon: <BarChart3 className="w-5 h-5" />, color: "from-pink-500 to-pink-600" },
     { label: "Pending HOD", value: data.filter(d => !d.actual).length, icon: <Clock className="w-5 h-5" />, color: "from-orange-400 to-orange-500" },
-    { label: "Pending Mgmt", value: data.filter(d => d.actual && !d.actual2).length, icon: <User className="w-5 h-5" />, color: "from-purple-500 to-purple-600" },
+    { label: "Pending Mgmt", value: data.filter(d => d.actual && !d.actual2).length, icon: <User className="w-5 h-5" />, color: "from-pink-500 to-pink-600" },
     { label: "Completed", value: data.filter(d => d.actual3).length, icon: <CheckCircle className="w-5 h-5" />, color: "from-emerald-500 to-emerald-600" },
   ];
 
@@ -288,8 +288,8 @@ export const SalaryIncrementModule: React.FC = () => {
     // Header color per tab
     const headerColor: [number, number, number] =
       activeTab === "hod"     ? [37, 99, 235]  :
-      activeTab === "mgmt"    ? [234, 88, 12]  :
-      activeTab === "final"   ? [124, 58, 237] :
+      activeTab === "mgmt"    ? [217, 119, 6]  :
+      activeTab === "final"   ? [77, 101, 21]  :
                                 [16, 185, 129];
 
     const tabLabel = tabs.find(t => t.id === activeTab)?.label || activeTab;
@@ -438,7 +438,7 @@ export const SalaryIncrementModule: React.FC = () => {
         ],
         body: rows,
         styles: { fontSize: 7.5, cellPadding: 2.5, overflow: "linebreak" },
-        headStyles: { fillColor: [234,88,12], textColor: [255,255,255], fontStyle: "bold" },
+        headStyles: { fillColor: [217,119,6], textColor: [255,255,255], fontStyle: "bold" },
         columnStyles: {
           uniqueNo:     { cellWidth: 25 },
           employeeName: { cellWidth: 45 },
@@ -555,13 +555,13 @@ export const SalaryIncrementModule: React.FC = () => {
               placeholder="Search records..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none font-medium"
+              className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-pink-500 outline-none font-medium"
             />
           </div>
           <div className="flex items-center gap-2 ml-auto">
             <button
               onClick={() => setIsModalOpen(true)}
-              className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-xl font-black text-xs hover:bg-blue-700 transition-all shadow-lg shadow-blue-100"
+              className="flex items-center gap-2 px-5 py-2.5 bg-pink-600 text-white rounded-xl font-black text-xs hover:bg-pink-700 transition-all shadow-lg shadow-pink-100"
             >
               <Plus className="w-4 h-4" /> New Increment
             </button>
@@ -571,7 +571,7 @@ export const SalaryIncrementModule: React.FC = () => {
             <button
               onClick={downloadPdf}
               title="Download PDF"
-              className="w-9 h-9 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-all flex items-center justify-center"
+              className="w-9 h-9 bg-pink-50 text-pink-600 rounded-xl hover:bg-pink-100 transition-all flex items-center justify-center"
             >
               <FileDown className="w-4 h-4" />
             </button>
@@ -582,7 +582,7 @@ export const SalaryIncrementModule: React.FC = () => {
         <div className="overflow-x-auto overflow-y-auto" style={{ maxHeight: "460px" }}>
           <table className="w-full text-sm border-collapse min-w-max">
             <thead className="sticky top-0 z-20 bg-slate-50 border-b border-slate-200">
-              <tr className="bg-gradient-to-r from-blue-600 to-blue-500 text-white">
+              <tr className="bg-gradient-to-r from-pink-600 to-pink-500 text-white">
                 <th className="px-4 py-3.5 text-[10px] font-black uppercase tracking-wider text-left whitespace-nowrap">Unique No</th>
                 <th className="px-4 py-3.5 text-[10px] font-black uppercase tracking-wider text-left whitespace-nowrap">Employee</th>
                 <th className="px-4 py-3.5 text-[10px] font-black uppercase tracking-wider text-left whitespace-nowrap">Company</th>
@@ -606,7 +606,7 @@ export const SalaryIncrementModule: React.FC = () => {
                 </>}
                 {/* Extra columns for history tab */}
                 {activeTab === "history" && <>
-                  <th className="px-4 py-3.5 text-[10px] font-black uppercase tracking-wider text-left whitespace-nowrap bg-blue-700/40">Inc. Date</th>
+                  <th className="px-4 py-3.5 text-[10px] font-black uppercase tracking-wider text-left whitespace-nowrap bg-pink-700/40">Inc. Date</th>
                   <th className="px-4 py-3.5 text-[10px] font-black uppercase tracking-wider text-right whitespace-nowrap bg-emerald-500/30">Inc. Amount</th>
                   <th className="px-4 py-3.5 text-[10px] font-black uppercase tracking-wider text-right whitespace-nowrap bg-emerald-500/30">New Salary</th>
                   <th className="px-4 py-3.5 text-[10px] font-black uppercase tracking-wider text-center whitespace-nowrap">Next Inc. (Months)</th>
@@ -619,7 +619,7 @@ export const SalaryIncrementModule: React.FC = () => {
               {isLoading ? (
                 <tr>
                   <td colSpan={20} className="py-20 text-center">
-                    <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto" />
+                    <Loader2 className="w-8 h-8 animate-spin text-pink-600 mx-auto" />
                     <p className="mt-2 text-sm text-slate-400 font-medium">Loading records...</p>
                   </td>
                 </tr>
@@ -642,7 +642,7 @@ export const SalaryIncrementModule: React.FC = () => {
                     {/* Employee */}
                     <td className="px-4 py-3 whitespace-nowrap">
                       <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-xl bg-blue-100 flex items-center justify-center text-blue-700 font-black text-xs shrink-0">
+                        <div className="w-8 h-8 rounded-xl bg-pink-100 flex items-center justify-center text-pink-700 font-black text-xs shrink-0">
                           {(item.employeeName || "?").charAt(0)}
                         </div>
                         <div>
@@ -691,12 +691,12 @@ export const SalaryIncrementModule: React.FC = () => {
                     </>}
                     {/* History-only columns */}
                     {activeTab === "history" && <>
-                      <td className="px-4 py-3 text-xs font-bold text-blue-700 whitespace-nowrap">{item.dateOfIncrement || "—"}</td>
+                      <td className="px-4 py-3 text-xs font-bold text-pink-700 whitespace-nowrap">{item.dateOfIncrement || "—"}</td>
                       <td className="px-4 py-3 text-right bg-emerald-50/40">
                         <span className="text-xs font-black text-emerald-600">₹{item.incrementAmount || "—"}</span>
                       </td>
                       <td className="px-4 py-3 text-right bg-emerald-50/40">
-                        <span className="text-sm font-black text-blue-800">
+                        <span className="text-sm font-black text-pink-800">
                           ₹{(Number(item.currentSalary) || 0) + (Number(item.incrementAmount) || 0) || item.currentSalaryAfterIncrement || "—"}
                         </span>
                       </td>
@@ -725,8 +725,8 @@ export const SalaryIncrementModule: React.FC = () => {
                           className={cn(
                             "px-3.5 py-1.5 rounded-xl text-[10px] font-black transition-all hover:scale-105 shadow-sm uppercase tracking-wide",
                             activeTab === "hod" ? "bg-blue-600 text-white shadow-blue-200" :
-                            activeTab === "mgmt" ? "bg-orange-500 text-white shadow-orange-200" :
-                            "bg-purple-600 text-white shadow-purple-200"
+                            activeTab === "mgmt" ? "bg-amber-500 text-white shadow-amber-200" :
+                            "bg-pink-600 text-white shadow-pink-200"
                           )}
                         >
                           {activeTab === "hod" ? "Review" : activeTab === "mgmt" ? "Approve" : "Finalize"}
@@ -752,14 +752,14 @@ export const SalaryIncrementModule: React.FC = () => {
         <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/70 backdrop-blur-sm">
           <div className="bg-white w-full sm:max-w-2xl sm:rounded-3xl rounded-t-3xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300">
             {/* Modal Header */}
-            <div className="bg-gradient-to-r from-blue-600 via-blue-600 to-blue-500 p-5 sm:p-6 flex items-center justify-between">
+            <div className="bg-gradient-to-r from-pink-600 via-pink-600 to-pink-500 p-5 sm:p-6 flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center shrink-0">
                   <TrendingUp className="w-5 h-5 text-white" />
                 </div>
                 <div>
                   <h3 className="text-base sm:text-lg font-black text-white">Salary Increment Form</h3>
-                  <p className="text-xs text-blue-100 mt-0.5">Search employee and submit increment request</p>
+                  <p className="text-xs text-pink-100 mt-0.5">Search employee and submit increment request</p>
                 </div>
               </div>
               <button
@@ -776,7 +776,7 @@ export const SalaryIncrementModule: React.FC = () => {
                 {/* Step 1 — Employee Search */}
                 <div className="space-y-2">
                   <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-1.5">
-                    <User className="w-3 h-3 text-blue-500" /> Employee Code
+                    <User className="w-3 h-3 text-pink-500" /> Employee Code
                   </label>
                   <div className="relative">
                     <input
@@ -790,7 +790,7 @@ export const SalaryIncrementModule: React.FC = () => {
                         handleFetchEmployee(e.target.value);
                       }}
                       onBlur={(e) => handleFetchEmployee(e.target.value)}
-                      className="w-full pl-5 pr-12 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50 transition-all outline-none text-sm font-bold"
+                      className="w-full pl-5 pr-12 py-4 bg-slate-50 border-2 border-slate-200 rounded-2xl focus:border-pink-500 focus:bg-white focus:ring-4 focus:ring-pink-50 transition-all outline-none text-sm font-bold"
                     />
                     <datalist id="employee-ids">
                       {allEmps.map((e, index) => (
@@ -799,7 +799,7 @@ export const SalaryIncrementModule: React.FC = () => {
                     </datalist>
                     <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
                       {isSearching
-                        ? <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
+                        ? <Loader2 className="w-5 h-5 animate-spin text-pink-500" />
                         : <Search className="w-5 h-5 text-slate-400" />}
                     </div>
                   </div>
@@ -821,14 +821,14 @@ export const SalaryIncrementModule: React.FC = () => {
                   <>
                     {/* Profile header */}
                     <div className="flex items-center gap-3 bg-slate-50 rounded-2xl p-3.5 border border-slate-100">
-                      <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black text-base shrink-0">
+                      <div className="w-10 h-10 bg-pink-600 rounded-xl flex items-center justify-center text-white font-black text-base shrink-0">
                         {(newEntry.employeeName || newEntry.employeeCode || "?").charAt(0).toUpperCase()}
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-black text-slate-900 truncate">{newEntry.employeeName || newEntry.employeeCode}</p>
                         <p className="text-[10px] text-slate-400">{newEntry.employeeCode}</p>
                       </div>
-                      <span className="px-2.5 py-1 bg-blue-50 text-blue-600 text-[10px] font-black rounded-lg border border-blue-100">
+                      <span className="px-2.5 py-1 bg-pink-50 text-pink-600 text-[10px] font-black rounded-lg border border-pink-100">
                         {isSearching ? "Loading..." : newEntry.employeeName ? "Auto-filled" : "Fill manually"}
                       </span>
                     </div>
@@ -845,7 +845,7 @@ export const SalaryIncrementModule: React.FC = () => {
                       {/* Employee Name */}
                       <div className="col-span-2 space-y-1.5">
                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
-                          <User className="w-3 h-3 text-blue-400" /> Employee Name <span className="text-red-400">*</span>
+                          <User className="w-3 h-3 text-pink-400" /> Employee Name <span className="text-red-400">*</span>
                         </label>
                         <input
                           required
@@ -856,7 +856,7 @@ export const SalaryIncrementModule: React.FC = () => {
                           className={cn(
                             "w-full px-4 py-3 border-2 rounded-xl outline-none text-sm font-bold transition-all",
                             newEntry.employeeName
-                              ? "bg-blue-50 border-blue-200 text-blue-900 focus:border-blue-400"
+                              ? "bg-pink-50 border-pink-200 text-pink-900 focus:border-pink-400"
                               : "bg-amber-50 border-amber-200 text-slate-900 focus:border-amber-400 placeholder:text-amber-300"
                           )}
                         />
@@ -865,7 +865,7 @@ export const SalaryIncrementModule: React.FC = () => {
                       {/* Designation */}
                       <div className="space-y-1.5">
                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
-                          <FileText className="w-3 h-3 text-blue-400" /> Designation <span className="text-red-400">*</span>
+                          <FileText className="w-3 h-3 text-pink-400" /> Designation <span className="text-red-400">*</span>
                         </label>
                         <input
                           required
@@ -876,7 +876,7 @@ export const SalaryIncrementModule: React.FC = () => {
                           className={cn(
                             "w-full px-4 py-3 border-2 rounded-xl outline-none text-sm font-bold transition-all",
                             newEntry.designation
-                              ? "bg-blue-50 border-blue-200 text-blue-900 focus:border-blue-400"
+                              ? "bg-pink-50 border-pink-200 text-pink-900 focus:border-pink-400"
                               : "bg-amber-50 border-amber-200 text-slate-900 focus:border-amber-400 placeholder:text-amber-300"
                           )}
                         />
@@ -885,7 +885,7 @@ export const SalaryIncrementModule: React.FC = () => {
                       {/* Department */}
                       <div className="space-y-1.5">
                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
-                          <Building2 className="w-3 h-3 text-blue-400" /> Department <span className="text-red-400">*</span>
+                          <Building2 className="w-3 h-3 text-pink-400" /> Department <span className="text-red-400">*</span>
                         </label>
                         <input
                           required
@@ -896,7 +896,7 @@ export const SalaryIncrementModule: React.FC = () => {
                           className={cn(
                             "w-full px-4 py-3 border-2 rounded-xl outline-none text-sm font-bold transition-all",
                             newEntry.department
-                              ? "bg-blue-50 border-blue-200 text-blue-900 focus:border-blue-400"
+                              ? "bg-pink-50 border-pink-200 text-pink-900 focus:border-pink-400"
                               : "bg-amber-50 border-amber-200 text-slate-900 focus:border-amber-400 placeholder:text-amber-300"
                           )}
                         />
@@ -905,7 +905,7 @@ export const SalaryIncrementModule: React.FC = () => {
                       {/* HOD */}
                       <div className="space-y-1.5">
                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
-                          <User className="w-3 h-3 text-blue-400" /> HOD / Reporting Manager <span className="text-red-400">*</span>
+                          <User className="w-3 h-3 text-pink-400" /> HOD / Reporting Manager <span className="text-red-400">*</span>
                         </label>
                         <input
                           required
@@ -916,7 +916,7 @@ export const SalaryIncrementModule: React.FC = () => {
                           className={cn(
                             "w-full px-4 py-3 border-2 rounded-xl outline-none text-sm font-bold transition-all",
                             newEntry.hod
-                              ? "bg-blue-50 border-blue-200 text-blue-900 focus:border-blue-400"
+                              ? "bg-pink-50 border-pink-200 text-pink-900 focus:border-pink-400"
                               : "bg-amber-50 border-amber-200 text-slate-900 focus:border-amber-400 placeholder:text-amber-300"
                           )}
                         />
@@ -925,7 +925,7 @@ export const SalaryIncrementModule: React.FC = () => {
                       {/* Company */}
                       <div className="space-y-1.5">
                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
-                          <Building2 className="w-3 h-3 text-blue-400" /> Company <span className="text-red-400">*</span>
+                          <Building2 className="w-3 h-3 text-pink-400" /> Company <span className="text-red-400">*</span>
                         </label>
                         <input
                           required
@@ -936,7 +936,7 @@ export const SalaryIncrementModule: React.FC = () => {
                           className={cn(
                             "w-full px-4 py-3 border-2 rounded-xl outline-none text-sm font-bold transition-all",
                             newEntry.joiningCompanyName
-                              ? "bg-blue-50 border-blue-200 text-blue-900 focus:border-blue-400"
+                              ? "bg-pink-50 border-pink-200 text-pink-900 focus:border-pink-400"
                               : "bg-amber-50 border-amber-200 text-slate-900 focus:border-amber-400 placeholder:text-amber-300"
                           )}
                         />
@@ -945,7 +945,7 @@ export const SalaryIncrementModule: React.FC = () => {
                       {/* Date of Joining */}
                       <div className="space-y-1.5">
                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
-                          <Calendar className="w-3 h-3 text-blue-400" /> Date of Joining <span className="text-red-400">*</span>
+                          <Calendar className="w-3 h-3 text-pink-400" /> Date of Joining <span className="text-red-400">*</span>
                         </label>
                         <input
                           required
@@ -955,7 +955,7 @@ export const SalaryIncrementModule: React.FC = () => {
                           className={cn(
                             "w-full px-4 py-3 border-2 rounded-xl outline-none text-sm font-bold transition-all",
                             newEntry.dateOfJoining
-                              ? "bg-blue-50 border-blue-200 text-blue-900 focus:border-blue-400"
+                              ? "bg-pink-50 border-pink-200 text-pink-900 focus:border-pink-400"
                               : "bg-amber-50 border-amber-200 text-slate-900 focus:border-amber-400"
                           )}
                         />
@@ -984,7 +984,7 @@ export const SalaryIncrementModule: React.FC = () => {
                             className={cn(
                               "w-full pl-8 pr-4 py-3 border-2 rounded-xl outline-none text-sm font-bold transition-all",
                               newEntry.joiningSalary
-                                ? "bg-blue-50 border-blue-200 text-blue-900 focus:border-blue-400"
+                                ? "bg-pink-50 border-pink-200 text-pink-900 focus:border-pink-400"
                                 : "bg-amber-50 border-amber-200 text-slate-900 focus:border-amber-400 placeholder:text-amber-300"
                             )}
                           />
@@ -994,7 +994,7 @@ export const SalaryIncrementModule: React.FC = () => {
                       {/* Current Salary */}
                       <div className="space-y-1.5">
                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
-                          <DollarSign className="w-3 h-3 text-blue-500" /> Current Salary <span className="text-red-400">*</span>
+                          <DollarSign className="w-3 h-3 text-pink-500" /> Current Salary <span className="text-red-400">*</span>
                         </label>
                         <div className="relative">
                           <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">₹</span>
@@ -1007,7 +1007,7 @@ export const SalaryIncrementModule: React.FC = () => {
                             className={cn(
                               "w-full pl-8 pr-4 py-3 border-2 rounded-xl outline-none text-sm font-bold transition-all",
                               newEntry.currentSalary
-                                ? "bg-blue-50 border-blue-200 text-blue-900 focus:border-blue-400"
+                                ? "bg-pink-50 border-pink-200 text-pink-900 focus:border-pink-400"
                                 : "bg-amber-50 border-amber-200 text-slate-900 focus:border-amber-400 placeholder:text-amber-300"
                             )}
                           />
@@ -1057,12 +1057,12 @@ export const SalaryIncrementModule: React.FC = () => {
                       {/* Note — full width */}
                       <div className="col-span-2 space-y-1.5 pt-1">
                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
-                          <FileText className="w-3 h-3 text-blue-400" /> Reason / Note for Increment
+                          <FileText className="w-3 h-3 text-pink-400" /> Reason / Note for Increment
                         </label>
                         <textarea
                           value={newEntry.note || ""}
                           onChange={(e) => setNewEntry({ ...newEntry, note: e.target.value })}
-                          className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:bg-white transition-all outline-none text-sm font-medium min-h-[75px] resize-none"
+                          className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-pink-500 focus:bg-white transition-all outline-none text-sm font-medium min-h-[75px] resize-none"
                           placeholder="Reason for increment request..."
                         />
                       </div>
@@ -1070,7 +1070,7 @@ export const SalaryIncrementModule: React.FC = () => {
 
                     {/* Legend */}
                     <div className="flex items-center gap-4 text-[10px] text-slate-400 font-bold">
-                      <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-blue-100 border border-blue-200 inline-block" /> Auto-filled</span>
+                      <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-pink-100 border border-pink-200 inline-block" /> Auto-filled</span>
                       <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-amber-100 border border-amber-200 inline-block" /> Fill manually</span>
                     </div>
                   </>
@@ -1089,7 +1089,7 @@ export const SalaryIncrementModule: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isLoading || isSearching || !newEntry.employeeName}
-                  className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-black text-xs hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="flex-1 py-3 bg-pink-600 text-white rounded-xl font-black text-xs hover:bg-pink-700 transition-all shadow-lg shadow-pink-200 flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   {isLoading
                     ? <Loader2 className="w-4 h-4 animate-spin" />
@@ -1109,8 +1109,8 @@ export const SalaryIncrementModule: React.FC = () => {
             <div className={cn(
               "p-5 flex items-center justify-between",
               activeTab === "hod" ? "bg-gradient-to-r from-blue-600 to-blue-500" :
-              activeTab === "mgmt" ? "bg-gradient-to-r from-orange-500 to-orange-400" :
-              "bg-gradient-to-r from-purple-600 to-purple-500"
+              activeTab === "mgmt" ? "bg-gradient-to-r from-amber-500 to-amber-400" :
+              "bg-gradient-to-r from-pink-600 to-pink-500"
             )}>
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center">
@@ -1154,7 +1154,7 @@ export const SalaryIncrementModule: React.FC = () => {
                         type="number"
                         value={activeTab === 'hod' ? actionData.hodAmount : actionData.mgmtAmount}
                         onChange={(e) => setActionData({ ...actionData, [activeTab === 'hod' ? 'hodAmount' : 'mgmtAmount']: e.target.value })}
-                        className="w-full pl-8 pr-5 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:bg-white transition-all outline-none text-sm font-black"
+                        className="w-full pl-8 pr-5 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-pink-500 focus:bg-white transition-all outline-none text-sm font-black"
                         placeholder="Enter amount"
                       />
                     </div>
@@ -1167,7 +1167,7 @@ export const SalaryIncrementModule: React.FC = () => {
                       required
                       value={activeTab === 'hod' ? actionData.hodFeedback : actionData.mgmtFeedback}
                       onChange={(e) => setActionData({ ...actionData, [activeTab === 'hod' ? 'hodFeedback' : 'mgmtFeedback']: e.target.value })}
-                      className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:bg-white transition-all outline-none text-sm font-medium min-h-[100px] resize-none"
+                      className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-pink-500 focus:bg-white transition-all outline-none text-sm font-medium min-h-[100px] resize-none"
                       placeholder="Provide detailed feedback..."
                     />
                   </div>
@@ -1188,7 +1188,7 @@ export const SalaryIncrementModule: React.FC = () => {
                             currentSalaryAfterIncrement: ((Number(selectedItem.currentSalary) || 0) + (Number(incAmt) || 0)).toString()
                           });
                         }}
-                        className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-blue-500 outline-none text-sm font-black"
+                        className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-pink-500 outline-none text-sm font-black"
                         placeholder="₹ 0"
                       />
                     </div>
@@ -1197,7 +1197,7 @@ export const SalaryIncrementModule: React.FC = () => {
                       <input
                         readOnly type="number"
                         value={actionData.currentSalaryAfterIncrement}
-                        className="w-full px-4 py-3 bg-blue-50 border-2 border-blue-200 rounded-xl outline-none text-sm font-black text-blue-900 cursor-not-allowed"
+                        className="w-full px-4 py-3 bg-pink-50 border-2 border-pink-200 rounded-xl outline-none text-sm font-black text-pink-900 cursor-not-allowed"
                         placeholder="Auto-calc"
                       />
                     </div>
@@ -1208,7 +1208,7 @@ export const SalaryIncrementModule: React.FC = () => {
                       required type="date"
                       value={actionData.dateOfIncrement}
                       onChange={(e) => setActionData({ ...actionData, dateOfIncrement: e.target.value })}
-                      className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-blue-500 outline-none text-sm font-black"
+                      className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-pink-500 outline-none text-sm font-black"
                     />
                   </div>
                   <div className="space-y-2">
@@ -1217,7 +1217,7 @@ export const SalaryIncrementModule: React.FC = () => {
                       required type="number"
                       value={actionData.nextIncrementNoOfMonth}
                       onChange={(e) => setActionData({ ...actionData, nextIncrementNoOfMonth: e.target.value })}
-                      className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-blue-500 outline-none text-sm font-black"
+                      className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-pink-500 outline-none text-sm font-black"
                       placeholder="e.g. 12"
                     />
                   </div>
@@ -1227,7 +1227,7 @@ export const SalaryIncrementModule: React.FC = () => {
                       required
                       value={actionData.note}
                       onChange={(e) => setActionData({ ...actionData, note: e.target.value })}
-                      className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-blue-500 outline-none text-sm font-medium min-h-[80px] resize-none"
+                      className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-pink-500 outline-none text-sm font-medium min-h-[80px] resize-none"
                     />
                   </div>
                 </div>
@@ -1247,8 +1247,8 @@ export const SalaryIncrementModule: React.FC = () => {
                   className={cn(
                     "flex-1 py-3 rounded-xl font-black text-xs text-white transition-all flex items-center justify-center gap-2 shadow-lg disabled:opacity-50",
                     activeTab === "hod" ? "bg-blue-600 hover:bg-blue-700 shadow-blue-200" :
-                    activeTab === "mgmt" ? "bg-orange-500 hover:bg-orange-600 shadow-orange-200" :
-                    "bg-purple-600 hover:bg-purple-700 shadow-purple-200"
+                    activeTab === "mgmt" ? "bg-amber-500 hover:bg-amber-600 shadow-amber-200" :
+                    "bg-pink-600 hover:bg-pink-700 shadow-pink-200"
                   )}
                 >
                   {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <>

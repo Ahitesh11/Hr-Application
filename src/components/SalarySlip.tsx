@@ -28,21 +28,21 @@ export const SalarySlip: React.FC<SalarySlipProps> = ({ record, onClose }) => {
   *{margin:0;padding:0;box-sizing:border-box}
   body{font-family:'Segoe UI',Arial,sans-serif;background:#f1f5f9;display:flex;justify-content:center;padding:24px}
   .slip{background:#fff;width:780px;border-radius:16px;overflow:hidden;box-shadow:0 4px 32px rgba(0,0,0,.15)}
-  .hdr{background:linear-gradient(135deg,#1d4ed8,#3b82f6);padding:28px 36px;display:flex;justify-content:space-between;align-items:center}
+  .hdr{background:linear-gradient(135deg,#3a4e0f,#618016);padding:28px 36px;display:flex;justify-content:space-between;align-items:center}
   .hdr-l h1{font-size:20px;font-weight:900;color:#fff;margin-bottom:4px}
-  .hdr-l p{font-size:11px;color:#bfdbfe}
+  .hdr-l p{font-size:11px;color:#c4d28f}
   .hdr-r{text-align:right}
-  .hdr-r .badge{font-size:9px;font-weight:900;color:#bfdbfe;text-transform:uppercase;letter-spacing:2px}
+  .hdr-r .badge{font-size:9px;font-weight:900;color:#c4d28f;text-transform:uppercase;letter-spacing:2px}
   .hdr-r .month{font-size:22px;font-weight:900;color:#fff}
-  .hdr-r .gen{font-size:9px;color:#93c5fd;margin-top:4px}
+  .hdr-r .gen{font-size:9px;color:#a1bb59;margin-top:4px}
   .emp{background:#f8fafc;padding:20px 36px;border-bottom:1px solid #e2e8f0}
   .emp-top{display:flex;align-items:center;gap:14px;margin-bottom:16px}
-  .avatar{width:44px;height:44px;background:#dbeafe;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#1d4ed8;flex-shrink:0}
+  .avatar{width:44px;height:44px;background:#e3e9c6;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#3a4e0f;flex-shrink:0}
   .emp-top h2{font-size:16px;font-weight:900;color:#0f172a}
   .emp-top p{font-size:11px;color:#64748b;margin-top:2px}
   .emp-top .eid{margin-left:auto;text-align:right}
   .emp-top .eid span{font-size:9px;color:#94a3b8;font-weight:700;text-transform:uppercase;letter-spacing:1px;display:block}
-  .emp-top .eid b{font-size:13px;font-weight:900;color:#2563eb}
+  .emp-top .eid b{font-size:13px;font-weight:900;color:#4d6515}
   .info-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
   .info-cell span{font-size:8px;font-weight:900;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:2px}
   .info-cell b{font-size:11px;font-weight:700;color:#1e293b}
@@ -104,10 +104,10 @@ export const SalarySlip: React.FC<SalarySlipProps> = ({ record, onClose }) => {
 
   <div class="att">
     <div class="att-card" style="background:#f1f5f9;color:#475569"><span>Working Days</span><b>${record.calculationDays || "—"}</b></div>
-    <div class="att-card" style="background:#eff6ff;color:#1d4ed8"><span>Days Present</span><b>${record.noOfDaysPresent || "—"}</b></div>
+    <div class="att-card" style="background:#f3f5e7;color:#3a4e0f"><span>Days Present</span><b>${record.noOfDaysPresent || "—"}</b></div>
     <div class="att-card" style="background:#fef2f2;color:#dc2626"><span>LWP Days</span><b>${r.lwp || "0"}</b></div>
     <div class="att-card" style="background:#f0fdf4;color:#16a34a"><span>Total Actual</span><b>${record.totalActual || "—"}</b></div>
-    <div class="att-card" style="background:#faf5ff;color:#7c3aed"><span>Gross Salary</span><b>₹${fmt(totalGross)}</b></div>
+    <div class="att-card" style="background:#f3f5e7;color:#4d6515"><span>Gross Salary</span><b>₹${fmt(totalGross)}</b></div>
   </div>
 
   <div class="body">
@@ -222,7 +222,7 @@ export const SalarySlip: React.FC<SalarySlipProps> = ({ record, onClose }) => {
           </button>
           <button
             onClick={handlePrint}
-            className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-xl font-black text-xs hover:bg-blue-700 transition-all shadow-lg shadow-blue-300"
+            className="flex items-center gap-2 px-4 py-2.5 bg-pink-600 text-white rounded-xl font-black text-xs hover:bg-pink-700 transition-all shadow-lg shadow-pink-300"
           >
             <Printer className="w-4 h-4" /> Print
           </button>
@@ -238,27 +238,27 @@ export const SalarySlip: React.FC<SalarySlipProps> = ({ record, onClose }) => {
         <div className="slip-page bg-white w-full max-w-3xl rounded-2xl shadow-2xl overflow-hidden my-16 sm:my-8 border border-slate-200">
 
           {/* ── Header ── */}
-          <div className="bg-gradient-to-r from-blue-700 via-blue-600 to-blue-500 px-8 py-6 flex items-center justify-between">
+          <div className="bg-gradient-to-r from-pink-700 via-pink-600 to-pink-500 px-8 py-6 flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center shrink-0">
                 <img src={logoBase64} alt="Logo" className="w-10 h-10 object-contain" />
               </div>
               <div>
                 <h1 className="text-xl font-black text-white tracking-tight leading-none">{record.company || "Company Name"}</h1>
-                <p className="text-blue-200 text-xs font-medium mt-0.5">{record.location || ""}</p>
+                <p className="text-pink-200 text-xs font-medium mt-0.5">{record.location || ""}</p>
               </div>
             </div>
             <div className="text-right">
-              <p className="text-[10px] font-black text-blue-200 uppercase tracking-widest">Salary Pay Slip</p>
+              <p className="text-[10px] font-black text-pink-200 uppercase tracking-widest">Salary Pay Slip</p>
               <p className="text-2xl font-black text-white mt-0.5">{record.month} {record.year}</p>
-              <p className="text-[10px] text-blue-200 mt-0.5">Generated: {format(new Date(), "dd MMM yyyy")}</p>
+              <p className="text-[10px] text-pink-200 mt-0.5">Generated: {format(new Date(), "dd MMM yyyy")}</p>
             </div>
           </div>
 
           {/* ── Employee Info ── */}
           <div className="bg-slate-50 px-8 py-5 border-b border-slate-200">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center text-blue-700 font-black text-base shrink-0">
+              <div className="w-10 h-10 bg-pink-100 rounded-xl flex items-center justify-center text-pink-700 font-black text-base shrink-0">
                 {(record.employeeName || "E").charAt(0)}
               </div>
               <div>
@@ -267,7 +267,7 @@ export const SalarySlip: React.FC<SalarySlipProps> = ({ record, onClose }) => {
               </div>
               <div className="ml-auto text-right">
                 <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Employee ID</p>
-                <p className="text-sm font-black text-blue-600">{record.employeeCode}</p>
+                <p className="text-sm font-black text-pink-600">{record.employeeCode}</p>
               </div>
             </div>
 
@@ -291,7 +291,7 @@ export const SalarySlip: React.FC<SalarySlipProps> = ({ record, onClose }) => {
                 { label: "Days Present", value: record.noOfDaysPresent, color: "bg-blue-50 text-blue-700" },
                 { label: "LWP Days", value: r.lwp || "0", color: "bg-red-50 text-red-700" },
                 { label: "Total Actual", value: record.totalActual, color: "bg-emerald-50 text-emerald-700" },
-                { label: "Gross Salary", value: `₹${fmt(totalGross)}`, color: "bg-purple-50 text-purple-700" },
+                { label: "Gross Salary", value: `₹${fmt(totalGross)}`, color: "bg-pink-50 text-pink-700" },
               ].map((s) => (
                 <div key={s.label} className={`${s.color} rounded-xl px-3 py-2.5 text-center`}>
                   <p className="text-[9px] font-black uppercase tracking-wider opacity-70 mb-0.5">{s.label}</p>

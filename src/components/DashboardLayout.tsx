@@ -229,8 +229,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
               {user?.role === "Admin" && (
                 <div className="relative">
                   {actingAs ? (
-                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold"
-                      style={{ background: "#ecfdf5", color: "#065f46", border: "1px solid #a7f3d0" }}>
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
                       <UserCheck className="w-3.5 h-3.5" />
                       <span className="hidden sm:inline">Acting as:</span>
                       <span>{actingAs.name}</span>
@@ -242,8 +241,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
                   ) : (
                     <button
                       onClick={() => setShowActAsPanel(v => !v)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all"
-                      style={{ background: "#eff6ff", color: "#1d4ed8", border: "1px solid #bfdbfe" }}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-pink-50 text-pink-700 border border-pink-200 hover:bg-pink-100"
                     >
                       <UserCheck className="w-3.5 h-3.5" />
                       <span className="hidden sm:inline">Act As Employee</span>
@@ -267,29 +265,28 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
                           onChange={e => setActAsInput(e.target.value)}
                           onKeyDown={e => e.key === "Enter" && handleActAsLookup()}
                           placeholder="Employee ID (e.g. PMMPL-320)"
-                          className="flex-1 px-3 py-2 text-xs font-medium border border-slate-200 rounded-xl outline-none focus:border-blue-400"
+                          className="flex-1 px-3 py-2 text-xs font-medium border border-slate-200 rounded-xl outline-none focus:border-pink-400"
                         />
                         <button
                           onClick={handleActAsLookup}
                           disabled={actAsLoading || !actAsInput.trim()}
-                          className="px-3 py-2 rounded-xl text-white text-xs font-bold disabled:opacity-50"
-                          style={{ background: "#1d4ed8" }}
+                          className="px-3 py-2 rounded-xl text-white text-xs font-bold bg-pink-600 hover:bg-pink-700 disabled:opacity-50"
                         >
                           {actAsLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Search className="w-3.5 h-3.5" />}
                         </button>
                       </div>
 
                       {actAsIsLiving && (
-                        <div className="mb-3 p-2.5 rounded-xl text-xs" style={{ background: "#fef2f2", border: "1px solid #fecaca" }}>
+                        <div className="mb-3 p-2.5 rounded-xl text-xs bg-red-50 border border-red-200">
                           <p className="font-black text-red-700">Employee has left the organization</p>
                           <p className="text-red-500 mt-0.5">This employee is in Living History and cannot be selected.</p>
                         </div>
                       )}
 
                       {actAsLookupResult && (
-                        <div className="mb-3 p-2.5 rounded-xl text-xs" style={{ background: "#ecfdf5", border: "1px solid #a7f3d0" }}>
-                          <p className="font-black text-green-800">{actAsLookupResult.name}</p>
-                          <p className="text-green-600">{actAsLookupResult.companyName}</p>
+                        <div className="mb-3 p-2.5 rounded-xl text-xs bg-emerald-50 border border-emerald-200">
+                          <p className="font-black text-emerald-800">{actAsLookupResult.name}</p>
+                          <p className="text-emerald-600">{actAsLookupResult.companyName}</p>
                         </div>
                       )}
 
@@ -301,14 +298,14 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
                             value={actAsManualName}
                             onChange={e => setActAsManualName(e.target.value)}
                             placeholder="Employee Name"
-                            className="w-full px-3 py-2 text-xs font-medium border border-slate-200 rounded-xl outline-none focus:border-blue-400"
+                            className="w-full px-3 py-2 text-xs font-medium border border-slate-200 rounded-xl outline-none focus:border-pink-400"
                           />
                           <input
                             type="text"
                             value={actAsManualCompany}
                             onChange={e => setActAsManualCompany(e.target.value)}
                             placeholder="Company Name (e.g. Pmmpl)"
-                            className="w-full px-3 py-2 text-xs font-medium border border-slate-200 rounded-xl outline-none focus:border-blue-400"
+                            className="w-full px-3 py-2 text-xs font-medium border border-slate-200 rounded-xl outline-none focus:border-pink-400"
                           />
                         </div>
                       )}
@@ -316,8 +313,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
                       <button
                         onClick={handleActAsSet}
                         disabled={!actAsInput.trim() || actAsIsLiving || (!actAsLookupResult && !actAsManualName)}
-                        className="w-full py-2 rounded-xl text-white text-xs font-black disabled:opacity-40"
-                        style={{ background: "#1d4ed8" }}
+                        className="w-full py-2 rounded-xl text-white text-xs font-black bg-pink-600 hover:bg-pink-700 disabled:opacity-40"
                       >
                         Set Employee
                       </button>
@@ -330,8 +326,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
 
           {/* Active "acting as" banner */}
           {actingAs && user?.role === "Admin" && (
-            <div className="px-4 md:px-8 py-2 text-xs font-bold flex items-center gap-2"
-              style={{ background: "#d1fae5", color: "#065f46" }}>
+            <div className="px-4 md:px-8 py-2 text-xs font-bold flex items-center gap-2 bg-emerald-100 text-emerald-800">
               <UserCheck className="w-3.5 h-3.5" />
               Forms will be submitted for: <span className="font-black">{actingAs.name} ({actingAs.employeeId})</span>
               <button onClick={handleActAsClear} className="ml-auto underline font-medium">Clear</button>

@@ -103,7 +103,7 @@ const CreditBadge = ({ n }: { n: number }) => (
   </span>
 );
 const UsedBadge = ({ n }: { n: number }) => n > 0
-  ? <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-50 text-rose-700 border border-rose-200">{n}</span>
+  ? <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black bg-pink-50 text-pink-700 border border-pink-200">{n}</span>
   : <span className="text-slate-300 text-xs font-bold">—</span>;
 const PendBadge = ({ n }: { n: number }) => n > 0
   ? <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-50 text-amber-700 border border-amber-200">{n}</span>
@@ -112,7 +112,7 @@ const CloseBadge = ({ n, theme }: { n: number; theme: "el"|"cl"|"ml" }) => {
   const low = n < 2, neg = n < 0;
   const base = theme === "el" ? "bg-blue-50 text-blue-700 border-blue-200"
              : theme === "cl" ? "bg-pink-50 text-pink-700 border-pink-200"
-             :                  "bg-fuchsia-50 text-fuchsia-700 border-fuchsia-200";
+             :                  "bg-pink-50 text-pink-700 border-pink-200";
   return (
     <span className={cn(
       "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-black border",
@@ -389,7 +389,7 @@ export const LeaveReportModule: React.FC = () => {
               <Download className="w-4 h-4"/> Excel
             </button>
             <button onClick={exportPDF}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-rose-50 text-rose-700 border border-rose-100 text-sm font-bold hover:bg-rose-100 transition-all">
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-pink-50 text-pink-700 border border-pink-100 text-sm font-bold hover:bg-pink-100 transition-all">
               <FileText className="w-4 h-4"/> PDF
             </button>
             <button onClick={()=>window.print()}
@@ -397,7 +397,7 @@ export const LeaveReportModule: React.FC = () => {
               <Printer className="w-4 h-4"/> Print
             </button>
             <button onClick={handleSaveReport} disabled={saving || loading}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-violet-600 text-white text-sm font-bold hover:bg-violet-700 transition-all disabled:opacity-50 shadow-lg shadow-violet-200">
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-pink-600 text-white text-sm font-bold hover:bg-pink-700 transition-all disabled:opacity-50 shadow-lg shadow-pink-200">
               {saving ? <Loader2 className="w-4 h-4 animate-spin"/> : <Save className="w-4 h-4"/>}
               {saving ? "Saving…" : "Generate Monthly Report"}
             </button>
@@ -437,7 +437,7 @@ export const LeaveReportModule: React.FC = () => {
         <SCard label="EL Credited"      value={tot.elCredited}        sub={`+${EL_PER_MONTH}/month`} icon={TrendingUp}  color="bg-blue-50     border-blue-100    text-blue-700"    />
         <SCard label="CL Credited"      value={tot.clCredited}        sub={`+${CL_PER_MONTH}/month`} icon={TrendingUp}  color="bg-pink-50     border-pink-100    text-pink-700"    />
         <SCard label="Leave Availed"    value={tot.paidLeaveAvailed}  sub="EL + CL approved"         icon={CheckCircle} color="bg-emerald-50  border-emerald-100 text-emerald-700" />
-        <SCard label="Leave Balance"    value={tot.paidLeaveBalance}  sub="EL + CL available"        icon={Calendar}    color="bg-violet-50   border-violet-100  text-violet-700"  />
+        <SCard label="Leave Balance"    value={tot.paidLeaveBalance}  sub="EL + CL available"        icon={Calendar}    color="bg-pink-50     border-pink-100    text-pink-700"    />
       </div>
 
       {/* ── Filter Bar ── */}
@@ -493,7 +493,7 @@ export const LeaveReportModule: React.FC = () => {
           <div className="hidden md:flex items-center gap-3 text-[10px] font-bold text-slate-400 print:hidden">
             <span className="flex items-center gap-1"><span className="w-3 h-1 rounded bg-blue-300 inline-block"/>EL</span>
             <span className="flex items-center gap-1"><span className="w-3 h-1 rounded bg-pink-300 inline-block"/>CL</span>
-            <span className="flex items-center gap-1"><span className="w-3 h-1 rounded bg-fuchsia-300 inline-block"/>ML</span>
+            <span className="flex items-center gap-1"><span className="w-3 h-1 rounded bg-pink-300 inline-block"/>ML</span>
             <span className="flex items-center gap-1"><span className="w-3 h-1 rounded bg-amber-200 inline-block"/>Low (&lt;2)</span>
             <span className="flex items-center gap-1"><span className="w-3 h-1 rounded bg-red-200 inline-block"/>Negative</span>
           </div>
@@ -526,7 +526,7 @@ export const LeaveReportModule: React.FC = () => {
                   <th colSpan={4} className="px-2 py-2 text-center border-r border-slate-700 bg-pink-900">
                     CL — Casual Leave (+{CL_PER_MONTH}/month)
                   </th>
-                  <th colSpan={3} className="px-2 py-2 text-center border-r border-slate-700 bg-fuchsia-900">
+                  <th colSpan={3} className="px-2 py-2 text-center border-r border-slate-700 bg-pink-900">
                     ML — Medical Leave
                   </th>
                   <th colSpan={3} className="px-2 py-2 text-center bg-slate-700">
@@ -537,17 +537,17 @@ export const LeaveReportModule: React.FC = () => {
                 <tr className="bg-slate-700 text-[10px] font-black uppercase tracking-wide">
                   <th className="px-3 py-2 text-center text-blue-200">Open</th>
                   <th className="px-3 py-2 text-center text-emerald-300">+Credit</th>
-                  <th className="px-3 py-2 text-center text-rose-300">Used</th>
+                  <th className="px-3 py-2 text-center text-pink-300">Used</th>
                   <th className="px-3 py-2 text-center text-blue-200 border-r border-slate-600">Close</th>
 
                   <th className="px-3 py-2 text-center text-pink-200">Open</th>
                   <th className="px-3 py-2 text-center text-emerald-300">+Credit</th>
-                  <th className="px-3 py-2 text-center text-rose-300">Used</th>
+                  <th className="px-3 py-2 text-center text-pink-300">Used</th>
                   <th className="px-3 py-2 text-center text-pink-200 border-r border-slate-600">Close</th>
 
-                  <th className="px-3 py-2 text-center text-fuchsia-200">Open</th>
-                  <th className="px-3 py-2 text-center text-rose-300">Used</th>
-                  <th className="px-3 py-2 text-center text-fuchsia-200 border-r border-slate-600">Close</th>
+                  <th className="px-3 py-2 text-center text-pink-200">Open</th>
+                  <th className="px-3 py-2 text-center text-pink-300">Used</th>
+                  <th className="px-3 py-2 text-center text-pink-200 border-r border-slate-600">Close</th>
 
                   <th className="px-3 py-2 text-center text-white">Balance</th>
                   <th className="px-3 py-2 text-center text-amber-200">Pending</th>
@@ -621,13 +621,13 @@ export const LeaveReportModule: React.FC = () => {
                       </td>
 
                       {/* ML */}
-                      <td className="px-3 py-3 text-center bg-fuchsia-50/20">
-                        <span className="text-sm font-black text-fuchsia-700">{c.ml.open}</span>
+                      <td className="px-3 py-3 text-center bg-pink-50/20">
+                        <span className="text-sm font-black text-pink-700">{c.ml.open}</span>
                       </td>
-                      <td className="px-3 py-3 text-center bg-fuchsia-50/20">
+                      <td className="px-3 py-3 text-center bg-pink-50/20">
                         <UsedBadge n={c.ml.availed}/>
                       </td>
-                      <td className="px-3 py-3 text-center bg-fuchsia-50/20 border-r border-fuchsia-100">
+                      <td className="px-3 py-3 text-center bg-pink-50/20 border-r border-pink-100">
                         <CloseBadge n={c.ml.close} theme="ml"/>
                         <MiniBar av={c.ml.availed} pe={c.ml.pending} q={c.ml.open}/>
                       </td>
@@ -665,17 +665,17 @@ export const LeaveReportModule: React.FC = () => {
                   {/* EL */}
                   <td className="px-3 py-3 text-center bg-blue-900/40 text-blue-200">—</td>
                   <td className="px-3 py-3 text-center bg-blue-900/40 text-emerald-300">+{filtered.length * EL_PER_MONTH}</td>
-                  <td className="px-3 py-3 text-center bg-blue-900/40 text-rose-300">{fmt(filtered.reduce((s,r)=>s+r.current.el.availed,0))}</td>
+                  <td className="px-3 py-3 text-center bg-blue-900/40 text-pink-300">{fmt(filtered.reduce((s,r)=>s+r.current.el.availed,0))}</td>
                   <td className="px-3 py-3 text-center bg-blue-900/40 text-blue-200">{tot.elBal}</td>
                   {/* CL */}
                   <td className="px-3 py-3 text-center bg-pink-900/40 text-pink-200">—</td>
                   <td className="px-3 py-3 text-center bg-pink-900/40 text-emerald-300">+{filtered.length * CL_PER_MONTH}</td>
-                  <td className="px-3 py-3 text-center bg-pink-900/40 text-rose-300">{fmt(filtered.reduce((s,r)=>s+r.current.cl.availed,0))}</td>
+                  <td className="px-3 py-3 text-center bg-pink-900/40 text-pink-300">{fmt(filtered.reduce((s,r)=>s+r.current.cl.availed,0))}</td>
                   <td className="px-3 py-3 text-center bg-pink-900/40 text-pink-200">{tot.clBal}</td>
                   {/* ML */}
-                  <td className="px-3 py-3 text-center bg-fuchsia-900/40 text-fuchsia-200">—</td>
-                  <td className="px-3 py-3 text-center bg-fuchsia-900/40 text-rose-300">{fmt(filtered.reduce((s,r)=>s+r.current.ml.availed,0))}</td>
-                  <td className="px-3 py-3 text-center bg-fuchsia-900/40 text-fuchsia-200">{tot.mlBal}</td>
+                  <td className="px-3 py-3 text-center bg-pink-900/40 text-pink-200">—</td>
+                  <td className="px-3 py-3 text-center bg-pink-900/40 text-pink-300">{fmt(filtered.reduce((s,r)=>s+r.current.ml.availed,0))}</td>
+                  <td className="px-3 py-3 text-center bg-pink-900/40 text-pink-200">{tot.mlBal}</td>
                   {/* Summary */}
                   <td className="px-3 py-3 text-center">{fmt(tot.elBal+tot.clBal+tot.mlBal)}</td>
                   <td className="px-3 py-3 text-center text-amber-300">{tot.pending}</td>
@@ -694,7 +694,7 @@ export const LeaveReportModule: React.FC = () => {
                onClick={e=>e.stopPropagation()}>
 
             {/* Modal Header */}
-            <div className="p-6 border-b border-pink-50 flex items-center justify-between bg-gradient-to-r from-pink-600 to-rose-600 text-white rounded-t-3xl">
+            <div className="p-6 border-b border-pink-50 flex items-center justify-between bg-gradient-to-r from-pink-600 to-pink-500 text-white rounded-t-3xl">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-lg font-black">
                   {(pbRow.name||"?").charAt(0).toUpperCase()}
@@ -718,21 +718,21 @@ export const LeaveReportModule: React.FC = () => {
                     <th rowSpan={2} className="px-4 py-3 border-r border-slate-700 align-middle">Month</th>
                     <th colSpan={4} className="px-2 py-2 text-center border-r border-slate-700 bg-blue-900">EL (+{EL_PER_MONTH}/month)</th>
                     <th colSpan={4} className="px-2 py-2 text-center border-r border-slate-700 bg-pink-900">CL (+{CL_PER_MONTH}/month)</th>
-                    <th colSpan={3} className="px-2 py-2 text-center border-r border-slate-700 bg-fuchsia-900">ML</th>
+                    <th colSpan={3} className="px-2 py-2 text-center border-r border-slate-700 bg-pink-900">ML</th>
                     <th rowSpan={2} className="px-4 py-3 text-center align-middle">Total</th>
                   </tr>
                   <tr className="bg-slate-700 text-[10px] font-black uppercase tracking-wide">
                     <th className="px-3 py-2 text-center text-blue-200">Open</th>
                     <th className="px-3 py-2 text-center text-emerald-300">+Credit</th>
-                    <th className="px-3 py-2 text-center text-rose-300">Used</th>
+                    <th className="px-3 py-2 text-center text-pink-300">Used</th>
                     <th className="px-3 py-2 text-center text-blue-200 border-r border-slate-600">Close</th>
                     <th className="px-3 py-2 text-center text-pink-200">Open</th>
                     <th className="px-3 py-2 text-center text-emerald-300">+Credit</th>
-                    <th className="px-3 py-2 text-center text-rose-300">Used</th>
+                    <th className="px-3 py-2 text-center text-pink-300">Used</th>
                     <th className="px-3 py-2 text-center text-pink-200 border-r border-slate-600">Close</th>
-                    <th className="px-3 py-2 text-center text-fuchsia-200">Open</th>
-                    <th className="px-3 py-2 text-center text-rose-300">Used</th>
-                    <th className="px-3 py-2 text-center text-fuchsia-200 border-r border-slate-600">Close</th>
+                    <th className="px-3 py-2 text-center text-pink-200">Open</th>
+                    <th className="px-3 py-2 text-center text-pink-300">Used</th>
+                    <th className="px-3 py-2 text-center text-pink-200 border-r border-slate-600">Close</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-pink-50">
@@ -769,9 +769,9 @@ export const LeaveReportModule: React.FC = () => {
                         <td className="px-3 py-3 text-center bg-pink-50/20"><UsedBadge n={row.cl.availed}/></td>
                         <td className="px-3 py-3 text-center bg-pink-50/20 border-r border-pink-100"><CloseBadge n={row.cl.close} theme="cl"/></td>
                         {/* ML */}
-                        <td className="px-3 py-3 text-center text-fuchsia-700 font-bold bg-fuchsia-50/20">{row.ml.open}</td>
-                        <td className="px-3 py-3 text-center bg-fuchsia-50/20"><UsedBadge n={row.ml.availed}/></td>
-                        <td className="px-3 py-3 text-center bg-fuchsia-50/20 border-r border-fuchsia-100"><CloseBadge n={row.ml.close} theme="ml"/></td>
+                        <td className="px-3 py-3 text-center text-pink-700 font-bold bg-pink-50/20">{row.ml.open}</td>
+                        <td className="px-3 py-3 text-center bg-pink-50/20"><UsedBadge n={row.ml.availed}/></td>
+                        <td className="px-3 py-3 text-center bg-pink-50/20 border-r border-pink-100"><CloseBadge n={row.ml.close} theme="ml"/></td>
                         {/* Total */}
                         <td className="px-3 py-3 text-center">
                           <span className={cn(

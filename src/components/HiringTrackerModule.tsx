@@ -222,8 +222,8 @@ export const HiringTrackerModule = () => {
       <div className="bg-white border-b border-slate-200 px-6 pt-5 shrink-0 z-10 relative">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center shrink-0">
-              <Briefcase className="w-5 h-5 text-indigo-600" />
+            <div className="w-10 h-10 bg-pink-100 rounded-xl flex items-center justify-center shrink-0">
+              <Briefcase className="w-5 h-5 text-pink-600" />
             </div>
             <div>
               <h1 className="text-xl font-black text-slate-800 leading-tight">Hiring Tracker</h1>
@@ -234,7 +234,7 @@ export const HiringTrackerModule = () => {
           <div className="flex flex-col sm:flex-row items-center gap-3">
             <button
               onClick={() => setIsModalOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white font-bold text-sm rounded-xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200"
+              className="flex items-center gap-2 px-4 py-2 bg-pink-600 text-white font-bold text-sm rounded-xl hover:bg-pink-700 transition-colors shadow-lg shadow-pink-200"
             >
               <Plus className="w-4 h-4" />
               Add New Indent Request
@@ -246,7 +246,7 @@ export const HiringTrackerModule = () => {
                 placeholder="Search Indent, Post..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 bg-slate-100 border-none rounded-xl text-sm font-medium text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-500 transition-all"
+                className="w-full pl-9 pr-4 py-2 bg-slate-100 border-none rounded-xl text-sm font-medium text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-pink-500 transition-all"
               />
             </div>
             <button
@@ -263,46 +263,46 @@ export const HiringTrackerModule = () => {
         <div className="flex gap-6 mt-2">
           <button
             onClick={() => setActiveTab("social-site")}
-            className={cn("py-3 font-bold text-sm border-b-2 transition-colors flex items-center gap-1.5", activeTab === "social-site" ? "border-indigo-600 text-indigo-600" : "border-transparent text-slate-500 hover:text-slate-700")}
+            className={cn("py-3 font-bold text-sm border-b-2 transition-colors flex items-center gap-1.5", activeTab === "social-site" ? "border-pink-600 text-pink-600" : "border-transparent text-slate-500 hover:text-slate-700")}
           >
             1st Tab: Social Site
-            <span className={cn("px-2 py-0.5 rounded-full text-[10px]", activeTab === "social-site" ? "bg-indigo-100 text-indigo-700" : "bg-slate-100 text-slate-500")}>
+            <span className={cn("px-2 py-0.5 rounded-full text-[10px]", activeTab === "social-site" ? "bg-pink-100 text-pink-700" : "bg-slate-100 text-slate-500")}>
               {getTabCount("social-site")}
             </span>
           </button>
           <button
             onClick={() => setActiveTab("call-tracker")}
-            className={cn("py-3 font-bold text-sm border-b-2 transition-colors flex items-center gap-1.5", activeTab === "call-tracker" ? "border-indigo-600 text-indigo-600" : "border-transparent text-slate-500 hover:text-slate-700")}
+            className={cn("py-3 font-bold text-sm border-b-2 transition-colors flex items-center gap-1.5", activeTab === "call-tracker" ? "border-pink-600 text-pink-600" : "border-transparent text-slate-500 hover:text-slate-700")}
           >
             2st Tab: Call Tracker
-            <span className={cn("px-2 py-0.5 rounded-full text-[10px]", activeTab === "call-tracker" ? "bg-indigo-100 text-indigo-700" : "bg-slate-100 text-slate-500")}>
+            <span className={cn("px-2 py-0.5 rounded-full text-[10px]", activeTab === "call-tracker" ? "bg-pink-100 text-pink-700" : "bg-slate-100 text-slate-500")}>
               {getTabCount("call-tracker")}
             </span>
           </button>
           <button
             onClick={() => setActiveTab("follow-up")}
-            className={cn("py-3 font-bold text-sm border-b-2 transition-colors flex items-center gap-1.5", activeTab === "follow-up" ? "border-indigo-600 text-indigo-600" : "border-transparent text-slate-500 hover:text-slate-700")}
+            className={cn("py-3 font-bold text-sm border-b-2 transition-colors flex items-center gap-1.5", activeTab === "follow-up" ? "border-pink-600 text-pink-600" : "border-transparent text-slate-500 hover:text-slate-700")}
           >
             Follow Up
-            <span className={cn("px-2 py-0.5 rounded-full text-[10px]", activeTab === "follow-up" ? "bg-indigo-100 text-indigo-700" : "bg-slate-100 text-slate-500")}>
+            <span className={cn("px-2 py-0.5 rounded-full text-[10px]", activeTab === "follow-up" ? "bg-pink-100 text-pink-700" : "bg-slate-100 text-slate-500")}>
               {getTabCount("follow-up")}
             </span>
           </button>
           <button
             onClick={() => setActiveTab("interview")}
-            className={cn("py-3 font-bold text-sm border-b-2 transition-colors flex items-center gap-1.5", activeTab === "interview" ? "border-indigo-600 text-indigo-600" : "border-transparent text-slate-500 hover:text-slate-700")}
+            className={cn("py-3 font-bold text-sm border-b-2 transition-colors flex items-center gap-1.5", activeTab === "interview" ? "border-pink-600 text-pink-600" : "border-transparent text-slate-500 hover:text-slate-700")}
           >
             3st Tab: Interview
-            <span className={cn("px-2 py-0.5 rounded-full text-[10px]", activeTab === "interview" ? "bg-indigo-100 text-indigo-700" : "bg-slate-100 text-slate-500")}>
+            <span className={cn("px-2 py-0.5 rounded-full text-[10px]", activeTab === "interview" ? "bg-pink-100 text-pink-700" : "bg-slate-100 text-slate-500")}>
               {getTabCount("interview")}
             </span>
           </button>
           <button
             onClick={() => setActiveTab("history")}
-            className={cn("py-3 font-bold text-sm border-b-2 transition-colors flex items-center gap-1.5", activeTab === "history" ? "border-indigo-600 text-indigo-600" : "border-transparent text-slate-500 hover:text-slate-700")}
+            className={cn("py-3 font-bold text-sm border-b-2 transition-colors flex items-center gap-1.5", activeTab === "history" ? "border-pink-600 text-pink-600" : "border-transparent text-slate-500 hover:text-slate-700")}
           >
             History
-            <span className={cn("px-2 py-0.5 rounded-full text-[10px]", activeTab === "history" ? "bg-indigo-100 text-indigo-700" : "bg-slate-100 text-slate-500")}>
+            <span className={cn("px-2 py-0.5 rounded-full text-[10px]", activeTab === "history" ? "bg-pink-100 text-pink-700" : "bg-slate-100 text-slate-500")}>
               {getTabCount("history")}
             </span>
           </button>
@@ -314,7 +314,7 @@ export const HiringTrackerModule = () => {
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 h-full flex flex-col overflow-hidden">
           {isLoading ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-4">
-              <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+              <Loader2 className="w-8 h-8 animate-spin text-pink-600" />
               <p className="text-slate-500 font-medium">Loading tracking data...</p>
             </div>
           ) : filteredData.length === 0 ? (
@@ -345,14 +345,14 @@ export const HiringTrackerModule = () => {
                     
                     {/* Active Tab Specific Columns */}
                     {activeTab === "social-site" && (
-                      <th className="px-4 py-3 text-[11px] font-bold tracking-wider text-indigo-600 uppercase tracking-wider border-b border-r border-slate-200 bg-indigo-50/50">Planned1</th>
+                      <th className="px-4 py-3 text-[11px] font-bold tracking-wider text-pink-600 uppercase tracking-wider border-b border-r border-slate-200 bg-pink-50/50">Planned1</th>
                     )}
                     
                     {activeTab === "call-tracker" && (
                       <>
                         <th className="px-4 py-3 text-[11px] font-bold tracking-wider text-slate-500 uppercase tracking-wider border-b border-r border-slate-100">Social Site Post</th>
                         <th className="px-4 py-3 text-[11px] font-bold tracking-wider text-slate-500 uppercase tracking-wider border-b border-r border-slate-200">Which</th>
-                        <th className="px-4 py-3 text-[11px] font-bold tracking-wider text-indigo-600 uppercase tracking-wider border-b border-r border-slate-200 bg-indigo-50/50">Planned2</th>
+                        <th className="px-4 py-3 text-[11px] font-bold tracking-wider text-pink-600 uppercase tracking-wider border-b border-r border-slate-200 bg-pink-50/50">Planned2</th>
                       </>
                     )}
                     
@@ -361,7 +361,7 @@ export const HiringTrackerModule = () => {
                         <th className="px-4 py-3 text-[11px] font-bold tracking-wider text-slate-500 uppercase tracking-wider border-b border-r border-slate-100 min-w-[200px]">Follow Up History</th>
                         <th className="px-4 py-3 text-[11px] font-bold tracking-wider text-slate-500 uppercase tracking-wider border-b border-r border-slate-100">Next Call Date</th>
                         <th className="px-4 py-3 text-[11px] font-bold tracking-wider text-slate-500 uppercase tracking-wider border-b border-r border-slate-100">Tracker Status</th>
-                        <th className="px-4 py-3 text-[11px] font-bold tracking-wider text-indigo-600 uppercase tracking-wider border-b border-r border-slate-200 bg-indigo-50/50">Planned2</th>
+                        <th className="px-4 py-3 text-[11px] font-bold tracking-wider text-pink-600 uppercase tracking-wider border-b border-r border-slate-200 bg-pink-50/50">Planned2</th>
                       </>
                     )}
                     
@@ -371,7 +371,7 @@ export const HiringTrackerModule = () => {
                         <th className="px-4 py-3 text-[11px] font-bold tracking-wider text-slate-500 uppercase tracking-wider border-b border-r border-slate-100">Which</th>
                         <th className="px-4 py-3 text-[11px] font-bold tracking-wider text-slate-500 uppercase tracking-wider border-b border-r border-slate-100">Interview Status</th>
                         <th className="px-4 py-3 text-[11px] font-bold tracking-wider text-slate-500 uppercase tracking-wider border-b border-r border-slate-100">Tracker Status</th>
-                        {activeTab === "interview" && <th className="px-4 py-3 text-[11px] font-bold tracking-wider text-indigo-600 uppercase tracking-wider border-b border-r border-slate-200 bg-indigo-50/50">Planned3</th>}
+                        {activeTab === "interview" && <th className="px-4 py-3 text-[11px] font-bold tracking-wider text-pink-600 uppercase tracking-wider border-b border-r border-slate-200 bg-pink-50/50">Planned3</th>}
                         {activeTab === "history" && <th className="px-4 py-3 text-[11px] font-bold tracking-wider text-emerald-600 uppercase tracking-wider border-b border-r border-slate-200 bg-emerald-50/50">Actual3 (Completed)</th>}
                       </>
                     )}
@@ -387,7 +387,7 @@ export const HiringTrackerModule = () => {
                     <tr key={idx} className="hover:bg-pink-50/40 transition-colors duration-200">
                       {/* Common Basic Info */}
                       <td className="px-4 py-3 text-xs font-bold text-slate-900 border-r border-slate-100 whitespace-nowrap">{row.indentNumber || "—"}</td>
-                      <td className="px-4 py-3 text-xs font-bold text-indigo-700 border-r border-slate-100 whitespace-nowrap">{row.company || "—"}</td>
+                      <td className="px-4 py-3 text-xs font-bold text-pink-700 border-r border-slate-100 whitespace-nowrap">{row.company || "—"}</td>
                       <td className="px-4 py-3 text-xs font-medium text-slate-700 border-r border-slate-100 whitespace-nowrap">{row.post || "—"}</td>
                       <td className="px-4 py-3 text-xs font-medium text-slate-600 border-r border-slate-100 whitespace-nowrap">{row.gender || "—"}</td>
                       <td className="px-4 py-3 text-xs font-medium text-slate-600 border-r border-slate-100 whitespace-nowrap">{row.prefer || "—"}</td>
@@ -398,14 +398,14 @@ export const HiringTrackerModule = () => {
                       
                       {/* Active Tab Specific Columns */}
                       {activeTab === "social-site" && (
-                        <td className="px-4 py-3 text-xs font-bold text-indigo-700 whitespace-nowrap bg-indigo-50/30 border-r border-slate-200">{row.planned1 || "—"}</td>
+                        <td className="px-4 py-3 text-xs font-bold text-pink-700 whitespace-nowrap bg-pink-50/30 border-r border-slate-200">{row.planned1 || "—"}</td>
                       )}
                       
                       {activeTab === "call-tracker" && (
                         <>
                           <td className="px-4 py-3 text-xs font-medium text-slate-600 border-r border-slate-100 truncate max-w-[150px]" title={row.socialSitePost}>{row.socialSitePost || "—"}</td>
                           <td className="px-4 py-3 text-xs font-medium text-slate-600 border-r border-slate-200 whitespace-nowrap">{row.which || "—"}</td>
-                          <td className="px-4 py-3 text-xs font-bold text-indigo-700 whitespace-nowrap bg-indigo-50/30 border-r border-slate-200">{row.planned2 || "—"}</td>
+                          <td className="px-4 py-3 text-xs font-bold text-pink-700 whitespace-nowrap bg-pink-50/30 border-r border-slate-200">{row.planned2 || "—"}</td>
                         </>
                       )}
 
@@ -424,7 +424,7 @@ export const HiringTrackerModule = () => {
                               </span>
                             ) : "—"}
                           </td>
-                          <td className="px-4 py-3 text-xs font-bold text-indigo-700 whitespace-nowrap bg-indigo-50/30 border-r border-slate-200 align-top">{row.planned2 || "—"}</td>
+                          <td className="px-4 py-3 text-xs font-bold text-pink-700 whitespace-nowrap bg-pink-50/30 border-r border-slate-200 align-top">{row.planned2 || "—"}</td>
                         </>
                       )}
                       
@@ -446,7 +446,7 @@ export const HiringTrackerModule = () => {
                               </span>
                             ) : "—"}
                           </td>
-                          {activeTab === "interview" && <td className="px-4 py-3 text-xs font-bold text-indigo-700 whitespace-nowrap bg-indigo-50/30 border-r border-slate-200">{row.planned3 || "—"}</td>}
+                          {activeTab === "interview" && <td className="px-4 py-3 text-xs font-bold text-pink-700 whitespace-nowrap bg-pink-50/30 border-r border-slate-200">{row.planned3 || "—"}</td>}
                           {activeTab === "history" && <td className="px-4 py-3 text-xs font-bold text-emerald-700 whitespace-nowrap bg-emerald-50/30 border-r border-slate-200">{row.actual3 || "—"}</td>}
                         </>
                       )}
@@ -456,7 +456,7 @@ export const HiringTrackerModule = () => {
                         <td className="px-4 py-3 text-center sticky right-0 bg-white shadow-[-4px_0_12px_rgba(0,0,0,0.03)]">
                           <button
                             onClick={() => openUpdateModal(row)}
-                            className="px-3 py-1.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white font-bold text-[11px] rounded-lg transition-colors whitespace-nowrap"
+                            className="px-3 py-1.5 bg-pink-50 text-pink-600 hover:bg-pink-600 hover:text-white font-bold text-[11px] rounded-lg transition-colors whitespace-nowrap"
                           >
                             Update
                           </button>
@@ -504,7 +504,7 @@ export const HiringTrackerModule = () => {
                           value={(formData as any)[field.name]}
                           onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
                           required
-                          className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none transition-all appearance-none"
+                          className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:border-pink-400 focus:ring-2 focus:ring-pink-100 outline-none transition-all appearance-none"
                         >
                           <option value="">-- Select --</option>
                           {field.options?.map(opt => <option key={opt} value={opt}>{opt}</option>)}
@@ -517,7 +517,7 @@ export const HiringTrackerModule = () => {
                         value={(formData as any)[field.name]}
                         onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
                         required
-                        className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 placeholder:text-slate-300 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none transition-all"
+                        className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 placeholder:text-slate-300 focus:border-pink-400 focus:ring-2 focus:ring-pink-100 outline-none transition-all"
                       />
                     )}
                   </div>
@@ -537,7 +537,7 @@ export const HiringTrackerModule = () => {
                 type="submit"
                 form="hiring-form"
                 disabled={isSubmitting}
-                className="px-6 py-2 bg-indigo-600 text-white font-bold text-sm rounded-xl hover:bg-indigo-700 transition-colors flex items-center gap-2 shadow-lg shadow-indigo-200 disabled:opacity-50"
+                className="px-6 py-2 bg-pink-600 text-white font-bold text-sm rounded-xl hover:bg-pink-700 transition-colors flex items-center gap-2 shadow-lg shadow-pink-200 disabled:opacity-50"
               >
                 {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Briefcase className="w-4 h-4" />}
                 Submit Request
@@ -561,9 +561,9 @@ export const HiringTrackerModule = () => {
             <form id="update-form" onSubmit={handleUpdateSubmit} className="flex-1 overflow-y-auto p-6 space-y-5 custom-scrollbar">
               
               {/* Common Details for context */}
-              <div className="bg-indigo-50 p-3 rounded-lg border border-indigo-100 mb-2">
-                <p className="text-xs font-bold text-indigo-800">Indent: {updateData.indentNumber}</p>
-                <p className="text-xs text-indigo-600 mt-1">Completing {
+              <div className="bg-pink-50 p-3 rounded-lg border border-pink-100 mb-2">
+                <p className="text-xs font-bold text-pink-800">Indent: {updateData.indentNumber}</p>
+                <p className="text-xs text-pink-600 mt-1">Completing {
                   activeTab === 'social-site' ? '1st Step (Social Site)' : 
                   (activeTab === 'call-tracker' || activeTab === 'follow-up') ? '2nd Step (Call Tracker)' : 
                   '3rd Step (Interview)'
@@ -580,7 +580,7 @@ export const HiringTrackerModule = () => {
                       value={updateData.socialSitePost}
                       onChange={(e) => setUpdateData({ ...updateData, socialSitePost: e.target.value })}
                       required
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none transition-all"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:border-pink-400 focus:ring-2 focus:ring-pink-100 outline-none transition-all"
                     />
                   </div>
                   <div>
@@ -590,7 +590,7 @@ export const HiringTrackerModule = () => {
                       value={updateData.which}
                       onChange={(e) => setUpdateData({ ...updateData, which: e.target.value })}
                       required
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none transition-all"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:border-pink-400 focus:ring-2 focus:ring-pink-100 outline-none transition-all"
                     />
                   </div>
                 </>
@@ -613,7 +613,7 @@ export const HiringTrackerModule = () => {
                         value={updateData.trackerStatus}
                         onChange={(e) => setUpdateData({ ...updateData, trackerStatus: e.target.value })}
                         required
-                        className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium appearance-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none transition-all"
+                        className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium appearance-none focus:border-pink-400 focus:ring-2 focus:ring-pink-100 outline-none transition-all"
                       >
                         <option value="">-- Select Status --</option>
                         <option value="In Progress">In Progress</option>
@@ -632,7 +632,7 @@ export const HiringTrackerModule = () => {
                         onChange={(e) => setUpdateData({ ...updateData, whatDidTheCandidateSays: e.target.value })}
                         required
                         rows={3}
-                        className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none transition-all"
+                        className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:border-pink-400 focus:ring-2 focus:ring-pink-100 outline-none transition-all"
                       />
                     </div>
                   )}
@@ -643,7 +643,7 @@ export const HiringTrackerModule = () => {
                         type="date"
                         value={updateData.nextCallDate}
                         onChange={(e) => setUpdateData({ ...updateData, nextCallDate: e.target.value })}
-                        className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none transition-all"
+                        className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:border-pink-400 focus:ring-2 focus:ring-pink-100 outline-none transition-all"
                       />
                     </div>
                   )}
@@ -746,7 +746,7 @@ export const HiringTrackerModule = () => {
                         <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1.5">Candidate Photo (Image/PDF)</label>
                         {updateData.candidatePhoto && !updateData.candidatePhoto.startsWith("data:") ? (
                           <div className="flex items-center justify-between px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl">
-                            <a href={updateData.candidatePhoto} target="_blank" rel="noreferrer" className="text-xs font-bold text-indigo-600 hover:underline truncate max-w-[200px]">View Uploaded Photo</a>
+                            <a href={updateData.candidatePhoto} target="_blank" rel="noreferrer" className="text-xs font-bold text-pink-600 hover:underline truncate max-w-[200px]">View Uploaded Photo</a>
                             <button type="button" onClick={() => setUpdateData({ ...updateData, candidatePhoto: "" })} className="text-xs text-red-500 font-bold hover:underline">Remove</button>
                           </div>
                         ) : (
@@ -766,7 +766,7 @@ export const HiringTrackerModule = () => {
                         <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1.5">Resume Copy (Image/PDF)</label>
                         {updateData.resumeCopy && !updateData.resumeCopy.startsWith("data:") ? (
                           <div className="flex items-center justify-between px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl">
-                            <a href={updateData.resumeCopy} target="_blank" rel="noreferrer" className="text-xs font-bold text-indigo-600 hover:underline truncate max-w-[200px]">View Uploaded Resume</a>
+                            <a href={updateData.resumeCopy} target="_blank" rel="noreferrer" className="text-xs font-bold text-pink-600 hover:underline truncate max-w-[200px]">View Uploaded Resume</a>
                             <button type="button" onClick={() => setUpdateData({ ...updateData, resumeCopy: "" })} className="text-xs text-red-500 font-bold hover:underline">Remove</button>
                           </div>
                         ) : (
@@ -806,7 +806,7 @@ export const HiringTrackerModule = () => {
                         value={updateData.interviewStatus}
                         onChange={(e) => setUpdateData({ ...updateData, interviewStatus: e.target.value })}
                         required
-                        className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium appearance-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 outline-none transition-all"
+                        className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium appearance-none focus:border-pink-400 focus:ring-2 focus:ring-pink-100 outline-none transition-all"
                       >
                         <option value="">-- Select Status --</option>
                         <option value="Scheduled">Scheduled</option>
@@ -833,7 +833,7 @@ export const HiringTrackerModule = () => {
                 type="submit"
                 form="update-form"
                 disabled={isUpdating}
-                className="px-6 py-2 bg-indigo-600 text-white font-bold text-sm rounded-xl hover:bg-indigo-700 transition-colors flex items-center gap-2 shadow-lg shadow-indigo-200 disabled:opacity-50"
+                className="px-6 py-2 bg-pink-600 text-white font-bold text-sm rounded-xl hover:bg-pink-700 transition-colors flex items-center gap-2 shadow-lg shadow-pink-200 disabled:opacity-50"
               >
                 {isUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
                 Submit Update

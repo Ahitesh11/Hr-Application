@@ -442,6 +442,24 @@ export const JoiningModule = () => {
   const toLabel = (key: string) =>
     key.replace(/([A-Z])/g, " $1").replace(/^./, s => s.toUpperCase()).trim();
 
+  // The "Present Employees" sheet only carries a handful of live/payroll columns (Salary, UAN,
+  // bank, next increment date...). All the details captured at onboarding (address, DOB, PF/ESIC,
+  // documents...) live in the "Joining" sheet instead. Match the two by employee code so the View
+  // modal can show the complete record, not just what's in Present Employees.
+  const findJoiningMatch = (r: any) => {
+    const id = (r.pmmplAc || r.employeeId || r.employeeCode || "").toString().trim().toLowerCase();
+    if (!id) return null;
+    return joiningList.find((j: any) => {
+      const jid = (j.pmmplAc || j.employeeId || j.employeeCode || "").toString().trim().toLowerCase();
+      return jid !== "" && jid === id;
+    }) || null;
+  };
+
+  const openView = (r: any) => {
+    const match = findJoiningMatch(r);
+    setViewRecord(match ? { ...match, ...r } : r);
+  };
+
   const livingEmployeeIds = new Set(
     livingList.map((r: any) => r.pmmplAc || r.employeeId || r.employeeCode).filter(Boolean)
   );
@@ -820,7 +838,7 @@ export const JoiningModule = () => {
                         <td className="px-4 py-3.5">
                           <div className="flex items-center gap-2">
                             <button
-                              onClick={() => setViewRecord(r)}
+                              onClick={() => openView(r)}
                               className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold text-pink-600 bg-pink-50 border border-pink-100 rounded-lg hover:bg-pink-100 transition-all"
                             >
                               <Eye className="w-3 h-3" /> View

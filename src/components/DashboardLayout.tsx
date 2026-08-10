@@ -106,7 +106,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
     { id: "hod-approvals", label: "HOD Approvals",       icon: CheckCircle,     roles: ["Admin", "HOD"] },
     { id: "hr-approvals",  label: "HR Approvals",        icon: Users,           roles: ["Admin"] },
     { id: "leave-report",  label: "Leave Report",        icon: TrendingUp,      roles: ["Admin"] },
-    { id: "attendance",    label: "Attendance",          icon: Users,           roles: ["Admin"] },
+    { id: "attendance",    label: "Attendance",          icon: Users,           roles: ["Staf", "Admin", "HOD"] },
     { id: "salary",        label: "Salary Records",      icon: CreditCard,      roles: ["Admin"] },
     { id: "payroll",       label: "Payroll",              icon: Wallet,          roles: ["Admin"] },
     { id: "salary-increment",          label: "Salary Increment",          icon: TrendingUp, roles: ["Admin"] },

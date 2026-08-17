@@ -1,10 +1,4 @@
-import {
-  Content,
-  createModelContent,
-  createPartFromFunctionCall,
-  createPartFromFunctionResponse,
-  createUserContent,
-} from "@google/genai";
+import type { Content } from "@google/genai" with { "resolution-mode": "import" };
 import type { AgentMessage } from "./agent";
 import { getGeminiClient, getGeminiModel } from "./gemini";
 import { getGeminiFunctionDeclarations } from "./geminiSchema";
@@ -21,11 +15,20 @@ export interface GeminiAgentResult {
   history: AgentMessage[];
 }
 
-function buildContents(history: AgentMessage[] | undefined, message: string): Content[] {
+// @google/genai ships ESM-only, so this CommonJS server can only reach its
+// runtime exports (as opposed to its types, imported above) via a dynamic
+// import — see gemini.ts for the same pattern on the client constructor.
+type GenaiRuntime = typeof import("@google/genai", { with: { "resolution-mode": "import" } });
+
+function buildContents(
+  genai: Pick<GenaiRuntime, "createUserContent" | "createModelContent">,
+  history: AgentMessage[] | undefined,
+  message: string
+): Content[] {
   const contents: Content[] = (history ?? []).map((turn) =>
-    turn.role === "user" ? createUserContent(turn.content) : createModelContent(turn.content)
+    turn.role === "user" ? genai.createUserContent(turn.content) : genai.createModelContent(turn.content)
   );
-  contents.push(createUserContent(message));
+  contents.push(genai.createUserContent(message));
   return contents;
 }
 
@@ -41,11 +44,12 @@ export async function runGeminiAgentTurn(
   context: ToolExecutionContext,
   history: AgentMessage[] | undefined
 ): Promise<GeminiAgentResult> {
-  const ai = getGeminiClient();
+  const genai = await import("@google/genai");
+  const ai = await getGeminiClient();
   const model = getGeminiModel();
   const tools = [{ functionDeclarations: getGeminiFunctionDeclarations() }];
 
-  const contents = buildContents(history, message);
+  const contents = buildContents(genai, history, message);
 
   for (let round = 0; round < MAX_TOOL_CALL_ROUNDS; round++) {
     const response = await ai.models.generateContent({
@@ -67,7 +71,7 @@ export async function runGeminiAgentTurn(
     // The model's turn: the function call(s) it produced.
     contents.push({
       role: "model",
-      parts: calls.map((call) => createPartFromFunctionCall(call.name ?? "", call.args ?? {})),
+      parts: calls.map((call) => genai.createPartFromFunctionCall(call.name ?? "", call.args ?? {})),
     });
 
     // Support multiple tool execution: run every requested call in parallel.
@@ -76,11 +80,11 @@ export async function runGeminiAgentTurn(
         const toolName = call.name ?? "";
         try {
           const result = await executeTool({ toolName, input: call.args ?? {} }, context);
-          return createPartFromFunctionResponse(call.id ?? toolName, toolName, { output: result.output });
+          return genai.createPartFromFunctionResponse(call.id ?? toolName, toolName, { output: result.output });
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : "Tool execution failed";
           logger.error(`Gemini-requested tool "${toolName}" failed`, { errorMessage });
-          return createPartFromFunctionResponse(call.id ?? toolName, toolName, { error: errorMessage });
+          return genai.createPartFromFunctionResponse(call.id ?? toolName, toolName, { error: errorMessage });
         }
       })
     );

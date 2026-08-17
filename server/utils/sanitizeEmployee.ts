@@ -3,7 +3,7 @@ import { GasRecord } from "../types/gas.types";
 /**
  * Fields safe to expose from an employee record. Deliberately an allowlist,
  * not a denylist — the "User" sheet also holds the login password column
- * (see login() in GOOGLE_APPS_SCRIPT.gs), and an allowlist guarantees that
+ * (see login() in apps-script/Auth.gs), and an allowlist guarantees that
  * can never leak through a tool output regardless of what else the sheet
  * contains or how its columns change over time.
  */

@@ -10,7 +10,7 @@ export interface DocumentRecordsLookupOutput {
 
 /**
  * GAS's submitDocument action writes into the same "Offer Letters" sheet as
- * offer letters (see GOOGLE_APPS_SCRIPT.gs) — there is no separate documents
+ * offer letters (see apps-script/Core.gs and apps-script/Documents.gs) — there is no separate documents
  * sheet or action in the existing backend. This tool reads that same source;
  * it isn't duplicating OfferLetterTool, both genuinely read the one sheet
  * that exists.

@@ -2,32 +2,75 @@ import { User, PunchMissFms, LeaveFms, HolidayWorkingFms, Attendance, SalaryReco
 
 const GAS_URL = import.meta.env.VITE_GAS_WEB_APP_URL || "";
 
+/**
+ * Every screen in this app fetches its own data independently (no shared data
+ * layer), and switching tabs remounts the target module from scratch — so
+ * without a cache, navigating back and forth re-issues the same GAS reads
+ * (e.g. getActiveEmployees/getPresentEmployees/getJoining) over and over.
+ * Each GAS web app round-trip is inherently slow (Google's own overhead),
+ * so this short-TTL cache — plus in-flight de-duplication for calls fired
+ * near-simultaneously by multiple components — is the highest-leverage fix
+ * available without restructuring every component's data fetching.
+ */
+const READ_CACHE_TTL_MS = 60_000;
+const readCache = new Map<string, { data: any; ts: number; promise?: Promise<any> }>();
+
 async function callGas(action: string, payload: any = {}) {
   if (!GAS_URL) {
     console.error("GAS_WEB_APP_URL is not set.");
     return null;
   }
 
-  try {
-    const response = await fetch(GAS_URL, {
-      method: "POST",
-      redirect: "follow",
-      headers: {
-        "Content-Type": "text/plain;charset=utf-8",
-      },
-      body: JSON.stringify({ action, ...payload }),
-    });
+  // Only pure reads are safe to cache/de-dupe — "test" and "login" are excluded
+  // deliberately (login has credential/security implications; caching auth
+  // outcomes is never worth the ambiguity, even though it doesn't start with "get").
+  const isRead = action.startsWith("get");
+  const cacheKey = isRead ? `${action}:${JSON.stringify(payload)}` : null;
 
-    if (!response.ok) {
-      console.error(`GAS returned HTTP ${response.status} for action ${action}`);
+  if (cacheKey) {
+    const cached = readCache.get(cacheKey);
+    if (cached) {
+      if (cached.promise) return cached.promise; // identical request already in flight
+      if (Date.now() - cached.ts < READ_CACHE_TTL_MS) return cached.data;
+    }
+  }
+
+  const fetchPromise = (async () => {
+    try {
+      const response = await fetch(GAS_URL, {
+        method: "POST",
+        redirect: "follow",
+        headers: {
+          "Content-Type": "text/plain;charset=utf-8",
+        },
+        body: JSON.stringify({ action, ...payload }),
+      });
+
+      if (!response.ok) {
+        console.error(`GAS returned HTTP ${response.status} for action ${action}`);
+        if (cacheKey) readCache.delete(cacheKey);
+        return null;
+      }
+      const data = await response.json();
+
+      if (cacheKey) {
+        readCache.set(cacheKey, { data, ts: Date.now() });
+      } else {
+        // Any successful write invalidates all cached reads so the next fetch
+        // of any screen reflects the change — simpler and safer than trying
+        // to guess which specific reads a given mutation could have affected.
+        readCache.clear();
+      }
+      return data;
+    } catch (error) {
+      console.error(`Error calling GAS action ${action}:`, error);
+      if (cacheKey) readCache.delete(cacheKey);
       return null;
     }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error(`Error calling GAS action ${action}:`, error);
-    return null;
-  }
+  })();
+
+  if (cacheKey) readCache.set(cacheKey, { data: undefined, ts: Date.now(), promise: fetchPromise });
+  return fetchPromise;
 }
 
 // For development/demo purposes, we'll use a mock if GAS_URL is not set or fails

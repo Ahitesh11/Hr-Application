@@ -1,4 +1,4 @@
-import { FunctionDeclaration } from "@google/genai";
+import type { FunctionDeclaration } from "@google/genai" with { "resolution-mode": "import" };
 import { toolRegistry } from "../tools";
 
 /**

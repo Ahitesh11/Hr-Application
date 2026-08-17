@@ -1,24 +1,36 @@
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { Login } from "./components/Login";
 import { DashboardLayout } from "./components/DashboardLayout";
 import { DashboardHome } from "./components/DashboardHome";
-import { PunchMissModule } from "./components/PunchMissModule";
-import { LeaveModule } from "./components/LeaveModule";
-import { HolidayWorkingModule } from "./components/HolidayWorkingModule";
-import { AttendanceModule } from "./components/AttendanceModule";
-import { SalaryModule } from "./components/SalaryModule";
-import { PayrollModule } from "./components/PayrollModule";
-import { SalaryIncrementModule } from "./components/SalaryIncrementModule";
-import { ApprovalModule } from "./components/ApprovalModule";
-import { JoiningModule } from "./components/JoiningModule";
-import { LeaveReportModule } from "./components/LeaveReportModule";
-import { UpcomingIncrementModule } from "./components/UpcomingIncrementModule";
-import { HiringTrackerModule } from "./components/HiringTrackerModule";
-import { LoanApplicationModule } from "./components/LoanApplicationModule";
-import { FormatsModule } from "./components/FormatsModule";
-import { OutsiderAttendanceModule } from "./components/OutsiderAttendanceModule";
 import { Loader2 } from "lucide-react";
+
+// Lazy-loaded: each of these (plus PDF libs some of them pull in, e.g. jsPDF/html2canvas
+// for offer letters and payslips) previously shipped in one ~1.2MB upfront bundle even
+// though a given user only ever opens a handful of these tabs. Splitting them means the
+// initial load only pays for Login + the dashboard shell; a module's code downloads the
+// first time its tab is opened, not before.
+const PunchMissModule = lazy(() => import("./components/PunchMissModule").then(m => ({ default: m.PunchMissModule })));
+const LeaveModule = lazy(() => import("./components/LeaveModule").then(m => ({ default: m.LeaveModule })));
+const HolidayWorkingModule = lazy(() => import("./components/HolidayWorkingModule").then(m => ({ default: m.HolidayWorkingModule })));
+const AttendanceModule = lazy(() => import("./components/AttendanceModule").then(m => ({ default: m.AttendanceModule })));
+const SalaryModule = lazy(() => import("./components/SalaryModule").then(m => ({ default: m.SalaryModule })));
+const PayrollModule = lazy(() => import("./components/PayrollModule").then(m => ({ default: m.PayrollModule })));
+const SalaryIncrementModule = lazy(() => import("./components/SalaryIncrementModule").then(m => ({ default: m.SalaryIncrementModule })));
+const ApprovalModule = lazy(() => import("./components/ApprovalModule").then(m => ({ default: m.ApprovalModule })));
+const JoiningModule = lazy(() => import("./components/JoiningModule").then(m => ({ default: m.JoiningModule })));
+const LeaveReportModule = lazy(() => import("./components/LeaveReportModule").then(m => ({ default: m.LeaveReportModule })));
+const UpcomingIncrementModule = lazy(() => import("./components/UpcomingIncrementModule").then(m => ({ default: m.UpcomingIncrementModule })));
+const HiringTrackerModule = lazy(() => import("./components/HiringTrackerModule").then(m => ({ default: m.HiringTrackerModule })));
+const LoanApplicationModule = lazy(() => import("./components/LoanApplicationModule").then(m => ({ default: m.LoanApplicationModule })));
+const FormatsModule = lazy(() => import("./components/FormatsModule").then(m => ({ default: m.FormatsModule })));
+const OutsiderAttendanceModule = lazy(() => import("./components/OutsiderAttendanceModule").then(m => ({ default: m.OutsiderAttendanceModule })));
+
+const ModuleFallback = () => (
+  <div className="flex items-center justify-center py-24">
+    <Loader2 className="w-8 h-8 animate-spin text-pink-600" />
+  </div>
+);
 
 const AppContent = () => {
   const { user, isLoading } = useAuth();
@@ -82,7 +94,9 @@ const AppContent = () => {
 
   return (
     <DashboardLayout activeTab={activeTab} setActiveTab={setActiveTab}>
-      {renderContent()}
+      <Suspense fallback={<ModuleFallback />}>
+        {renderContent()}
+      </Suspense>
     </DashboardLayout>
   );
 };

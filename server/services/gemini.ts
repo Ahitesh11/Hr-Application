@@ -1,4 +1,4 @@
-import { GoogleGenAI } from "@google/genai";
+import type { GoogleGenAI } from "@google/genai" with { "resolution-mode": "import" };
 import { ApiError } from "../utils/ApiError";
 
 /** Fallback only — override via GEMINI_MODEL, never hardcode a model at a call site. */
@@ -9,13 +9,17 @@ let client: GoogleGenAI | null = null;
 /**
  * Lazy singleton — constructed on first use so a missing GEMINI_API_KEY
  * doesn't throw at import time, only when something actually needs Gemini.
+ * @google/genai ships ESM-only, so this server (CommonJS) can only reach its
+ * runtime exports via a dynamic import — the type-only import above is
+ * erased at compile time and never produces a require() call.
  */
-export function getGeminiClient(): GoogleGenAI {
+export async function getGeminiClient(): Promise<GoogleGenAI> {
   if (!client) {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
       throw ApiError.internal("GEMINI_API_KEY is not configured");
     }
+    const { GoogleGenAI } = await import("@google/genai");
     client = new GoogleGenAI({ apiKey });
   }
   return client;

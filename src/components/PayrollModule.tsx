@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { api } from "../services/api";
 import { SalaryRecord } from "../types";
 import { Search, Loader2, AlertTriangle, RefreshCcw } from "lucide-react";
@@ -69,8 +69,24 @@ export const PayrollModule: React.FC = () => {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [companyFilter, setCompanyFilter] = useState("All");
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  /** Cheap read of whatever payroll was last generated — no sheet recompute/rewrite. */
+  const loadExistingPayroll = async () => {
+    setIsLoading(true);
+    setErrorMsg(null);
+    try {
+      const existingRows = await api.getPayroll();
+      setRows(existingRows);
+      setWarnings([]);
+    } catch (error) {
+      console.error("Error loading payroll:", error);
+      setErrorMsg("Failed to load payroll");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  /** Heavy: recomputes payroll from Attendance/Present Employees and rewrites the sheet. */
   const runPayroll = async (y: string, m: string) => {
     if (!y || !m) return;
     setIsLoading(true);
@@ -92,16 +108,12 @@ export const PayrollModule: React.FC = () => {
     }
   };
 
+  // Show whatever payroll already exists immediately on mount — cheap read, no recompute.
+  // Selecting a different Year/Month no longer auto-regenerates; use "Generate" for that.
   useEffect(() => {
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => {
-      runPayroll(year, month);
-    }, 500);
-    return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-    };
+    loadExistingPayroll();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [year, month]);
+  }, []);
 
   const companies = useMemo(() => {
     const set = new Set(rows.map(r => (r.company || "Unassigned").toString()));
@@ -148,7 +160,7 @@ export const PayrollModule: React.FC = () => {
                 type="number"
                 value={year}
                 onChange={e => setYear(e.target.value)}
-                className="w-24 px-3 py-2 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-pink-500 text-sm font-bold"
+                className="w-24 px-3 py-2 h-[38px] bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-pink-500 text-sm font-bold"
               />
             </div>
             <div>
@@ -156,44 +168,45 @@ export const PayrollModule: React.FC = () => {
               <select
                 value={month}
                 onChange={e => setMonth(e.target.value)}
-                className="px-3 py-2 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-pink-500 text-sm font-bold"
+                className="px-3 py-2 h-[38px] bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-pink-500 text-sm font-bold"
               >
                 {MONTHS.map(m => <option key={m} value={m}>{m}</option>)}
               </select>
             </div>
-            {isLoading && (
-              <div className="flex items-center gap-2 text-xs font-bold text-pink-600">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Calculating payroll...
-              </div>
-            )}
-            <button
-              onClick={() => runPayroll(year, month)}
-              disabled={isLoading}
-              title="Refresh"
-              className="flex items-center gap-2 px-3 py-2 bg-slate-100 text-slate-600 rounded-xl font-bold text-sm hover:bg-slate-200 transition-all disabled:opacity-50"
-            >
-              <RefreshCcw className="w-4 h-4" />
-            </button>
+            <div>
+              <label className="block text-[10px] font-bold text-transparent uppercase mb-1 select-none" aria-hidden="true">Action</label>
+              <button
+                onClick={() => runPayroll(year, month)}
+                disabled={isLoading}
+                title="Recalculates payroll for the selected Year/Month from Attendance and Present Employees, and overwrites the Payroll sheet"
+                className="flex items-center justify-center gap-2 px-4 py-2 h-[38px] bg-pink-600 text-white rounded-xl font-bold text-sm hover:bg-pink-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+              >
+                <RefreshCcw className={`w-4 h-4 shrink-0 ${isLoading ? "animate-spin" : ""}`} />
+                {isLoading ? "Generating..." : "Generate Payroll"}
+              </button>
+            </div>
           </div>
 
-          <div className="flex flex-wrap gap-3">
-            <div className="relative w-full md:w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <input
-                type="text"
-                placeholder="Search by name or code..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-pink-500 outline-none transition-all text-sm"
-              />
+          <div className="flex flex-wrap gap-3 items-end">
+            <div className="w-full md:w-64">
+              <label className="block text-[10px] font-bold text-transparent uppercase mb-1 select-none" aria-hidden="true">Search</label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="Search by name or code..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-9 pr-4 py-2 h-[38px] bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-pink-500 outline-none transition-all text-sm"
+                />
+              </div>
             </div>
             <div>
               <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Firm</label>
               <select
                 value={companyFilter}
                 onChange={e => setCompanyFilter(e.target.value)}
-                className="px-3 py-2 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-pink-500 text-sm font-bold"
+                className="px-3 py-2 h-[38px] bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-pink-500 text-sm font-bold"
               >
                 {companies.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
@@ -244,7 +257,7 @@ export const PayrollModule: React.FC = () => {
               ) : groups.length === 0 ? (
                 <tr>
                   <td colSpan={COLUMNS.length} className="px-3 py-12 text-center text-slate-500">
-                    {errorMsg ? "Could not load payroll." : "No employees found in Present Employees for this selection."}
+                    {errorMsg ? "Could not load payroll." : "No payroll generated yet. Pick a Year/Month and click \"Generate Payroll\"."}
                   </td>
                 </tr>
               ) : (

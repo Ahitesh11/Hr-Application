@@ -15,7 +15,6 @@ const LeaveModule = lazy(() => import("./components/LeaveModule").then(m => ({ d
 const HolidayWorkingModule = lazy(() => import("./components/HolidayWorkingModule").then(m => ({ default: m.HolidayWorkingModule })));
 const AttendanceModule = lazy(() => import("./components/AttendanceModule").then(m => ({ default: m.AttendanceModule })));
 const SalaryModule = lazy(() => import("./components/SalaryModule").then(m => ({ default: m.SalaryModule })));
-const PayrollModule = lazy(() => import("./components/PayrollModule").then(m => ({ default: m.PayrollModule })));
 const SalaryIncrementModule = lazy(() => import("./components/SalaryIncrementModule").then(m => ({ default: m.SalaryIncrementModule })));
 const ApprovalModule = lazy(() => import("./components/ApprovalModule").then(m => ({ default: m.ApprovalModule })));
 const JoiningModule = lazy(() => import("./components/JoiningModule").then(m => ({ default: m.JoiningModule })));
@@ -71,8 +70,6 @@ const AppContent = () => {
         return <AttendanceModule />;
       case "salary":
         return <SalaryModule />;
-      case "payroll":
-        return <PayrollModule />;
       case "salary-increment":
         return <SalaryIncrementModule />;
       case "upcoming-increment":

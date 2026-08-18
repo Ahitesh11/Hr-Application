@@ -3,13 +3,10 @@ import { api } from "../services/api";
 import { LeaveFms } from "../types";
 import {
   Calendar, Users, CheckCircle, Clock, XCircle,
-  Download, Printer, Search, Filter, TrendingUp,
-  Loader2, AlertCircle, FileText, ChevronDown, BarChart2, BookOpen, X, Save,
+  Search, Filter, TrendingUp,
+  Loader2, AlertCircle, ChevronDown, BarChart2, BookOpen, X,
 } from "lucide-react";
-import { logoBase64 } from "../lib/logoBase64";
 import { cn } from "../lib/utils";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 
 /* ─────────────────────────── constants ─── */
 const START_YEAR     = 2026;   // system accrual start year
@@ -152,8 +149,6 @@ export const LeaveReportModule: React.FC = () => {
   const [leaves,   setLeaves]   = useState<LeaveFms[]>([]);
   const [emps,     setEmps]     = useState<any[]>([]);
   const [loading,    setLoading]    = useState(true);
-  const [saving,     setSaving]     = useState(false);
-  const [saveStatus, setSaveStatus] = useState<"success"|"error"|null>(null);
 
   useEffect(() => {
     (async () => {
@@ -245,107 +240,6 @@ export const LeaveReportModule: React.FC = () => {
 
   const pbRow = useMemo(() => allRows.find(r => r.id === pbEmpId) ?? null, [allRows, pbEmpId]);
 
-  /* ── CSV export ── */
-  const exportCSV = () => {
-    const h = ["Emp ID","Name","Dept",
-               "EL Opening","EL Credit","EL Availed","EL Closing",
-               "CL Opening","CL Credit","CL Availed","CL Closing",
-               "ML Opening","ML Availed","ML Closing",
-               "Total Balance","Pending"];
-    const body = filtered.map(r => {
-      const c = r.current;
-      return [r.id,r.name,r.dept,
-              c.el.open,c.el.credit,c.el.availed,c.el.close,
-              c.cl.open,c.cl.credit,c.cl.availed,c.cl.close,
-              c.ml.open,c.ml.availed,c.ml.close,
-              c.total, c.el.pending+c.cl.pending+c.ml.pending];
-    });
-    const csv = [h,...body].map(r=>r.join(",")).join("\n");
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
-    a.download = `Leave_Accrual_${MONTHS[selMonth]}_${selYear}.csv`;
-    a.click();
-  };
-
-  /* ── PDF export ── */
-  const exportPDF = () => {
-    const doc = new jsPDF({orientation:"landscape"});
-    try { doc.addImage(logoBase64, "PNG", 14, 5, 12, 12); } catch(e){}
-    doc.setFontSize(14);
-    doc.text(`Leave Balance Report (Accrual) — ${MONTHS[selMonth]} ${selYear}`, 30, 14);
-    doc.setFontSize(8);
-    doc.text(`EL: +${EL_PER_MONTH}/month  CL: +${CL_PER_MONTH}/month  |  Generated: ${new Date().toLocaleString()}`, 30, 20);
-
-    autoTable(doc, {
-      startY: 25,
-      head: [
-        [
-          {content:"#",        rowSpan:2, styles:{valign:"middle"}},
-          {content:"Employee", rowSpan:2, styles:{valign:"middle"}},
-          {content:"Dept",     rowSpan:2, styles:{valign:"middle"}},
-          {content:`EL (Earned Leave) — +${EL_PER_MONTH}/month`, colSpan:4, styles:{halign:"center",fillColor:[219,234,254],textColor:[29,78,216],fontStyle:"bold"}},
-          {content:`CL (Casual Leave) — +${CL_PER_MONTH}/month`, colSpan:4, styles:{halign:"center",fillColor:[252,231,243],textColor:[157,23,77],fontStyle:"bold"}},
-          {content:"ML (Medical Leave)", colSpan:3, styles:{halign:"center",fillColor:[250,232,255],textColor:[134,25,143],fontStyle:"bold"}},
-          {content:"Summary", colSpan:2, styles:{halign:"center",fillColor:[240,253,244],textColor:[22,101,52],fontStyle:"bold"}},
-        ],
-        ["Open","+Credit","Used","Close","Open","+Credit","Used","Close","Open","Used","Close","Balance","Pending"],
-      ],
-      body: filtered.map((r,i)=>{
-        const c=r.current;
-        return [i+1,`${r.name}\n${r.id}`,r.dept,
-                c.el.open,`+${c.el.credit}`,c.el.availed,c.el.close,
-                c.cl.open,`+${c.cl.credit}`,c.cl.availed,c.cl.close,
-                c.ml.open,c.ml.availed,c.ml.close,
-                c.total, c.el.pending+c.cl.pending+c.ml.pending];
-      }),
-      foot:[["","TOTAL","","","",tot.taken,"",
-             "","",fmt(filtered.reduce((s,r)=>s+r.current.cl.availed,0)),"",
-             "",fmt(filtered.reduce((s,r)=>s+r.current.ml.availed,0)),"",
-             `EL:${tot.elBal} CL:${tot.clBal} ML:${tot.mlBal}`,tot.pending]],
-      styles:{fontSize:7,cellPadding:2},
-      headStyles:{fillColor:[219,39,119],textColor:255,fontStyle:"bold"},
-      alternateRowStyles:{fillColor:[255,248,252]},
-      footStyles:{fillColor:[253,232,244],fontStyle:"bold"},
-      didParseCell:(data:any)=>{
-        const v=parseFloat(data.cell.raw);
-        if([6,10,13].includes(data.column.index) && !isNaN(v)){
-          if(v<0)  data.cell.styles.textColor=[220,38,38];
-          else if(v<2) data.cell.styles.textColor=[217,119,6];
-        }
-      },
-    });
-    doc.save(`Leave_Accrual_${MONTHS[selMonth]}_${selYear}.pdf`);
-  };
-
-  const handleSaveReport = async () => {
-    setSaving(true);
-    setSaveStatus(null);
-    try {
-      const rows = allRows.map(r => ({
-        employeeId:        r.id,
-        employeeName:      r.name,
-        department:        r.dept,
-        month:             MONTHS[selMonth],
-        year:              String(selYear),
-        elOpening:         r.current.el.open,
-        elCredit:          r.current.el.credit,
-        elAvailed:         r.current.el.availed,
-        elClosing:         r.current.el.close,
-        clOpening:         r.current.cl.open,
-        clCredit:          r.current.cl.credit,
-        clAvailed:         r.current.cl.availed,
-        clClosing:         r.current.cl.close,
-        totalLeaveBalance: fmt(r.current.el.close + r.current.cl.close),
-      }));
-      const ok = await api.savePaidLeaveReport(rows);
-      setSaveStatus(ok ? "success" : "error");
-    } catch {
-      setSaveStatus("error");
-    } finally {
-      setSaving(false);
-    }
-  };
-
   /* ════════════════════════════════════ render ══ */
   return (
     <div className="space-y-6 print:space-y-4">
@@ -384,52 +278,9 @@ export const LeaveReportModule: React.FC = () => {
               </select>
               <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-pink-400 pointer-events-none"/>
             </div>
-            <button onClick={exportCSV}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-100 text-sm font-bold hover:bg-emerald-100 transition-all">
-              <Download className="w-4 h-4"/> Excel
-            </button>
-            <button onClick={exportPDF}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-pink-50 text-pink-700 border border-pink-100 text-sm font-bold hover:bg-pink-100 transition-all">
-              <FileText className="w-4 h-4"/> PDF
-            </button>
-            <button onClick={()=>window.print()}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-50 text-slate-700 border border-slate-100 text-sm font-bold hover:bg-slate-100 transition-all">
-              <Printer className="w-4 h-4"/> Print
-            </button>
-            <button onClick={handleSaveReport} disabled={saving || loading}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-pink-600 text-white text-sm font-bold hover:bg-pink-700 transition-all disabled:opacity-50 shadow-lg shadow-pink-200">
-              {saving ? <Loader2 className="w-4 h-4 animate-spin"/> : <Save className="w-4 h-4"/>}
-              {saving ? "Saving…" : "Generate Monthly Report"}
-            </button>
           </div>
         </div>
       </div>
-
-      {/* ── Save Status Notification ── */}
-      {saveStatus === "success" && (
-        <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl p-4 flex items-center gap-3 print:hidden">
-          <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0"/>
-          <div>
-            <p className="font-bold text-sm">Report saved to "Paid Leave" sheet!</p>
-            <p className="text-xs opacity-70">{MONTHS[selMonth]} {selYear} — {allRows.length} employees saved. Existing entries updated automatically.</p>
-          </div>
-          <button onClick={()=>setSaveStatus(null)} className="ml-auto p-1.5 hover:bg-emerald-100 rounded-xl transition-all">
-            <X className="w-4 h-4"/>
-          </button>
-        </div>
-      )}
-      {saveStatus === "error" && (
-        <div className="bg-red-50 border border-red-200 text-red-800 rounded-2xl p-4 flex items-center gap-3 print:hidden">
-          <AlertCircle className="w-5 h-5 text-red-500 shrink-0"/>
-          <div>
-            <p className="font-bold text-sm">Failed to save report</p>
-            <p className="text-xs opacity-70">Ensure the "Paid Leave" sheet exists in Google Sheets and the GAS is re-deployed, then try again.</p>
-          </div>
-          <button onClick={()=>setSaveStatus(null)} className="ml-auto p-1.5 hover:bg-red-100 rounded-xl transition-all">
-            <X className="w-4 h-4"/>
-          </button>
-        </div>
-      )}
 
       {/* ── Summary Cards ── */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">

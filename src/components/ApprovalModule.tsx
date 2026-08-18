@@ -220,7 +220,7 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
     if (user.role === "Admin") {
       // Admin sees ALL pending HOD-step salary increment approvals
       rows = salaryData.filter(d =>
-        d.employeeCode && (!d.status || d.status === "Pending")
+        d.employeeCode && (!d.actual || d.actual.trim() === "")
       );
     } else {
       const myEmployeeIds = new Set(
@@ -231,7 +231,7 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
       rows = salaryData.filter(d =>
         d.employeeCode &&
         myEmployeeIds.has(d.employeeCode.toString().trim()) &&
-        (!d.status || d.status === "Pending")
+        (!d.actual || d.actual.trim() === "")
       );
     }
     if (!q) return rows;

@@ -12,7 +12,7 @@ const GAS_URL = import.meta.env.VITE_GAS_WEB_APP_URL || "";
  * near-simultaneously by multiple components — is the highest-leverage fix
  * available without restructuring every component's data fetching.
  */
-const READ_CACHE_TTL_MS = 60_000;
+const READ_CACHE_TTL_MS = 180_000;
 const readCache = new Map<string, { data: any; ts: number; promise?: Promise<any> }>();
 
 async function callGas(action: string, payload: any = {}) {
@@ -35,23 +35,49 @@ async function callGas(action: string, payload: any = {}) {
     }
   }
 
+  // Google's web app URL replies via an internal redirect to a one-time
+  // googleusercontent.com "echo" link; that hop occasionally 404s or falls
+  // back to the plain-text doGet() response instead of the real doPost()
+  // JSON — a transient Google-side hiccup, not a real failure of the request.
+  // Reads are idempotent, so it's safe to silently retry a couple of times
+  // (with backoff) before giving up.
+  const attempt = async () => {
+    const response = await fetch(GAS_URL, {
+      method: "POST",
+      redirect: "follow",
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8",
+      },
+      body: JSON.stringify({ action, ...payload }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`GAS returned HTTP ${response.status} for action ${action}`);
+    }
+    return response.json();
+  };
+
+  const READ_RETRY_DELAYS_MS = [600, 1500];
+
   const fetchPromise = (async () => {
     try {
-      const response = await fetch(GAS_URL, {
-        method: "POST",
-        redirect: "follow",
-        headers: {
-          "Content-Type": "text/plain;charset=utf-8",
-        },
-        body: JSON.stringify({ action, ...payload }),
-      });
-
-      if (!response.ok) {
-        console.error(`GAS returned HTTP ${response.status} for action ${action}`);
-        if (cacheKey) readCache.delete(cacheKey);
-        return null;
+      let data;
+      let lastError: unknown;
+      let attempted = false;
+      for (let i = 0; i <= (isRead ? READ_RETRY_DELAYS_MS.length : 0); i++) {
+        if (i > 0) {
+          console.warn(`Retrying GAS action ${action} after transient failure (attempt ${i + 1}):`, lastError);
+          await new Promise(r => setTimeout(r, READ_RETRY_DELAYS_MS[i - 1]));
+        }
+        try {
+          data = await attempt();
+          attempted = true;
+          break;
+        } catch (err) {
+          lastError = err;
+        }
       }
-      const data = await response.json();
+      if (!attempted) throw lastError;
 
       if (cacheKey) {
         readCache.set(cacheKey, { data, ts: Date.now() });
@@ -337,18 +363,4 @@ export const api = {
     return res;
   },
 
-  getPayroll: async (): Promise<SalaryRecord[]> => {
-    if (useMock) return [];
-    const res = await callGas("getPayroll", {});
-    return Array.isArray(res) ? res : [];
-  },
-
-  generatePayroll: async (year: string, month: string): Promise<{ ok: boolean; rows: SalaryRecord[]; warnings: string[]; error?: string }> => {
-    if (useMock) return { ok: true, rows: [], warnings: [] };
-    const res = await callGas("generatePayroll", { year, month });
-    if (res && res.success) {
-      return { ok: true, rows: Array.isArray(res.rows) ? res.rows : [], warnings: Array.isArray(res.warnings) ? res.warnings : [] };
-    }
-    return { ok: false, rows: [], warnings: [], error: res?.error || "GAS returned failure — check deployment" };
-  },
 };

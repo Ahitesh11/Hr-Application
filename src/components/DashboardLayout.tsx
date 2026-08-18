@@ -13,6 +13,8 @@ import {
   Menu,
   X,
   ChevronRight,
+  PanelLeftClose,
+  PanelLeftOpen,
   CheckCircle,
   TrendingUp,
   UserPlus,
@@ -23,8 +25,7 @@ import {
   Banknote,
   FileText,
   FileSignature,
-  MapPin,
-  Wallet
+  MapPin
 } from "lucide-react";
 import { cn } from "../lib/utils";
 
@@ -37,6 +38,7 @@ interface DashboardLayoutProps {
 export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, activeTab, setActiveTab }) => {
   const { user, logout, actingAs, setActingAs } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(() => localStorage.getItem("sidebarCollapsed") === "true");
   const [showActAsPanel, setShowActAsPanel] = useState(false);
   const [actAsInput, setActAsInput] = useState("");
   const [actAsLookupResult, setActAsLookupResult] = useState<{ name: string; companyName: string } | null>(null);
@@ -108,9 +110,8 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
     { id: "leave-report",  label: "Leave Report",        icon: TrendingUp,      roles: ["Admin"] },
     { id: "attendance",    label: "Attendance",          icon: Users,           roles: ["Staf", "Admin", "HOD"] },
     { id: "salary",        label: "Salary Records",      icon: CreditCard,      roles: ["Admin"] },
-    { id: "payroll",       label: "Payroll",              icon: Wallet,          roles: ["Admin"] },
     { id: "salary-increment",          label: "Salary Increment",          icon: TrendingUp, roles: ["Admin"] },
-    { id: "upcoming-increment",        label: "Upcoming Increment",         icon: Bell,       roles: ["Admin"] },
+    { id: "upcoming-increment",        label: "Upcoming Inc.",         icon: Bell,       roles: ["Admin"] },
     { id: "hiring-tracker",            label: "Hiring Tracker",             icon: Search,     roles: ["Admin"] },
     { id: "joining",                   label: "Joining",                    icon: UserPlus,   roles: ["Admin"] },
     { id: "loan-application",          label: "Loan Application",           icon: Banknote,   roles: ["Admin"] },
@@ -124,6 +125,13 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
     if (window.innerWidth < 768) {
       setIsSidebarOpen(false);
     }
+  };
+
+  const toggleCollapsed = () => {
+    setIsCollapsed(prev => {
+      localStorage.setItem("sidebarCollapsed", String(!prev));
+      return !prev;
+    });
   };
 
   return (
@@ -140,17 +148,28 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
       <aside
         className={cn(
           "bg-white border-r border-pink-100 transition-all duration-300 flex flex-col z-[70] h-full fixed md:relative",
-          isSidebarOpen ? "w-64 translate-x-0" : "w-64 -translate-x-full md:translate-x-0 md:w-20 lg:w-64"
+          isSidebarOpen ? "w-64 translate-x-0" : cn("w-64 -translate-x-full md:translate-x-0", isCollapsed ? "md:w-20" : "md:w-64")
         )}
       >
-        <div className="p-6 flex items-center justify-between shrink-0">
-          <div className={cn("flex items-center gap-2 transition-opacity", !isSidebarOpen && "md:opacity-0 lg:opacity-100")}>
-            <img src="/logo.png" alt="Logo" className="h-8 w-auto" />
-            <span className="font-bold text-xl text-pink-600">Human Resource Application</span>
-          </div>
+        <button
+          onClick={toggleCollapsed}
+          title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          className="hidden md:flex absolute -right-3 top-8 w-6 h-6 items-center justify-center rounded-full bg-white border border-pink-100 shadow-md hover:bg-pink-50 transition-colors z-10"
+        >
+          {isCollapsed ? <PanelLeftOpen className="w-3.5 h-3.5 text-slate-500" /> : <PanelLeftClose className="w-3.5 h-3.5 text-slate-500" />}
+        </button>
+
+        <div className="p-6 flex items-center gap-2 shrink-0 overflow-hidden">
+          <img src="/logo.png" alt="Logo" className="h-8 w-auto shrink-0" />
+          <span className={cn(
+            "font-bold text-xl text-pink-600 whitespace-nowrap transition-all overflow-hidden",
+            !isSidebarOpen && isCollapsed ? "md:w-0 md:opacity-0" : "md:w-auto md:opacity-100"
+          )}>
+            HR Application
+          </span>
           <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="p-2 hover:bg-pink-50 rounded-lg transition-colors md:hidden"
+            className="p-2 hover:bg-pink-50 rounded-lg transition-colors md:hidden ml-auto"
           >
             <X className="w-5 h-5 text-slate-500" />
           </button>
@@ -169,22 +188,22 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
               )}
             >
               <item.icon className={cn("w-5 h-5 shrink-0", activeTab === item.id ? "text-white" : "text-slate-400 group-hover:text-pink-600")} />
-              <span className={cn("font-medium transition-opacity", !isSidebarOpen && "md:opacity-0 lg:opacity-100")}>
+              <span className={cn("font-medium transition-opacity", !isSidebarOpen && isCollapsed && "md:opacity-0")}>
                 {item.label}
               </span>
               {activeTab === item.id && (
-                <ChevronRight className={cn("w-4 h-4 ml-auto transition-opacity", !isSidebarOpen && "md:opacity-0 lg:opacity-100")} />
+                <ChevronRight className={cn("w-4 h-4 ml-auto transition-opacity", !isSidebarOpen && isCollapsed && "md:opacity-0")} />
               )}
             </button>
           ))}
         </nav>
 
         <div className="p-4 border-t border-pink-50 shrink-0">
-          <div className={cn("flex items-center gap-3 mb-4", !isSidebarOpen && "md:justify-center lg:justify-start")}>
+          <div className={cn("flex items-center gap-3 mb-4", !isSidebarOpen && isCollapsed && "md:justify-center")}>
             <div className="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center font-bold text-pink-600 shrink-0">
               {user?.name.charAt(0)}
             </div>
-            <div className={cn("flex-1 min-w-0 transition-opacity", !isSidebarOpen && "md:opacity-0 lg:opacity-100")}>
+            <div className={cn("flex-1 min-w-0 transition-opacity", !isSidebarOpen && isCollapsed && "md:opacity-0")}>
               <p className="text-sm font-bold text-slate-900 truncate">{user?.name}</p>
               <p className="text-xs text-slate-500 truncate">{user?.role}</p>
             </div>
@@ -193,11 +212,11 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
             onClick={logout}
             className={cn(
               "w-full flex items-center gap-3 p-3 text-red-500 hover:bg-red-50 rounded-xl transition-all",
-              !isSidebarOpen && "md:justify-center lg:justify-start"
+              !isSidebarOpen && isCollapsed && "md:justify-center"
             )}
           >
             <LogOut className="w-5 h-5 shrink-0" />
-            <span className={cn("font-medium transition-opacity", !isSidebarOpen && "md:opacity-0 lg:opacity-100")}>
+            <span className={cn("font-medium transition-opacity", !isSidebarOpen && isCollapsed && "md:opacity-0")}>
               Logout
             </span>
           </button>

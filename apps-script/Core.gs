@@ -205,14 +205,6 @@ function doPost(e) {
         result = submitData(ss, 'Offer Letters', request);
         result.documentLink = request.documentLink;
         break;
-
-      case 'getPayroll':
-        result = getPayrollRows(ss);
-        break;
-      case 'generatePayroll':
-        result = generatePayroll(ss, request.year, request.month);
-        break;
-
     }
     return createJsonResponse(result);
   } catch (err) {

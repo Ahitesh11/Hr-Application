@@ -47,13 +47,22 @@ function getHeaderInfo(sheet) {
   const data = sheet.getDataRange().getValues();
   const commonHeaders = ['timestamp', 'employee id', 'emp id', 'leave no', 'pm no', 'pmmpl', 'name as per aadhar'];
 
+  // "Present Employees" data rows contain cells like "Pmmpl" (company) and "PMMPL-2"
+  // (employee code), which false-positive-match the 'pmmpl' keyword below and make
+  // the scan mistake an early data row for the header row. Unlike "Joining", this
+  // sheet has no title rows above its headers — row 1 (index 0) is the real header
+  // row (confirmed via the debugRows diagnostic) — so skip the keyword scan entirely.
+  if (sheet.getName() === 'Present Employees') {
+    return { index: 0, headers: data[0] };
+  }
+
   for (let i = 0; i < Math.min(20, data.length); i++) {
     // A real header row usually has multiple columns, skip title rows
     const nonEmptyCells = data[i].filter(c => c !== '' && c !== null);
     if (nonEmptyCells.length < 3) continue;
 
     if (data[i].some(cell => {
-      const val = cell.toString().toLowerCase();
+      const val = (cell || '').toString().toLowerCase();
       return commonHeaders.some(h => val === h || val.includes(h));
     })) {
       return { index: i, headers: data[i] };
@@ -226,11 +235,16 @@ function getData(ss, sheetName, employeeId) {
   const results = [];
 
   let empIdIdx = headers.findIndex(h => {
-    const val = h.toLowerCase();
+    const val = (h || '').toString().toLowerCase();
     return val.includes('employee id') || val.includes('emp id') || val.includes('employee code') || val.includes('emp code');
   });
 
   for (let i = index + 1; i < data.length; i++) {
+    // Skip fully-blank rows — the sheet's used range can extend past the real
+    // data (leftover formatting, deleted rows, etc.), which would otherwise
+    // pad the results with empty records.
+    if (data[i].every(cell => cell === '' || cell === null)) continue;
+
     const row = {};
     let currentSalaryCount = 0;
     headers.forEach((header, idx) => {
@@ -249,6 +263,10 @@ function getData(ss, sheetName, employeeId) {
 
   }
   return results;
+}
+
+function getPresentEmployeesRows(ss) {
+  return getData(ss, 'Present Employees', undefined);
 }
 
 function submitData(ss, sheetName, payload) {
@@ -276,13 +294,13 @@ function submitData(ss, sheetName, payload) {
   }
 
   // Find Unique No column index
-  let idIdx = headers.findIndex(h => h.toLowerCase().includes('unique no') || h.toLowerCase().includes('uniqueno'));
-  if (idIdx === -1) idIdx = headers.findIndex(h => h.toLowerCase().includes('no.'));
+  let idIdx = headers.findIndex(h => (h || '').toString().toLowerCase().includes('unique no') || (h || '').toString().toLowerCase().includes('uniqueno'));
+  if (idIdx === -1) idIdx = headers.findIndex(h => (h || '').toString().toLowerCase().includes('no.'));
 
   // Logic to update existing row if ID exists
   if (idIdx !== -1 && payload.uniqueNo) {
     // Find row by Unique No.
-    let uniqueNoIdx = headers.findIndex(h => h.toLowerCase().includes('no.'));
+    let uniqueNoIdx = headers.findIndex(h => (h || '').toString().toLowerCase().includes('no.'));
     for (let i = index + 1; i < data.length; i++) {
       if (data[i][uniqueNoIdx].toString() === payload.uniqueNo.toString()) {
         let currentSalaryCount = 0;
@@ -354,7 +372,7 @@ function updateStep(ss, sheetName, rowId, step, actual, customStatus, extraField
   const data = sheet.getDataRange().getValues();
 
   let idIdx = headers.findIndex(h => {
-    const val = h.toLowerCase();
+    const val = (h || '').toString().toLowerCase();
     return val.includes('no.') || val.includes(' no') || val.endsWith('no') || val.includes('unique no') || val.includes('uniqueno');
   });
 
@@ -409,7 +427,7 @@ function applyUpdates(sheet, i, actualIdx, statusIdx, actual, customStatus, step
 }
 
 function camelize(str) {
-  return str.toLowerCase()
+  return (str || '').toString().toLowerCase()
     .replace(/>=/g, 'ge')
     .replace(/<=/g, 'le')
     .replace(/</g, 'lt')

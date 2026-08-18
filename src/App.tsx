@@ -24,6 +24,7 @@ const HiringTrackerModule = lazy(() => import("./components/HiringTrackerModule"
 const LoanApplicationModule = lazy(() => import("./components/LoanApplicationModule").then(m => ({ default: m.LoanApplicationModule })));
 const FormatsModule = lazy(() => import("./components/FormatsModule").then(m => ({ default: m.FormatsModule })));
 const OutsiderAttendanceModule = lazy(() => import("./components/OutsiderAttendanceModule").then(m => ({ default: m.OutsiderAttendanceModule })));
+const SettingsModule = lazy(() => import("./components/SettingsModule").then(m => ({ default: m.SettingsModule })));
 
 const ModuleFallback = () => (
   <div className="flex items-center justify-center py-24">
@@ -84,6 +85,8 @@ const AppContent = () => {
         return <LoanApplicationModule />;
       case "formats":
         return <FormatsModule />;
+      case "settings":
+        return <SettingsModule />;
       default:
         return <DashboardHome onNavigate={setActiveTab} />;
     }

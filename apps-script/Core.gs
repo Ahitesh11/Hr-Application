@@ -161,6 +161,22 @@ function doPost(e) {
         result = updateMailId(ss, request.employeeId, request.mailId);
         break;
 
+      case 'getUsers':
+        result = getUsers(ss);
+        break;
+
+      case 'addUser':
+        result = addUser(ss, request);
+        break;
+
+      case 'updateUser':
+        result = updateUser(ss, request);
+        break;
+
+      case 'deleteUser':
+        result = deleteUser(ss, request.employeeId);
+        break;
+
       case 'submitLiving':
         result = submitLivingData(ss, request);
         break;

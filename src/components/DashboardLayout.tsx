@@ -25,7 +25,8 @@ import {
   Banknote,
   FileText,
   FileSignature,
-  MapPin
+  MapPin,
+  Settings
 } from "lucide-react";
 import { cn } from "../lib/utils";
 
@@ -116,6 +117,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
     { id: "joining",                   label: "Joining",                    icon: UserPlus,   roles: ["Admin"] },
     { id: "loan-application",          label: "Loan Application",           icon: Banknote,   roles: ["Admin"] },
     { id: "formats",                   label: "Formats",                    icon: FileText,   roles: ["Admin"] },
+    { id: "settings",                  label: "Settings",                   icon: Settings,   roles: ["Admin"] },
   ];
 
   const filteredMenuItems = menuItems.filter(item => item.roles.includes(user?.role || "Staf"));

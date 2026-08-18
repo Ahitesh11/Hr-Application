@@ -363,4 +363,31 @@ export const api = {
     return res;
   },
 
+  getUsers: async (): Promise<any[]> => {
+    if (useMock) return [];
+    const res = await callGas("getUsers", {});
+    return Array.isArray(res) ? res : [];
+  },
+
+  addUser: async (data: Record<string, any>): Promise<{ ok: boolean; error?: string }> => {
+    if (useMock) return { ok: true };
+    const res = await callGas("addUser", data);
+    if (res && res.success) return { ok: true };
+    return { ok: false, error: res?.error || "Failed to add user" };
+  },
+
+  updateUser: async (data: Record<string, any>): Promise<{ ok: boolean; error?: string }> => {
+    if (useMock) return { ok: true };
+    const res = await callGas("updateUser", data);
+    if (res && res.success) return { ok: true };
+    return { ok: false, error: res?.error || "Failed to update user" };
+  },
+
+  deleteUser: async (employeeId: string): Promise<{ ok: boolean; error?: string }> => {
+    if (useMock) return { ok: true };
+    const res = await callGas("deleteUser", { employeeId });
+    if (res && res.success) return { ok: true };
+    return { ok: false, error: res?.error || "Failed to delete user" };
+  },
+
 };

@@ -308,8 +308,8 @@ export const JoiningModule = () => {
     setLivingSubmitResult(null);
     try {
       const payload = {
-        pmmplAc: livingTarget.pmmplAc || "",
-        employeeName: livingTarget.nameAsPerAadhar || "",
+        pmmplAc: livingTarget.pmmplAc || livingTarget.employeeId || livingTarget.employeeCode || "",
+        employeeName: livingTarget.nameAsPerAadhar || livingTarget.employeeName || livingTarget.name || "",
         designation: livingTarget.designation || "",
         joiningPlace: livingTarget.joiningPlace || "",
         dateOfLiving: livingForm.dateOfLiving,
@@ -844,7 +844,21 @@ export const JoiningModule = () => {
                               <Eye className="w-3 h-3" /> View
                             </button>
                             <button
-                              onClick={() => { setLivingTarget(r); setLivingForm(emptyLivingForm); setLivingSubmitResult(null); }}
+                              onClick={() => {
+                                // Present Employees rows don't always carry the identifier under the
+                                // "pmmplAc" key (depends on that sheet's column header text), so merge
+                                // in the matching Joining record — which is guaranteed to have the
+                                // PMMPL-AC value in the exact form the Living lookup needs — before
+                                // falling back to whatever id-ish field Present Employees does have.
+                                const match = findJoiningMatch(r);
+                                const merged = match ? { ...match, ...r } : r;
+                                setLivingTarget({
+                                  ...merged,
+                                  pmmplAc: merged.pmmplAc || merged.employeeId || merged.employeeCode || "",
+                                });
+                                setLivingForm(emptyLivingForm);
+                                setLivingSubmitResult(null);
+                              }}
                               className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold text-pink-700 bg-pink-50 border border-pink-100 rounded-lg hover:bg-pink-100 transition-all"
 
                             >

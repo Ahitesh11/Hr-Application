@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { Search, Loader2, RefreshCw, Bell, Calendar, User, Building2, History, BarChart3 } from "lucide-react";
+import { Search, Loader2, RefreshCw, Bell, Calendar, User, Users, Building2, History, BarChart3, AlertTriangle, Clock, Sparkles } from "lucide-react";
 import { api } from "../services/api";
 import { cn } from "../lib/utils";
 import { format, addMonths, addDays, differenceInDays } from "date-fns";
@@ -274,17 +274,18 @@ export const UpcomingIncrementModule = () => {
         <>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { label: "Total Employees",  value: upCounts.total,   color: "from-slate-700 to-slate-800" },
-              { label: "Overdue",          value: upCounts.overdue, color: "from-red-500 to-red-600" },
-              { label: "Due in 30 Days",   value: upCounts.soon,    color: "from-orange-400 to-orange-500" },
-              { label: "First Increment",  value: upCounts.first,   color: "from-pink-500 to-pink-600" },
+              { label: "Total Employees",  value: upCounts.total,   color: "from-slate-800 via-slate-700 to-slate-900", shadow: "shadow-slate-500/20", icon: <Users className="w-5 h-5" /> },
+              { label: "Overdue",          value: upCounts.overdue, color: "from-rose-600 via-red-600 to-red-700",      shadow: "shadow-red-500/30",   icon: <AlertTriangle className="w-5 h-5" /> },
+              { label: "Due in 30 Days",   value: upCounts.soon,    color: "from-amber-500 via-orange-500 to-orange-600", shadow: "shadow-orange-500/30", icon: <Clock className="w-5 h-5" /> },
+              { label: "First Increment",  value: upCounts.first,   color: "from-fuchsia-600 via-pink-600 to-pink-700", shadow: "shadow-pink-500/30",  icon: <Sparkles className="w-5 h-5" /> },
             ].map((s, i) => (
-              <div key={i} className={`bg-gradient-to-br ${s.color} rounded-2xl p-4 text-white shadow-lg`}>
-                <div className="flex items-center justify-between mb-2">
-                  <Bell className="w-5 h-5 opacity-80" />
+              <div key={i} className={`relative overflow-hidden bg-gradient-to-br ${s.color} rounded-2xl p-4 text-white shadow-lg ${s.shadow} ring-1 ring-black/5`}>
+                <div className="absolute -right-5 -top-5 w-20 h-20 bg-white/10 rounded-full blur-2xl pointer-events-none" />
+                <div className="relative flex items-center justify-between mb-2">
+                  <div className="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center">{s.icon}</div>
                   <span className="text-3xl font-black">{s.value}</span>
                 </div>
-                <p className="text-xs font-bold text-white/80">{s.label}</p>
+                <p className="relative text-xs font-bold text-white/80 uppercase tracking-wider">{s.label}</p>
               </div>
             ))}
           </div>
@@ -432,17 +433,18 @@ export const UpcomingIncrementModule = () => {
           {/* Dashboard Stats */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { label: "Total Records",     value: histStats.total,                                           color: "from-emerald-600 to-emerald-700", icon: <History className="w-5 h-5 opacity-80" /> },
-              { label: "This Year",         value: histStats.thisYear,                                        color: "from-blue-500 to-blue-600",     icon: <Calendar className="w-5 h-5 opacity-80" /> },
-              { label: "Unique Employees",  value: histStats.unique,                                          color: "from-pink-500 to-pink-600", icon: <User className="w-5 h-5 opacity-80" /> },
-              { label: "Total Amount Paid", value: `₹${histStats.totalAmt.toLocaleString("en-IN")}`,          color: "from-orange-400 to-orange-500", icon: <BarChart3 className="w-5 h-5 opacity-80" /> },
+              { label: "Total Records",     value: histStats.total,                                           color: "from-emerald-600 via-emerald-600 to-teal-700", shadow: "shadow-emerald-500/30", icon: <History className="w-5 h-5" /> },
+              { label: "This Year",         value: histStats.thisYear,                                        color: "from-sky-500 via-blue-600 to-blue-700",        shadow: "shadow-blue-500/30",    icon: <Calendar className="w-5 h-5" /> },
+              { label: "Unique Employees",  value: histStats.unique,                                          color: "from-fuchsia-600 via-pink-600 to-pink-700",    shadow: "shadow-pink-500/30",    icon: <User className="w-5 h-5" /> },
+              { label: "Total Amount Paid", value: `₹${histStats.totalAmt.toLocaleString("en-IN")}`,          color: "from-amber-500 via-orange-500 to-orange-600",  shadow: "shadow-orange-500/30",  icon: <BarChart3 className="w-5 h-5" /> },
             ].map((s, i) => (
-              <div key={i} className={`bg-gradient-to-br ${s.color} rounded-2xl p-4 text-white shadow-lg`}>
-                <div className="flex items-center justify-between mb-2">
-                  {s.icon}
+              <div key={i} className={`relative overflow-hidden bg-gradient-to-br ${s.color} rounded-2xl p-4 text-white shadow-lg ${s.shadow} ring-1 ring-black/5`}>
+                <div className="absolute -right-5 -top-5 w-20 h-20 bg-white/10 rounded-full blur-2xl pointer-events-none" />
+                <div className="relative flex items-center justify-between mb-2">
+                  <div className="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center">{s.icon}</div>
                   <span className={cn("font-black", typeof s.value === "string" ? "text-xl" : "text-3xl")}>{s.value}</span>
                 </div>
-                <p className="text-xs font-bold text-white/80">{s.label}</p>
+                <p className="relative text-xs font-bold text-white/80 uppercase tracking-wider">{s.label}</p>
               </div>
             ))}
           </div>

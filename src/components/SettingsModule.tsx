@@ -38,7 +38,7 @@ type UserForm = {
 
 const emptyForm: UserForm = {
   employeeId: "", password: "", name: "", designation: "",
-  companyName: "Pmmpl", role: "Staf", cl: "", el: "", ml: "", hod: "",
+  companyName: "Pmmpl", role: "Staf", cl: "12", el: "22", ml: "6", hod: "",
 };
 
 const presentEmpId = (r: any) => (r.pmmplAc || r.employeeId || r.employeeCode || "").toString().trim();
@@ -80,11 +80,18 @@ export const SettingsModule = () => {
     api.getPresentEmployees().then(res => setPresentEmployees(Array.isArray(res) ? res : []));
   }, [loadUsers]);
 
-  // Employee IDs from "Present Employees" that don't already have a login account.
+  // Employee IDs from "Present Employees" that don't already have a login account —
+  // employees already in the User sheet are excluded entirely.
   const existingUserIds = new Set(users.map(u => (u.employeeId || "").toString().trim()));
   const employeeOptions = presentEmployees
     .map(r => ({ id: presentEmpId(r), name: presentEmpName(r), raw: r }))
-    .filter((r, idx, arr) => r.id && !existingUserIds.has(r.id) && arr.findIndex(x => x.id === r.id) === idx);
+    .filter((r, idx, arr) => r.id && !existingUserIds.has(r.id) && arr.findIndex(x => x.id === r.id) === idx)
+    .sort((a, b) => a.id.localeCompare(b.id, undefined, { numeric: true }));
+
+  // Users eligible to be someone's HOD (HOD/Admin role holders), excluding the user being edited.
+  const hodOptions = users
+    .filter(u => (u.role === "HOD" || u.role === "Admin") && u.employeeId && u.employeeId !== editTarget?.employeeId)
+    .sort((a, b) => a.employeeId.localeCompare(b.employeeId, undefined, { numeric: true }));
 
   const openAdd = () => {
     setEditTarget(null);
@@ -100,7 +107,7 @@ export const SettingsModule = () => {
       employeeId: id,
       name: match ? presentEmpName(match) : f.name,
       designation: match?.designation || f.designation,
-      companyName: match?.companyName || match?.joiningCompanyName || f.companyName,
+      companyName: match?.company || match?.companyName || match?.joiningCompanyName || f.companyName,
     }));
   };
 
@@ -390,13 +397,19 @@ export const SettingsModule = () => {
 
                 <div className="col-span-2 sm:col-span-1">
                   <label className="block text-xs font-bold text-slate-500 mb-1.5">HOD (Employee ID)</label>
-                  <input
-                    type="text"
+                  <select
                     value={form.hod}
                     onChange={e => setForm(f => ({ ...f, hod: e.target.value }))}
-                    placeholder="e.g. PMMPL-7"
-                    className="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-xl outline-none focus:border-pink-400"
-                  />
+                    className="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-xl outline-none focus:border-pink-400 bg-white"
+                  >
+                    <option value="">-- None --</option>
+                    {form.hod && !hodOptions.some(h => h.employeeId === form.hod) && (
+                      <option value={form.hod}>{form.hod}</option>
+                    )}
+                    {hodOptions.map(h => (
+                      <option key={h.employeeId} value={h.employeeId}>{h.employeeId}{h.name ? ` — ${h.name}` : ""}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
             </div>

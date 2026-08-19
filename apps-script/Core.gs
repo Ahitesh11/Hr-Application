@@ -45,7 +45,7 @@ const SHEETS = {
 // Helper to find the header row dynamically
 function getHeaderInfo(sheet) {
   const data = sheet.getDataRange().getValues();
-  const commonHeaders = ['timestamp', 'employee id', 'emp id', 'leave no', 'pm no', 'pmmpl', 'name as per aadhar'];
+  const commonHeaders = ['timestamp', 'employee id', 'emp id', 'employee code', 'emp code', 'leave no', 'pm no', 'pmmpl', 'name as per aadhar'];
 
   // "Present Employees" data rows contain cells like "Pmmpl" (company) and "PMMPL-2"
   // (employee code), which false-positive-match the 'pmmpl' keyword below and make

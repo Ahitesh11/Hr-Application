@@ -371,6 +371,17 @@ export const HiringTrackerModule = () => {
                         <th className="px-4 py-3 text-[11px] font-bold tracking-wider text-slate-500 uppercase tracking-wider border-b border-r border-slate-100">Which</th>
                         <th className="px-4 py-3 text-[11px] font-bold tracking-wider text-slate-500 uppercase tracking-wider border-b border-r border-slate-100">Interview Status</th>
                         <th className="px-4 py-3 text-[11px] font-bold tracking-wider text-slate-500 uppercase tracking-wider border-b border-r border-slate-100">Tracker Status</th>
+                        <th className="px-4 py-3 text-[11px] font-bold tracking-wider text-slate-500 uppercase tracking-wider border-b border-r border-slate-100 whitespace-nowrap">Candidate Name</th>
+                        <th className="px-4 py-3 text-[11px] font-bold tracking-wider text-slate-500 uppercase tracking-wider border-b border-r border-slate-100 whitespace-nowrap">DOB</th>
+                        <th className="px-4 py-3 text-[11px] font-bold tracking-wider text-slate-500 uppercase tracking-wider border-b border-r border-slate-100 whitespace-nowrap">Phone Number</th>
+                        <th className="px-4 py-3 text-[11px] font-bold tracking-wider text-slate-500 uppercase tracking-wider border-b border-r border-slate-100 whitespace-nowrap">Previous Company</th>
+                        <th className="px-4 py-3 text-[11px] font-bold tracking-wider text-slate-500 uppercase tracking-wider border-b border-r border-slate-100 whitespace-nowrap">Job Experience</th>
+                        <th className="px-4 py-3 text-[11px] font-bold tracking-wider text-slate-500 uppercase tracking-wider border-b border-r border-slate-100 whitespace-nowrap">Reason For Leaving</th>
+                        <th className="px-4 py-3 text-[11px] font-bold tracking-wider text-slate-500 uppercase tracking-wider border-b border-r border-slate-100 whitespace-nowrap">Marital Status</th>
+                        <th className="px-4 py-3 text-[11px] font-bold tracking-wider text-slate-500 uppercase tracking-wider border-b border-r border-slate-100 whitespace-nowrap">Candidate Photo</th>
+                        <th className="px-4 py-3 text-[11px] font-bold tracking-wider text-slate-500 uppercase tracking-wider border-b border-r border-slate-100 min-w-[180px]">Present Address</th>
+                        <th className="px-4 py-3 text-[11px] font-bold tracking-wider text-slate-500 uppercase tracking-wider border-b border-r border-slate-100 whitespace-nowrap">Resume Copy</th>
+                        <th className="px-4 py-3 text-[11px] font-bold tracking-wider text-slate-500 uppercase tracking-wider border-b border-r border-slate-100 whitespace-nowrap">Interview Schedule Date</th>
                         {activeTab === "interview" && <th className="px-4 py-3 text-[11px] font-bold tracking-wider text-pink-600 uppercase tracking-wider border-b border-r border-slate-200 bg-pink-50/50">Planned3</th>}
                         {activeTab === "history" && <th className="px-4 py-3 text-[11px] font-bold tracking-wider text-emerald-600 uppercase tracking-wider border-b border-r border-slate-200 bg-emerald-50/50">Actual3 (Completed)</th>}
                       </>
@@ -446,6 +457,25 @@ export const HiringTrackerModule = () => {
                               </span>
                             ) : "—"}
                           </td>
+                          <td className="px-4 py-3 text-xs font-bold text-slate-800 border-r border-slate-100 whitespace-nowrap">{row.candidateName || "—"}</td>
+                          <td className="px-4 py-3 text-xs font-medium text-slate-600 border-r border-slate-100 whitespace-nowrap">{row.dob || "—"}</td>
+                          <td className="px-4 py-3 text-xs font-medium text-slate-600 border-r border-slate-100 whitespace-nowrap">{row.candidatePhoneNumber || "—"}</td>
+                          <td className="px-4 py-3 text-xs font-medium text-slate-600 border-r border-slate-100 whitespace-nowrap">{row.previousCompanyName || "—"}</td>
+                          <td className="px-4 py-3 text-xs font-medium text-slate-600 border-r border-slate-100 whitespace-nowrap">{row.jobExperience || "—"}</td>
+                          <td className="px-4 py-3 text-xs font-medium text-slate-600 border-r border-slate-100 truncate max-w-[150px]" title={row.reasonForLeaving}>{row.reasonForLeaving || "—"}</td>
+                          <td className="px-4 py-3 text-xs font-medium text-slate-600 border-r border-slate-100 whitespace-nowrap">{row.maritalStatus || "—"}</td>
+                          <td className="px-4 py-3 text-xs border-r border-slate-100 whitespace-nowrap">
+                            {row.candidatePhoto ? (
+                              <a href={row.candidatePhoto} target="_blank" rel="noreferrer" className="font-bold text-pink-600 hover:underline">View</a>
+                            ) : "—"}
+                          </td>
+                          <td className="px-4 py-3 text-xs font-medium text-slate-600 border-r border-slate-100 truncate max-w-[180px]" title={row.presentAddress}>{row.presentAddress || "—"}</td>
+                          <td className="px-4 py-3 text-xs border-r border-slate-100 whitespace-nowrap">
+                            {row.resumeCopy ? (
+                              <a href={row.resumeCopy} target="_blank" rel="noreferrer" className="font-bold text-pink-600 hover:underline">View</a>
+                            ) : "—"}
+                          </td>
+                          <td className="px-4 py-3 text-xs font-medium text-slate-600 border-r border-slate-100 whitespace-nowrap">{row.interviewScheduleDate || "—"}</td>
                           {activeTab === "interview" && <td className="px-4 py-3 text-xs font-bold text-pink-700 whitespace-nowrap bg-pink-50/30 border-r border-slate-200">{row.planned3 || "—"}</td>}
                           {activeTab === "history" && <td className="px-4 py-3 text-xs font-bold text-emerald-700 whitespace-nowrap bg-emerald-50/30 border-r border-slate-200">{row.actual3 || "—"}</td>}
                         </>

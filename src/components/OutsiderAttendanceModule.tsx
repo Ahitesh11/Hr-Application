@@ -34,6 +34,7 @@ export const OutsiderAttendanceModule: React.FC = () => {
   const [location, setLocation] = useState<{
     lat: number;
     lng: number;
+    accuracy: number;
     address: string;
     mapLink: string;
   } | null>(null);
@@ -118,11 +119,12 @@ export const OutsiderAttendanceModule: React.FC = () => {
       async (pos) => {
         const lat = pos.coords.latitude;
         const lng = pos.coords.longitude;
+        const accuracy = pos.coords.accuracy;
         const mapLink = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
         let address = "Unknown Location";
 
         try {
-          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`, {
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1&zoom=18`, {
             headers: { 'Accept-Language': 'en' }
           });
           const data = await res.json();
@@ -133,7 +135,7 @@ export const OutsiderAttendanceModule: React.FC = () => {
           console.error("Reverse geocoding failed", err);
         }
 
-        setLocation({ lat, lng, address, mapLink });
+        setLocation({ lat, lng, accuracy, address, mapLink });
         setIsGettingLocation(false);
       },
       (err) => {
@@ -408,8 +410,12 @@ export const OutsiderAttendanceModule: React.FC = () => {
                       </div>
                       <div>
                         <h4 className="font-bold text-emerald-900 text-sm mb-1">Location Verified</h4>
-                        <p className="text-xs text-emerald-700 font-medium leading-relaxed mb-2">
+                        <p className="text-xs text-emerald-700 font-medium leading-relaxed mb-1">
                           {location.address}
+                        </p>
+                        <p className="text-[11px] text-emerald-600 font-mono mb-2">
+                          {location.lat.toFixed(6)}, {location.lng.toFixed(6)}
+                          {location.accuracy ? ` (±${Math.round(location.accuracy)}m)` : ""}
                         </p>
                         <a href={location.mapLink} target="_blank" rel="noreferrer" className="text-xs font-bold text-pink-600 hover:underline">
                           View on Map
@@ -572,18 +578,21 @@ export const OutsiderAttendanceModule: React.FC = () => {
                             <span className="text-xs text-slate-400 font-medium">No Image</span>
                           )}
                         </td>
-                        <td className="px-6 py-4 min-w-[200px]">
+                        <td className="px-6 py-4">
                           {!isLeave ? (
-                            <div>
-                              <p className="text-xs text-slate-600 font-medium line-clamp-2 leading-relaxed mb-1">
-                                {row.address || row.Address || "—"}
-                              </p>
-                              {(row.mapLink || row['Map Link']) && (
-                                <a href={row.mapLink || row['Map Link']} target="_blank" rel="noreferrer" className="text-[10px] font-bold text-pink-500 hover:underline inline-flex items-center gap-1">
-                                  <MapPin className="w-3 h-3" /> View Map
-                                </a>
-                              )}
-                            </div>
+                            (row.mapLink || row['Map Link']) ? (
+                              <a
+                                href={row.mapLink || row['Map Link']}
+                                target="_blank"
+                                rel="noreferrer"
+                                title={row.address || row.Address || "View on Map"}
+                                className="w-10 h-10 rounded-xl bg-pink-50 border border-pink-200 flex items-center justify-center hover:bg-pink-100 hover:border-pink-400 transition-all text-pink-500"
+                              >
+                                <MapPin className="w-5 h-5" />
+                              </a>
+                            ) : (
+                              <span className="text-xs text-slate-400 font-medium">No Location</span>
+                            )
                           ) : (
                             <div>
                               <p className="text-xs font-bold text-orange-600 mb-1">
@@ -674,15 +683,18 @@ export const OutsiderAttendanceModule: React.FC = () => {
                                   <ImageIcon className="w-4 h-4" />
                                 </a>
                               ) : <span className="text-xs text-slate-400">No Img</span>}
-                              
-                              <div className="flex-1">
-                                <p className="text-xs text-slate-600 font-medium line-clamp-1">{row.address || row.Address || "—"}</p>
-                                {(row.mapLink || row['Map Link']) && (
-                                  <a href={row.mapLink || row['Map Link']} target="_blank" rel="noreferrer" className="text-[10px] font-bold text-pink-500 hover:underline inline-flex items-center gap-1">
-                                    <MapPin className="w-3 h-3" /> View Map
-                                  </a>
-                                )}
-                              </div>
+
+                              {(row.mapLink || row['Map Link']) ? (
+                                <a
+                                  href={row.mapLink || row['Map Link']}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  title={row.address || row.Address || "View on Map"}
+                                  className="shrink-0 w-8 h-8 rounded-lg bg-pink-50 border border-pink-200 flex items-center justify-center hover:bg-pink-100 hover:border-pink-400 transition-all text-pink-500"
+                                >
+                                  <MapPin className="w-4 h-4" />
+                                </a>
+                              ) : <span className="text-xs text-slate-400">No Loc</span>}
                             </div>
                           ) : (
                             <div>

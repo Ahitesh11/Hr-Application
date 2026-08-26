@@ -265,7 +265,7 @@ export const HiringTrackerModule = () => {
             onClick={() => setActiveTab("social-site")}
             className={cn("py-3 font-bold text-sm border-b-2 transition-colors flex items-center gap-1.5", activeTab === "social-site" ? "border-pink-600 text-pink-600" : "border-transparent text-slate-500 hover:text-slate-700")}
           >
-            1st Tab: Social Site
+            Social Site
             <span className={cn("px-2 py-0.5 rounded-full text-[10px]", activeTab === "social-site" ? "bg-pink-100 text-pink-700" : "bg-slate-100 text-slate-500")}>
               {getTabCount("social-site")}
             </span>
@@ -274,7 +274,7 @@ export const HiringTrackerModule = () => {
             onClick={() => setActiveTab("call-tracker")}
             className={cn("py-3 font-bold text-sm border-b-2 transition-colors flex items-center gap-1.5", activeTab === "call-tracker" ? "border-pink-600 text-pink-600" : "border-transparent text-slate-500 hover:text-slate-700")}
           >
-            2st Tab: Call Tracker
+            Call Tracker
             <span className={cn("px-2 py-0.5 rounded-full text-[10px]", activeTab === "call-tracker" ? "bg-pink-100 text-pink-700" : "bg-slate-100 text-slate-500")}>
               {getTabCount("call-tracker")}
             </span>
@@ -292,7 +292,7 @@ export const HiringTrackerModule = () => {
             onClick={() => setActiveTab("interview")}
             className={cn("py-3 font-bold text-sm border-b-2 transition-colors flex items-center gap-1.5", activeTab === "interview" ? "border-pink-600 text-pink-600" : "border-transparent text-slate-500 hover:text-slate-700")}
           >
-            3st Tab: Interview
+            Interview
             <span className={cn("px-2 py-0.5 rounded-full text-[10px]", activeTab === "interview" ? "bg-pink-100 text-pink-700" : "bg-slate-100 text-slate-500")}>
               {getTabCount("interview")}
             </span>

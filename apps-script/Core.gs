@@ -39,6 +39,11 @@ const SHEETS = {
     'Planned 1', 'Actual 1', 'Delay 1', 'Status 1', 'Approved Amount',
     'Planned 2', 'Actual 2', 'Delay 2', 'Payment Form',
     'Planned 3', 'Actual 3', 'Delay 3', 'Status 2'
+  ],
+  'Direct Advance': [
+    'Timestamp', 'DA Number', 'Employee ID', 'Date', 'Person Name', 'Amount', 'Payment Type', 'Notes',
+    'Planned 1', 'Actual 1', 'Delay 1', 'Status1',
+    'Planned 2', 'Actual 2', 'Delay 2', 'Status2'
   ]
 };
 
@@ -72,6 +77,11 @@ function getHeaderInfo(sheet) {
   // Fallback for Joining which has headers on row 7 (index 6)
   if (sheet.getName() === 'Joining' && data.length > 6) {
     return { index: 6, headers: data[6] };
+  }
+
+  // Fallback for Direct Advance which has headers on row 6 (index 5)
+  if (sheet.getName() === 'Direct Advance' && data.length > 5) {
+    return { index: 5, headers: data[5] };
   }
 
   return { index: 0, headers: data[0] }; // Fallback to first row
@@ -216,6 +226,14 @@ function doPost(e) {
         break;
       case 'submitLoanApplication':
         result = submitData(ss, 'Loan Application', request);
+        break;
+
+      case 'getDirectAdvances':
+        result = getData(ss, 'Direct Advance', request.employeeId);
+        break;
+      case 'submitDirectAdvance':
+        request.daNumber = request.daNumber || ("DA-" + new Date().getTime().toString().slice(-6));
+        result = submitData(ss, 'Direct Advance', request);
         break;
       case 'getOfferLetters':
         result = getData(ss, 'Offer Letters');
@@ -389,7 +407,7 @@ function updateStep(ss, sheetName, rowId, step, actual, customStatus, extraField
 
   let idIdx = headers.findIndex(h => {
     const val = (h || '').toString().toLowerCase();
-    return val.includes('no.') || val.includes(' no') || val.endsWith('no') || val.includes('unique no') || val.includes('uniqueno');
+    return val.includes('no.') || val.includes(' no') || val.endsWith('no') || val.includes('unique no') || val.includes('uniqueno') || val.endsWith('number');
   });
 
 

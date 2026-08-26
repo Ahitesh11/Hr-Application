@@ -289,7 +289,7 @@ export const LoanApplicationModule: React.FC = () => {
             onClick={() => setActiveTab("mgmt-approval")}
             className={cn("py-3 font-bold text-sm border-b-2 transition-colors flex items-center gap-1.5 whitespace-nowrap", activeTab === "mgmt-approval" ? "border-blue-600 text-blue-600" : "border-transparent text-slate-500 hover:text-slate-700")}
           >
-            1st Tab: Mgmt Approval
+            Mgmt Approval
             <span className={cn("px-2 py-0.5 rounded-full text-[10px]", activeTab === "mgmt-approval" ? "bg-blue-100 text-blue-700" : "bg-slate-100 text-slate-500")}>
               {getTabCount("mgmt-approval")}
             </span>
@@ -298,7 +298,7 @@ export const LoanApplicationModule: React.FC = () => {
             onClick={() => setActiveTab("make-payment")}
             className={cn("py-3 font-bold text-sm border-b-2 transition-colors flex items-center gap-1.5 whitespace-nowrap", activeTab === "make-payment" ? "border-pink-600 text-pink-600" : "border-transparent text-slate-500 hover:text-slate-700")}
           >
-            2nd Tab: Make Payment
+            Make Payment
             <span className={cn("px-2 py-0.5 rounded-full text-[10px]", activeTab === "make-payment" ? "bg-pink-100 text-pink-700" : "bg-slate-100 text-slate-500")}>
               {getTabCount("make-payment")}
             </span>
@@ -307,7 +307,7 @@ export const LoanApplicationModule: React.FC = () => {
             onClick={() => setActiveTab("tally-entry")}
             className={cn("py-3 font-bold text-sm border-b-2 transition-colors flex items-center gap-1.5 whitespace-nowrap", activeTab === "tally-entry" ? "border-emerald-600 text-emerald-600" : "border-transparent text-slate-500 hover:text-slate-700")}
           >
-            3rd Tab: Tally Entry
+            Tally Entry
             <span className={cn("px-2 py-0.5 rounded-full text-[10px]", activeTab === "tally-entry" ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-500")}>
               {getTabCount("tally-entry")}
             </span>

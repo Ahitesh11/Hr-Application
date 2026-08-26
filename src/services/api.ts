@@ -1,4 +1,4 @@
-import { User, PunchMissFms, LeaveFms, HolidayWorkingFms, Attendance, SalaryRecord, SalaryIncrementFms, LoanApplicationFms } from "../types";
+import { User, PunchMissFms, LeaveFms, HolidayWorkingFms, Attendance, SalaryRecord, SalaryIncrementFms, LoanApplicationFms, DirectAdvanceFms } from "../types";
 
 const GAS_URL = import.meta.env.VITE_GAS_WEB_APP_URL || "";
 
@@ -323,6 +323,18 @@ export const api = {
   updateLoanApplicationStep: async (data: Record<string, any>): Promise<boolean> => {
     if (useMock) return true;
     const res = await callGas("updateLoanApplicationStep", data);
+    return !!(res && res.success);
+  },
+
+  getDirectAdvances: async (employeeId?: string): Promise<DirectAdvanceFms[]> => {
+    if (useMock) return [];
+    const res = await callGas("getDirectAdvances", { employeeId });
+    return Array.isArray(res) ? res : [];
+  },
+
+  submitDirectAdvance: async (data: Partial<DirectAdvanceFms>): Promise<boolean> => {
+    if (useMock) return true;
+    const res = await callGas("submitDirectAdvance", data);
     return !!(res && res.success);
   },
 

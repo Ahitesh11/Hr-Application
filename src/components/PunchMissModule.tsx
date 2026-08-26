@@ -176,7 +176,7 @@ export const PunchMissModule: React.FC = () => {
             className="p-2 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-all text-slate-500 flex items-center gap-2 whitespace-nowrap"
           >
             {isTesting ? <Loader2 className="w-5 h-5 animate-spin" /> : <AlertCircle className="w-5 h-5" />}
-            <span className="hidden sm:inline text-sm font-medium">Test Connection</span>
+            {/* <span className="hidden sm:inline text-sm font-medium"></span> */}
           </button>
         </div>
         <button

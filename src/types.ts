@@ -230,6 +230,29 @@ export interface HiringTracker {
   _row?: number;
 }
 
+export interface DirectAdvanceFms {
+  timestamp?: string;
+  daNumber?: string;
+  employeeId: string;
+  date: string;
+  personName: string;
+  amount: string;
+  paymentType: string;
+  notes: string;
+
+  planned1?: string;
+  actual1?: string;
+  delay1?: string;
+  status1?: string;
+
+  planned2?: string;
+  actual2?: string;
+  delay2?: string;
+  status2?: string;
+
+  _row?: number;
+}
+
 export interface LoanApplicationFms {
   timestamp?: string;
   loanNo?: string;

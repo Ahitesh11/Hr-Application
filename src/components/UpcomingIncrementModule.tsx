@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { Search, Loader2, RefreshCw, Bell, Calendar, User, Users, Building2, History, BarChart3, AlertTriangle, Clock, Sparkles } from "lucide-react";
 import { api } from "../services/api";
 import { cn } from "../lib/utils";
-import { format, addMonths, addDays, differenceInDays } from "date-fns";
+import { format, addMonths, differenceInDays } from "date-fns";
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 const parseDate = (raw: string | undefined): Date | null => {
@@ -85,8 +85,11 @@ export const UpcomingIncrementModule = () => {
 
   // ── UPCOMING rows ─────────────────────────────────────────────────────────
   // One row per "Present Employees" record — that sheet is the single source of truth here, so
-  // the row count always matches its row count exactly. Due date = "Next Increment Date" column
-  // + 365 days; if that's blank for an employee, falls back to their Joining Date + 365 days.
+  // the row count always matches its row count exactly. "Next Increment Date" (or Joining Date,
+  // if that's blank) is the anchor date of the employee's last recorded increment — not a
+  // precomputed due date — so the real due date is that anchor plus however many months their
+  // latest Actual Salary Increment row says is next ("Next Increment (No. Of Month)"); employees
+  // with no increment history yet default to a 12-month first-review cycle.
   const upcomingRows = useMemo(() => {
     type Row = {
       employeeId: string; name: string; designation: string; company: string;
@@ -118,9 +121,11 @@ export const UpcomingIncrementModule = () => {
       const nextIncDate = parseDate(rawNextIncDate);
       const joiningDate = parseDate(rawJoiningDate);
       const baseDate = nextIncDate || joiningDate;
-      const nextDueDate = baseDate ? addDays(baseDate, 365) : null;
 
       const lastActual = latestActualByEmp.get(code);
+      const rawMonths = lastActual?.nextIncrementNoOfMonth ? Number(lastActual.nextIncrementNoOfMonth) : NaN;
+      const monthsToNext = Number.isFinite(rawMonths) && rawMonths > 0 ? rawMonths : 12;
+      const nextDueDate = baseDate ? addMonths(baseDate, monthsToNext) : null;
 
       return {
         employeeId:   code,

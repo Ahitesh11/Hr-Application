@@ -22,6 +22,7 @@ const LeaveReportModule = lazy(() => import("./components/LeaveReportModule").th
 const UpcomingIncrementModule = lazy(() => import("./components/UpcomingIncrementModule").then(m => ({ default: m.UpcomingIncrementModule })));
 const HiringTrackerModule = lazy(() => import("./components/HiringTrackerModule").then(m => ({ default: m.HiringTrackerModule })));
 const LoanApplicationModule = lazy(() => import("./components/LoanApplicationModule").then(m => ({ default: m.LoanApplicationModule })));
+const DirectAdvanceModule = lazy(() => import("./components/DirectAdvanceModule").then(m => ({ default: m.DirectAdvanceModule })));
 const FormatsModule = lazy(() => import("./components/FormatsModule").then(m => ({ default: m.FormatsModule })));
 const OutsiderAttendanceModule = lazy(() => import("./components/OutsiderAttendanceModule").then(m => ({ default: m.OutsiderAttendanceModule })));
 const SettingsModule = lazy(() => import("./components/SettingsModule").then(m => ({ default: m.SettingsModule })));
@@ -83,6 +84,8 @@ const AppContent = () => {
         return <HiringTrackerModule />;
       case "loan-application":
         return <LoanApplicationModule />;
+      case "direct-advance":
+        return <DirectAdvanceModule />;
       case "formats":
         return <FormatsModule />;
       case "settings":

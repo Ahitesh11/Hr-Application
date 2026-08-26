@@ -23,6 +23,7 @@ import {
   Loader2,
   Bell,
   Banknote,
+  Wallet,
   FileText,
   FileSignature,
   MapPin,
@@ -116,6 +117,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, acti
     { id: "hiring-tracker",            label: "Hiring Tracker",             icon: Search,     roles: ["Admin"] },
     { id: "joining",                   label: "Joining",                    icon: UserPlus,   roles: ["Admin"] },
     { id: "loan-application",          label: "Loan Application",           icon: Banknote,   roles: ["Admin"] },
+    { id: "direct-advance",            label: "Direct Advance",             icon: Wallet,     roles: ["Admin"] },
     { id: "formats",                   label: "Formats",                    icon: FileText,   roles: ["Admin"] },
     { id: "settings",                  label: "Settings",                   icon: Settings,   roles: ["Admin"] },
   ];

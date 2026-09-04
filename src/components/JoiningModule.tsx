@@ -44,6 +44,7 @@ const DESIGNATION_OPTIONS = [
   "Senior General Manager", "Site Supervisor", "Sr Accountant",
   "Stock Yard Supervisor", "Store Executive", "Store Manager", "Store Purchaser",
   "Technical Head", "Welder", "Workshop Operator","Admin Executive","Logistic Executive","Fitter",
+  "Weibridge Operator","Nodulizer","Fitter",
 ];
 
 const emptyForm = {

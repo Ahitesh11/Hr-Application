@@ -5,7 +5,7 @@ import {
   UserPlus, Users, Loader2, Search, Upload, CheckCircle,
   AlertCircle, X, Eye, ChevronDown, LogOut, History
 } from "lucide-react";
-import { cn } from "../lib/utils";
+import { cn, formatIstDateTime } from "../lib/utils";
 
 type TabId = "new" | "present" | "living";
 
@@ -316,13 +316,13 @@ export const JoiningModule = () => {
         dateOfLiving: livingForm.dateOfLiving,
         totalWorkingDays: livingForm.totalWorkingDays,
         amount: livingForm.amount,
-        actual: new Date().toLocaleString("en-IN"),
+        actual: formatIstDateTime(),
         handoverAssets: livingForm.handoverAssets ? "Yes" : "No",
         clearanceForm: livingForm.clearanceForm ? "Yes" : "No",
         handoverDocSigned: livingForm.handoverDocSigned ? "Yes" : "No",
         cancelEmailBiometric: livingForm.cancelEmailBiometric ? "Yes" : "No",
         removeBenefitEnrollment: livingForm.removeBenefitEnrollment ? "Yes" : "No",
-        timestamp: new Date().toLocaleString("en-IN"),
+        timestamp: formatIstDateTime(),
       };
       const res = await api.submitLiving(payload);
       if (res.ok) {
@@ -417,7 +417,7 @@ export const JoiningModule = () => {
     try {
       const payload = {
         ...form,
-        timestamp: new Date().toLocaleString("en-IN"),
+        timestamp: formatIstDateTime(),
       };
       const ok = await api.submitJoining(payload);
       if (ok) {

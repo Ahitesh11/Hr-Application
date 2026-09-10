@@ -27,7 +27,7 @@ function submitOutsiderAttendance(ss, request) {
     }
 
     const row = [
-      new Date().toLocaleString("en-IN"), // Timestamp
+      istNow(), // Timestamp
       request.date || "", // Date
       request.time || "", // Time
       request.employeeId || "", // Emp Id
@@ -44,6 +44,7 @@ function submitOutsiderAttendance(ss, request) {
     ];
 
     sheet.appendRow(row);
+    sheet.getRange(sheet.getLastRow(), 1).setNumberFormat(IST_DATETIME_FORMAT);
     return { success: true, message: "Attendance recorded successfully" };
   } catch (err) {
     return { success: false, error: err.message };
@@ -81,8 +82,14 @@ function updateOutsiderAttendanceHRStatus(ss, request) {
     const targetTimestamp = request.timestamp; // The timestamp of the row to update
 
     for (let i = 1; i < data.length; i++) {
-      const rowTimestamp = new Date(data[i][timestampIdx]).getTime();
-      const reqTimestamp = new Date(targetTimestamp).getTime();
+      // data[i][timestampIdx] may be a real Date (new rows) or a legacy
+      // locale string (rows written before this fix) — parseIncomingDate
+      // handles both. Native `new Date(str)` is deliberately avoided here
+      // since it misreads our dd/MM/yyyy display strings as MM/dd.
+      const rowDate = parseIncomingDate(data[i][timestampIdx]);
+      const reqDate = parseIncomingDate(targetTimestamp);
+      const rowTimestamp = rowDate ? rowDate.getTime() : NaN;
+      const reqTimestamp = reqDate ? reqDate.getTime() : NaN;
 
       // Allow slight time difference or string match
       if (data[i][timestampIdx].toString() === targetTimestamp.toString() ||

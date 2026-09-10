@@ -5,7 +5,7 @@ import {
   ChevronLeft, Search, CheckCircle, 
   FileText, Loader2, PenTool, Type, Settings
 } from "lucide-react";
-import { cn } from "../lib/utils";
+import { cn, formatIstDateTime } from "../lib/utils";
 import { logoBase64 } from "../lib/logoBase64";
 import { DEFAULT_TEMPLATES, parseTemplate } from "../lib/templates";
 
@@ -314,7 +314,7 @@ export const DocumentGeneratorModule = () => {
     setSubmitResult({ status: null });
     try {
       const payload = {
-        timestamp: format(new Date(), "yyyy-MM-dd HH:mm:ss"),
+        timestamp: formatIstDateTime(),
         candidateId: formData.candidateId,
         employeeId: formData.candidateId,
         fullName: formData.fullName,

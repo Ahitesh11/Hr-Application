@@ -3,7 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { api } from "../services/api";
 import { LeaveFms } from "../types";
 import { Plus, Search, CheckCircle, Clock, AlertCircle, Loader2, Calendar, User, Building2, FileText, X, Image, Upload } from "lucide-react";
-import { cn } from "../lib/utils";
+import { cn, formatIstDateTime, parseSheetDateTime } from "../lib/utils";
 import { format } from "date-fns";
 
 const StatusBadge = ({ status }: { status: string }) => {
@@ -114,7 +114,7 @@ export const LeaveModule: React.FC = () => {
         employeeIdCode: actingAs?.employeeId || user?.employeeId,
         nameOfEmployee: actingAs?.name || user?.name,
         company: actingAs?.companyName || formData.company,
-        timestamp: format(new Date(), "M/d/yyyy H:mm:ss"),
+        timestamp: formatIstDateTime(),
         folderId: "1d45zekLBdo-BcLp2-1fqmDOEZ1ZM-hXx"
       } as any);
 
@@ -141,7 +141,7 @@ export const LeaveModule: React.FC = () => {
   const handleUpdateStep = async (rowId: string, step: number) => {
     setIsLoading(true);
     try {
-      const actualTime = format(new Date(), "yyyy-MM-dd HH:mm:ss");
+      const actualTime = formatIstDateTime();
       const success = await api.updateStep("Leave Fms", rowId, step, actualTime);
       if (success) {
         fetchData();
@@ -282,7 +282,7 @@ export const LeaveModule: React.FC = () => {
                     style={{ borderBottom: "1px solid #f1f5f9" }}
                   >
                     <td className="px-4 py-3 text-xs text-slate-500 whitespace-nowrap">
-                      {item.timestamp ? format(new Date(item.timestamp), "dd/MM/yy HH:mm") : "-"}
+                      {item.timestamp && parseSheetDateTime(item.timestamp) ? format(parseSheetDateTime(item.timestamp)!, "dd/MM/yy HH:mm") : "-"}
                     </td>
                     <td className="px-4 py-3 text-xs font-bold text-slate-800 whitespace-nowrap">{item.leaveNo}</td>
                     <td className="px-4 py-3">

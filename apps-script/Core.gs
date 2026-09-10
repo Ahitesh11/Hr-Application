@@ -47,6 +47,85 @@ const SHEETS = {
   ]
 };
 
+// ── IST date/time formatting ────────────────────────────────────────────────
+// Every auto-stamped Timestamp / Actual(1/2/3) column must be saved as a real
+// Date value, always displayed as dd/MM/yyyy HH:mm:ss in IST — regardless of
+// (a) what shape the frontend sent the value in (ISO string, epoch millis, a
+// serialized JS Date, an already-formatted dd/MM/yyyy string, ...), and
+// (b) the spreadsheet's own locale/timezone settings, which is what causes
+// values to silently shift a day or get mis-parsed as MM/dd instead of dd/MM.
+const IST_TIMEZONE = 'Asia/Kolkata';
+const IST_DATETIME_FORMAT = 'dd/mm/yyyy hh:mm:ss';
+
+// Cell display for a Date value follows the *spreadsheet's* timezone setting
+// (not the script project's), so pin it to IST once per request.
+function ensureIstTimeZone(ss) {
+  try {
+    if (ss.getSpreadsheetTimeZone() !== IST_TIMEZONE) ss.setSpreadsheetTimeZone(IST_TIMEZONE);
+  } catch (e) {
+    // Insufficient permission or already set elsewhere — non-fatal.
+  }
+}
+
+function istNow() {
+  return new Date();
+}
+
+// Parses Date objects, epoch millis, ISO date/datetime strings, and dd/MM/yyyy
+// (with optional time) strings into a real Date. Deliberately never routes a
+// date-only string through the native `new Date(str)` parser — that parses as
+// UTC midnight and can render as the previous day once shown in IST.
+function parseIncomingDate(input) {
+  if (input === undefined || input === null || input === '') return null;
+  if (input instanceof Date) return isNaN(input.getTime()) ? null : input;
+  if (typeof input === 'number') {
+    const d = new Date(input);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  const str = input.toString().trim();
+  if (!str) return null;
+
+  // ISO: yyyy-MM-dd or yyyy-MM-ddTHH:mm:ss(.sss)(Z|+hh:mm)
+  let m = str.match(/^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):(\d{2})(?::(\d{2}))?)?/);
+  if (m) {
+    return new Date(+m[1], +m[2] - 1, +m[3], +(m[4] || 0), +(m[5] || 0), +(m[6] || 0));
+  }
+
+  // dd/MM/yyyy or dd/MM/yyyy HH:mm:ss (our own display format, or manual re-entry)
+  m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:[ ,]+(\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
+  if (m) {
+    return new Date(+m[3], +m[2] - 1, +m[1], +(m[4] || 0), +(m[5] || 0), +(m[6] || 0));
+  }
+
+  // Last resort — covers things like Date.toString() output or a locale
+  // string such as "9/10/2026, 3:07:25 pm".
+  const fallback = new Date(str);
+  return isNaN(fallback.getTime()) ? null : fallback;
+}
+
+// Returns the dd/MM/yyyy HH:mm:ss IST display string for any supported input.
+function formatIstDateTime(input) {
+  const d = parseIncomingDate(input);
+  if (!d) return (input === undefined || input === null) ? '' : input;
+  return Utilities.formatDate(d, IST_TIMEZONE, 'dd/MM/yyyy HH:mm:ss');
+}
+
+// Writes a real Date value into `range` (defaulting to now) and pins its
+// display format, so Sheets never re-interprets it via its own locale.
+function setIstDateTimeValue(range, input) {
+  const d = parseIncomingDate(input) || istNow();
+  range.setValue(d);
+  range.setNumberFormat(IST_DATETIME_FORMAT);
+}
+
+// Timestamp / Actual / Actual1 / Actual2 / Actual3 — the auto-stamped columns
+// this project writes a "moment" into (as opposed to a user-picked plain date
+// like DOB or Next Call Date, which are left untouched).
+function isAutoStampKey(key) {
+  return key === 'timestamp' || /^actual[123]?$/.test(key);
+}
+
 // Helper to find the header row dynamically
 function getHeaderInfo(sheet) {
   const data = sheet.getDataRange().getValues();
@@ -103,6 +182,7 @@ function doPost(e) {
     let result = { success: false };
 
     const ss = getSs();
+    ensureIstTimeZone(ss);
 
     switch (action) {
       case 'test':
@@ -347,7 +427,11 @@ function submitData(ss, sheetName, payload) {
 
           if (['planned', 'planned2', 'planned3'].includes(key)) return;
           if (payload[key] !== undefined) {
-            sheet.getRange(i + 1, colIdx + 1).setValue(payload[key]);
+            if (isAutoStampKey(key)) {
+              setIstDateTimeValue(sheet.getRange(i + 1, colIdx + 1), payload[key]);
+            } else {
+              sheet.getRange(i + 1, colIdx + 1).setValue(payload[key]);
+            }
           }
         });
         return { success: true, updated: true };
@@ -356,10 +440,19 @@ function submitData(ss, sheetName, payload) {
   }
 
   // Otherwise, Create New Row
+  const autoStampCols = [];
   const newRow = headers.map((header, colIdx) => {
     const key = camelize(header);
     // PROTECT FORMULA COLUMNS: leave empty so GAS/sheet maintains formula if applicable
     if (['planned', 'planned2', 'planned3'].includes(key)) return "";
+
+    if (isAutoStampKey(key)) {
+      const dateVal = key === 'timestamp'
+        ? (parseIncomingDate(payload[key]) || istNow())
+        : (payload[key] !== undefined ? (parseIncomingDate(payload[key]) || payload[key]) : "");
+      if (dateVal instanceof Date) autoStampCols.push(colIdx);
+      return dateVal;
+    }
 
     return payload[key] !== undefined ? payload[key] : "";
   });
@@ -379,6 +472,9 @@ function submitData(ss, sheetName, payload) {
   }
 
   sheet.getRange(targetRow, 1, 1, newRow.length).setValues([newRow]);
+  autoStampCols.forEach(function(colIdx) {
+    sheet.getRange(targetRow, colIdx + 1).setNumberFormat(IST_DATETIME_FORMAT);
+  });
   return { success: true, added: true };
 }
 
@@ -440,8 +536,9 @@ function updateStep(ss, sheetName, rowId, step, actual, customStatus, extraField
 }
 
 function applyUpdates(sheet, i, actualIdx, statusIdx, actual, customStatus, step, extraFields, headers) {
-  // 1. Set Actual Time
-  if (actualIdx !== -1) sheet.getRange(i + 1, actualIdx + 1).setValue(actual);
+  // 1. Set Actual Time — always a real Date, displayed dd/MM/yyyy HH:mm:ss IST.
+  // Falls back to the server's current time if `actual` is missing/unparsable.
+  if (actualIdx !== -1) setIstDateTimeValue(sheet.getRange(i + 1, actualIdx + 1), actual);
 
   // 2. Set Status
   const defaultStatus = (step === 1) ? 'HOD Approved' : 'Work Done';
@@ -454,7 +551,11 @@ function applyUpdates(sheet, i, actualIdx, statusIdx, actual, customStatus, step
       const val = extraFields[key];
       const colIdx = headers.findIndex(h => camelize(h) === key);
       if (colIdx !== -1) {
-        sheet.getRange(i + 1, colIdx + 1).setValue(val);
+        if (isAutoStampKey(key)) {
+          setIstDateTimeValue(sheet.getRange(i + 1, colIdx + 1), val);
+        } else {
+          sheet.getRange(i + 1, colIdx + 1).setValue(val);
+        }
       }
     }
   }

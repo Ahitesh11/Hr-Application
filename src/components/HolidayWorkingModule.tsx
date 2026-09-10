@@ -3,7 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { api } from "../services/api";
 import { HolidayWorkingFms } from "../types";
 import { Plus, Search, CheckCircle, Clock, AlertCircle, Loader2, Briefcase, X } from "lucide-react";
-import { cn } from "../lib/utils";
+import { cn, formatIstDateTime } from "../lib/utils";
 import { format } from "date-fns";
 
 export const HolidayWorkingModule: React.FC = () => {
@@ -53,7 +53,7 @@ export const HolidayWorkingModule: React.FC = () => {
         employeeId: actingAs?.employeeId || user?.employeeId,
         name: actingAs?.name || user?.name,
         companyName: actingAs?.companyName || user?.companyName,
-        timestamp: format(new Date(), "yyyy-MM-dd HH:mm:ss")
+        timestamp: formatIstDateTime()
       } as any);
 
       if (success) {
@@ -70,7 +70,7 @@ export const HolidayWorkingModule: React.FC = () => {
   const handleUpdateStep = async (rowId: string, step: number) => {
     setIsLoading(true);
     try {
-      const actualTime = format(new Date(), "yyyy-MM-dd HH:mm:ss");
+      const actualTime = formatIstDateTime();
       const success = await api.updateStep("Holiday Working Fms", rowId, step, actualTime);
       if (success) {
         fetchData();

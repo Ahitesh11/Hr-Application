@@ -39,7 +39,7 @@ function savePaidLeaveReport(ss, rows) {
     var monthIdx  = headers.findIndex(function(h) { return h.toString().toLowerCase() === 'month'; });
     var yearIdx   = headers.findIndex(function(h) { return h.toString().toLowerCase() === 'year'; });
 
-    var timestamp = new Date().toLocaleString();
+    var timestamp = istNow();
     var added = 0, updated = 0;
 
     (rows || []).forEach(function(row) {
@@ -76,9 +76,12 @@ function savePaidLeaveReport(ss, rows) {
 
       if (existingIdx !== -1) {
         sheet.getRange(existingIdx + 1, 1, 1, newValues.length).setValues([newValues]);
+        sheet.getRange(existingIdx + 1, 1).setNumberFormat(IST_DATETIME_FORMAT);
         updated++;
       } else {
-        sheet.getRange(sheet.getLastRow() + 1, 1, 1, newValues.length).setValues([newValues]);
+        var newRowNum = sheet.getLastRow() + 1;
+        sheet.getRange(newRowNum, 1, 1, newValues.length).setValues([newValues]);
+        sheet.getRange(newRowNum, 1).setNumberFormat(IST_DATETIME_FORMAT);
         added++;
       }
     });

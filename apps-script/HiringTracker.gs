@@ -108,7 +108,7 @@ function submitHiringTracker(ss, payload) {
     if (idx !== -1) newRow[idx] = val;
   };
 
-  setVal('Timestamp', new Date().toLocaleString());
+  setVal('Timestamp', istNow());
   setVal('Indent Number', indentNum);
   setVal('Company', payload.company || '');
   setVal('Post', payload.post || '');
@@ -119,7 +119,12 @@ function submitHiringTracker(ss, payload) {
   setVal('Department', payload.department || '');
   setVal('Experience', payload.experience || '');
 
-  sheet.getRange(sheet.getLastRow() + 1, 1, 1, newRow.length).setValues([newRow]);
+  var targetRow = sheet.getLastRow() + 1;
+  sheet.getRange(targetRow, 1, 1, newRow.length).setValues([newRow]);
+
+  var timestampIdx = headers.findIndex(function(h) { return h.toString().toLowerCase().trim() === 'timestamp'; });
+  if (timestampIdx !== -1) sheet.getRange(targetRow, timestampIdx + 1).setNumberFormat(IST_DATETIME_FORMAT);
+
   return { success: true };
 }
 
@@ -162,15 +167,15 @@ function updateHiringTrackerStep(ss, payload) {
     if (h.toString().toLowerCase().trim().includes('actual')) actualCols.push(idx);
   });
 
-  var timestamp = new Date().toLocaleString();
+  var timestamp = istNow();
 
   if (payload.tab === 'social-site') {
-    if (actualCols[0] !== undefined) sheet.getRange(targetRowIdx + 1, actualCols[0] + 1).setValue(timestamp);
+    if (actualCols[0] !== undefined) setIstDateTimeValue(sheet.getRange(targetRowIdx + 1, actualCols[0] + 1), timestamp);
     setVal('Social Site Post', payload.socialSitePost);
     setVal('Which', payload.which);
   } else if (payload.tab === 'call-tracker' || payload.tab === 'follow-up') {
     if (payload.trackerStatus !== 'In Progress') {
-      if (actualCols[1] !== undefined) sheet.getRange(targetRowIdx + 1, actualCols[1] + 1).setValue(timestamp);
+      if (actualCols[1] !== undefined) setIstDateTimeValue(sheet.getRange(targetRowIdx + 1, actualCols[1] + 1), timestamp);
     }
 
     // Append to Follow Up History if there's a new remark
@@ -178,12 +183,7 @@ function updateHiringTrackerStep(ss, payload) {
       var historyIdx = headers.findIndex(function(h) { return h.toString().toLowerCase().trim() === 'follow up history'; });
       if (historyIdx !== -1) {
         var currentHistory = sheet.getRange(targetRowIdx + 1, historyIdx + 1).getValue();
-        var d = new Date();
-        var formattedDate = [
-          ('0' + d.getDate()).slice(-2),
-          ('0' + (d.getMonth() + 1)).slice(-2),
-          d.getFullYear()
-        ].join('-') + ' ' + ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
+        var formattedDate = Utilities.formatDate(timestamp, IST_TIMEZONE, 'dd-MM-yyyy HH:mm');
 
         var newEntry = "[" + formattedDate + "] " + payload.whatDidTheCandidateSays;
         var newHistory = currentHistory ? currentHistory + "\n" + newEntry : newEntry;
@@ -219,7 +219,7 @@ function updateHiringTrackerStep(ss, payload) {
     if(payload.interviewScheduleDate !== undefined) setVal('Interview Schedule Date', payload.interviewScheduleDate);
 
   } else if (payload.tab === 'interview') {
-    if (actualCols[2] !== undefined) sheet.getRange(targetRowIdx + 1, actualCols[2] + 1).setValue(timestamp);
+    if (actualCols[2] !== undefined) setIstDateTimeValue(sheet.getRange(targetRowIdx + 1, actualCols[2] + 1), timestamp);
     setVal('Interview Status', payload.interviewStatus);
   }
 

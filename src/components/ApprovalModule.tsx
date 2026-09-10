@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { api } from "../services/api";
 import { PunchMissFms, LeaveFms, HolidayWorkingFms, SalaryIncrementFms } from "../types";
 import { Loader2, CheckCircle, XCircle, Image, Search } from "lucide-react";
-import { cn } from "../lib/utils";
+import { cn, formatIstDateTime, parseSheetDateTime } from "../lib/utils";
 import { format } from "date-fns";
 import { useAuth } from "../context/AuthContext";
 
@@ -72,8 +72,8 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
       ]);
 
       const sortFn = (a: any, b: any) => {
-        const timeA = a.timestamp ? new Date(a.timestamp).getTime() : 0;
-        const timeB = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+        const timeA = parseSheetDateTime(a.timestamp)?.getTime() ?? 0;
+        const timeB = parseSheetDateTime(b.timestamp)?.getTime() ?? 0;
         return timeB - timeA;
       };
 
@@ -123,7 +123,7 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
     setExtraFields({});
 
     try {
-      const actualTime = format(new Date(), "yyyy-MM-dd HH:mm:ss");
+      const actualTime = formatIstDateTime();
       const success = await api.updateStep(sheetName, rowId, step, actualTime, status, fieldsOverride || extraFields, rowIndex);
 
       // Always sync after update to be safe
@@ -587,7 +587,7 @@ export const ApprovalModule: React.FC<ApprovalModuleProps> = ({ role }) => {
                       className={cn("transition-colors hover:bg-pink-50/40 transition-colors duration-200", idx % 2 === 0 ? "bg-white" : "bg-slate-50/40")}
                       style={{ borderBottom: "1px solid #f1f5f9" }}
                     >
-                      <td className="px-4 py-3 text-xs text-slate-500 whitespace-nowrap">{item.timestamp ? format(new Date(item.timestamp), "dd/MM/yy HH:mm") : "-"}</td>
+                      <td className="px-4 py-3 text-xs text-slate-500 whitespace-nowrap">{item.timestamp && parseSheetDateTime(item.timestamp) ? format(parseSheetDateTime(item.timestamp)!, "dd/MM/yy HH:mm") : "-"}</td>
                       <td className="px-4 py-3 text-xs font-bold text-slate-800 whitespace-nowrap">{item.holidayWorkingNo}</td>
                       {/* Employee cell */}
                       <td className="px-4 py-3">

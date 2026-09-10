@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Search, Loader2, FileText, CheckCircle, Clock } from "lucide-react";
 import { api } from "../services/api";
+import { parseSheetDateTime } from "../lib/utils";
 
 export const DocumentRecordsModule: React.FC = () => {
   const [records, setRecords] = useState<any[]>([]);
@@ -17,8 +18,8 @@ export const DocumentRecordsModule: React.FC = () => {
       const data = await api.getOfferLetters();
       // Sort by timestamp descending if possible
       data.sort((a, b) => {
-        const dateA = a.timestamp ? new Date(a.timestamp).getTime() : 0;
-        const dateB = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+        const dateA = parseSheetDateTime(a.timestamp)?.getTime() ?? 0;
+        const dateB = parseSheetDateTime(b.timestamp)?.getTime() ?? 0;
         return dateB - dateA;
       });
       setRecords(data);
@@ -82,7 +83,7 @@ export const DocumentRecordsModule: React.FC = () => {
                     <td className="p-4">
                       <div className="flex items-center gap-2 text-sm text-slate-600 font-medium">
                         <Clock className="w-4 h-4 text-slate-400" />
-                        {record.timestamp ? new Date(record.timestamp).toLocaleString() : "-"}
+                        {record.timestamp && parseSheetDateTime(record.timestamp) ? parseSheetDateTime(record.timestamp)!.toLocaleString() : "-"}
                       </div>
                     </td>
                     <td className="p-4">

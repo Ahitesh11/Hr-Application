@@ -3,7 +3,7 @@ import { Check, X, Search, FileText, Upload, Download, Trash2, Edit3, ArrowUpCir
 import { logoBase64 } from "../lib/logoBase64";
 import { api } from "../services/api";
 import { SalaryIncrementFms } from "../types";
-import { cn } from "../lib/utils";
+import { cn, formatIstDateTime } from "../lib/utils";
 import { format } from "date-fns";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -21,7 +21,7 @@ export const SalaryIncrementModule: React.FC = () => {
 
   const [newEntry, setNewEntry] = useState<Partial<SalaryIncrementFms>>({
     uniqueNo: `SI-${Date.now().toString().slice(-6)}`,
-    timestamp: format(new Date(), "yyyy-MM-dd HH:mm:ss"),
+    timestamp: formatIstDateTime(),
     hodAmount: "",
     hodFeedback: "",
     mgmtAmount: "",
@@ -178,7 +178,7 @@ export const SalaryIncrementModule: React.FC = () => {
         setIsModalOpen(false);
         setNewEntry({
           uniqueNo: `SI-${Date.now().toString().slice(-6)}`,
-          timestamp: format(new Date(), "yyyy-MM-dd HH:mm:ss"),
+          timestamp: formatIstDateTime(),
           hodAmount: "", hodFeedback: "", mgmtAmount: "", mgmtFeedback: "",
           dateOfIncrement: "", currentSalary: "", incrementAmount: "",
           nextIncrementNoOfMonth: "", note: "", status: "Pending", status2: "Pending", status3: "Pending"
@@ -230,18 +230,18 @@ export const SalaryIncrementModule: React.FC = () => {
         ...(activeTab === 'hod' ? {
           hodAmount: actionData.hodAmount,
           hodFeedback: actionData.hodFeedback,
-          actual: format(new Date(), "yyyy-MM-dd HH:mm:ss")
+          actual: formatIstDateTime()
         } : activeTab === 'mgmt' ? {
           mgmtAmount: actionData.mgmtAmount,
           mgmtFeedback: actionData.mgmtFeedback,
-          actual2: format(new Date(), "yyyy-MM-dd HH:mm:ss")
+          actual2: formatIstDateTime()
         } : {
           dateOfIncrement: actionData.dateOfIncrement,
           currentSalaryAfterIncrement: actionData.currentSalaryAfterIncrement,
           incrementAmount: actionData.incrementAmount,
           nextIncrementNoOfMonth: actionData.nextIncrementNoOfMonth,
           note: actionData.note,
-          actual3: format(new Date(), "yyyy-MM-dd HH:mm:ss")
+          actual3: formatIstDateTime()
         })
       };
       const success = await api.submitSalaryIncrement(payload as any);

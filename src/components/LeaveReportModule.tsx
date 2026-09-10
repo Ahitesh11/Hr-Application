@@ -4,7 +4,7 @@ import { LeaveFms } from "../types";
 import {
   Calendar, Users, CheckCircle, Clock, XCircle,
   Search, Filter, TrendingUp,
-  Loader2, AlertCircle, ChevronDown, BarChart2, BookOpen, X,
+  Loader2, AlertCircle, ChevronDown, BarChart2, BookOpen, X, Download,
 } from "lucide-react";
 import { cn } from "../lib/utils";
 
@@ -240,6 +240,46 @@ export const LeaveReportModule: React.FC = () => {
 
   const pbRow = useMemo(() => allRows.find(r => r.id === pbEmpId) ?? null, [allRows, pbEmpId]);
 
+  /* ── export filtered ledger to CSV ── */
+  const handleExportCsv = () => {
+    const headers = [
+      "#", "Employee", "Employee ID", "Department",
+      "EL Open", "EL Credit", "EL Used", "EL Close",
+      "CL Open", "CL Credit", "CL Used", "CL Close",
+      "ML Open", "ML Used", "ML Close",
+      "Total Balance", "Pending",
+    ];
+    const rows = filtered.map((r, i) => {
+      const c = r.current;
+      return [
+        i + 1, r.name, r.id, r.dept,
+        c.el.open, c.el.credit, c.el.availed, c.el.close,
+        c.cl.open, c.cl.credit, c.cl.availed, c.cl.close,
+        c.ml.open, c.ml.availed, c.ml.close,
+        c.total, fmt(c.el.pending + c.cl.pending + c.ml.pending),
+      ];
+    });
+
+    const escapeCell = (v: unknown) => {
+      const s = String(v ?? "");
+      return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+    // Leading BOM so Excel opens the UTF-8 file with correct encoding.
+    const csv = "﻿" + [headers, ...rows]
+      .map(row => row.map(escapeCell).join(","))
+      .join("\r\n");
+
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `leave-report-${MONTHS[selMonth]}-${selYear}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   /* ════════════════════════════════════ render ══ */
   return (
     <div className="space-y-6 print:space-y-4">
@@ -278,6 +318,13 @@ export const LeaveReportModule: React.FC = () => {
               </select>
               <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-pink-400 pointer-events-none"/>
             </div>
+            <button
+              onClick={handleExportCsv}
+              disabled={loading || filtered.length === 0}
+              className="flex items-center gap-2 px-4 py-2.5 text-sm font-bold rounded-xl bg-pink-600 text-white hover:bg-pink-700 transition-all shadow-sm shadow-pink-200 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              <Download className="w-4 h-4"/> Export
+            </button>
           </div>
         </div>
       </div>

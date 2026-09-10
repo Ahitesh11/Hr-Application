@@ -3,8 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { api } from "../services/api";
 import { LoanApplicationFms } from "../types";
 import { Plus, Search, Loader2, Banknote, ChevronDown } from "lucide-react";
-import { cn } from "../lib/utils";
-import { format } from "date-fns";
+import { cn, formatIstDateTime } from "../lib/utils";
 
 const StatusBadge = ({ status, step }: { status?: string, step: number }) => {
   const s = status || "Pending";
@@ -124,7 +123,7 @@ export const LoanApplicationModule: React.FC = () => {
       const desg = formData.designation || user?.designation || "";
       
       const payload: Partial<LoanApplicationFms> = {
-        timestamp: format(new Date(), "yyyy-MM-dd HH:mm:ss"),
+        timestamp: formatIstDateTime(),
         employeeId: empId,
         employeeName: empName,
         designation: desg,
@@ -167,7 +166,7 @@ export const LoanApplicationModule: React.FC = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const actualTime = format(new Date(), "yyyy-MM-dd HH:mm:ss");
+      const actualTime = formatIstDateTime();
       const extraFields = { approvedAmount: step1Data.approvedAmount };
       const success = await api.updateStep("Loan Application", selectedRowId, 1, actualTime, step1Data.status, extraFields, selectedRowIndex);
       if (success) {
@@ -185,7 +184,7 @@ export const LoanApplicationModule: React.FC = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const actualTime = format(new Date(), "yyyy-MM-dd HH:mm:ss");
+      const actualTime = formatIstDateTime();
       const success = await api.updateStep("Loan Application", selectedRowId, 2, actualTime, step2Data.status, undefined, selectedRowIndex);
       if (success) {
         setStep2ModalOpen(false);
@@ -202,7 +201,7 @@ export const LoanApplicationModule: React.FC = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const actualTime = format(new Date(), "yyyy-MM-dd HH:mm:ss");
+      const actualTime = formatIstDateTime();
       const success = await api.updateStep("Loan Application", selectedRowId, 3, actualTime, step3Data.status, undefined, selectedRowIndex);
       if (success) {
         setStep3ModalOpen(false);

@@ -67,7 +67,7 @@ function submitJoiningData(ss, payload) {
   // Build new row aligned to headers
   const newRow = headers.map(function(h) {
     const key = camelize(h);
-    if (key === 'timestamp') return payload.timestamp || new Date().toLocaleString();
+    if (key === 'timestamp') return parseIncomingDate(payload.timestamp) || istNow();
     return payload[key] !== undefined ? payload[key] : '';
   });
 
@@ -81,6 +81,10 @@ function submitJoiningData(ss, payload) {
   }
 
   sheet.getRange(targetRow, 1, 1, newRow.length).setValues([newRow]);
+
+  const timestampIdx = headers.findIndex(function(h) { return camelize(h) === 'timestamp'; });
+  if (timestampIdx !== -1) sheet.getRange(targetRow, timestampIdx + 1).setNumberFormat(IST_DATETIME_FORMAT);
+
   return { success: true, added: true };
 }
 
@@ -128,7 +132,7 @@ function submitLivingData(ss, payload) {
     } else if (kl === 'planned1' || kl === 'planned 1') {
       val = payload.dateOfLiving;                      // planned payment = date of living
     } else if (kl.includes('actual') && !kl.includes('1')) {
-      val = payload.actual;                            // auto-timestamp
+      val = parseIncomingDate(payload.actual) || istNow(); // auto-timestamp
     } else if (kl.includes('asset') || (kl.includes('handover') && (kl.includes('id card') || kl.includes('visiting')))) {
       val = payload.handoverAssets;
     } else if (kl.includes('clearance') && !kl.includes('document') && !kl.includes('signed')) {
@@ -142,7 +146,9 @@ function submitLivingData(ss, payload) {
     }
 
     if (val !== undefined) {
-      sheet.getRange(targetRowIdx + 1, colIdx + 1).setValue(val);
+      const cell = sheet.getRange(targetRowIdx + 1, colIdx + 1);
+      cell.setValue(val);
+      if (val instanceof Date) cell.setNumberFormat(IST_DATETIME_FORMAT);
     }
   });
 
@@ -239,7 +245,7 @@ function updateLivingPayment(ss, pmmplAc, paymentDate) {
   }
   if (targetRowIdx === -1) return { success: false, error: 'Employee ' + pmmplAc + ' not found' };
 
-  const actual = paymentDate || new Date().toLocaleDateString('en-IN');
+  const actual = parseIncomingDate(paymentDate) || istNow();
 
   // Only write to Actual1 column — nothing else
   const actual1Idx = headers.findIndex(function(h) {
@@ -248,7 +254,7 @@ function updateLivingPayment(ss, pmmplAc, paymentDate) {
   });
   if (actual1Idx === -1) return { success: false, error: 'Actual1 column not found in Joining sheet' };
 
-  sheet.getRange(targetRowIdx + 1, actual1Idx + 1).setValue(actual);
+  setIstDateTimeValue(sheet.getRange(targetRowIdx + 1, actual1Idx + 1), actual);
 
   return { success: true, updated: true };
 }

@@ -3,7 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { api } from "../services/api";
 import { PunchMissFms } from "../types";
 import { Plus, Search, Filter, CheckCircle, Clock, AlertCircle, Loader2 } from "lucide-react";
-import { cn } from "../lib/utils";
+import { cn, formatIstDateTime } from "../lib/utils";
 import { format } from "date-fns";
 
 const StatusBadge = ({ status }: { status: string }) => {
@@ -96,7 +96,7 @@ export const PunchMissModule: React.FC = () => {
     try {
       // Mapping fields exactly as requested for the Sheet
       const payload = {
-        timestamp: format(new Date(), "yyyy-MM-dd HH:mm:ss"),
+        timestamp: formatIstDateTime(),
         pmNo: "", // GAS will generate this
         inOut: formData.inOut,
         date: formData.date,
@@ -134,7 +134,7 @@ export const PunchMissModule: React.FC = () => {
   const handleUpdateStep = async (rowId: string) => {
     setIsLoading(true);
     try {
-      const actualTime = format(new Date(), "yyyy-MM-dd HH:mm:ss");
+      const actualTime = formatIstDateTime();
       const success = await api.updateStep("Punch Miss Fms", rowId, 1, actualTime);
       if (success) {
         fetchData();

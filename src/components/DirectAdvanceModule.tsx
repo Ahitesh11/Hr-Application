@@ -3,7 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { api } from "../services/api";
 import { DirectAdvanceFms } from "../types";
 import { Plus, Search, Loader2, Wallet, ChevronDown, X, RefreshCw } from "lucide-react";
-import { cn } from "../lib/utils";
+import { cn, formatIstDateTime } from "../lib/utils";
 import { format } from "date-fns";
 
 const StatusBadge = ({ status }: { status?: string }) => {
@@ -104,7 +104,7 @@ export const DirectAdvanceModule: React.FC = () => {
       const personName = formData.personName || actingAs?.name || user?.name || "";
 
       const payload: Partial<DirectAdvanceFms> = {
-        timestamp: format(new Date(), "yyyy-MM-dd HH:mm:ss"),
+        timestamp: formatIstDateTime(),
         employeeId: empId,
         personName,
         date: formData.date,
@@ -143,7 +143,7 @@ export const DirectAdvanceModule: React.FC = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const actualTime = format(new Date(), "yyyy-MM-dd HH:mm:ss");
+      const actualTime = formatIstDateTime();
       const success = await api.updateStep("Direct Advance", selectedRowId, 1, actualTime, step1Data.status, undefined, selectedRowIndex);
       if (success) {
         setStep1ModalOpen(false);
@@ -160,7 +160,7 @@ export const DirectAdvanceModule: React.FC = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const actualTime = format(new Date(), "yyyy-MM-dd HH:mm:ss");
+      const actualTime = formatIstDateTime();
       const success = await api.updateStep("Direct Advance", selectedRowId, 2, actualTime, step2Data.status, undefined, selectedRowIndex);
       if (success) {
         setStep2ModalOpen(false);

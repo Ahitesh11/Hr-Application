@@ -431,8 +431,15 @@ function submitData(ss, sheetName, payload) {
 
           if (['planned', 'planned2', 'planned3'].includes(key)) return;
           if (payload[key] !== undefined) {
+            // Update payloads here are often a full-record spread (e.g. SalaryIncrementModule
+            // sends {...selectedItem, ...tabFields}), so an auto-stamp column like actual2/actual3
+            // can arrive as "" simply because that stage hasn't happened yet — NOT as a request to
+            // stamp it now. Only write auto-stamp columns when a real value was actually provided;
+            // an empty one leaves the existing cell untouched instead of defaulting to "now".
             if (isAutoStampKey(key)) {
-              setIstDateTimeValue(sheet.getRange(i + 1, colIdx + 1), payload[key]);
+              if (payload[key] !== '' && payload[key] !== null) {
+                setIstDateTimeValue(sheet.getRange(i + 1, colIdx + 1), payload[key]);
+              }
             } else {
               sheet.getRange(i + 1, colIdx + 1).setValue(payload[key]);
             }
@@ -555,8 +562,12 @@ function applyUpdates(sheet, i, actualIdx, statusIdx, actual, customStatus, step
       const val = extraFields[key];
       const colIdx = headers.findIndex(h => camelize(h) === key);
       if (colIdx !== -1) {
+        // Same guard as submitData(): an auto-stamp key with an empty value means
+        // "not set yet", not "stamp it now" — skip rather than default to now().
         if (isAutoStampKey(key)) {
-          setIstDateTimeValue(sheet.getRange(i + 1, colIdx + 1), val);
+          if (val !== '' && val !== null && val !== undefined) {
+            setIstDateTimeValue(sheet.getRange(i + 1, colIdx + 1), val);
+          }
         } else {
           sheet.getRange(i + 1, colIdx + 1).setValue(val);
         }

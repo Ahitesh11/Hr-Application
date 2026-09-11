@@ -279,6 +279,10 @@ function doPost(e) {
         result = updateLivingPayment(ss, request.pmmplAc, request.paymentDate);
         break;
 
+      case 'updateJoiningMisStep':
+        result = updateJoiningMisStep(ss, request);
+        break;
+
       case 'savePaidLeaveReport':
         result = savePaidLeaveReport(ss, request.rows);
         break;

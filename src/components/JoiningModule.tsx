@@ -3,11 +3,14 @@ import { useAuth } from "../context/AuthContext";
 import { api } from "../services/api";
 import {
   UserPlus, Users, Loader2, Search, Upload, CheckCircle,
-  AlertCircle, X, Eye, ChevronDown, LogOut, History
+  AlertCircle, X, Eye, ChevronDown, LogOut, History, ClipboardList
 } from "lucide-react";
 import { cn, formatIstDateTime } from "../lib/utils";
 
-type TabId = "new" | "present" | "living";
+type TabId = "new" | "present" | "living" | "mis";
+
+type MisForm = { assignedTo: string; task: string; planned: string };
+const emptyMisForm: MisForm = { assignedTo: "", task: "", planned: "" };
 
 const GENDER_OPTIONS = ["Male", "Female", "Other"];
 const PF_ESIC_OPTIONS = ["Yes", "No"];
@@ -262,13 +265,18 @@ export const JoiningModule = () => {
   const [livingView, setLivingView] = useState<"all" | "paid">("all");
   const [isLivingLoading, setIsLivingLoading] = useState(false);
   const livingLoadedRef = useRef(false);
+  const [misModal, setMisModal] = useState<any | null>(null);
+  const [misForm, setMisForm] = useState<MisForm>(emptyMisForm);
+  const [misSavingId, setMisSavingId] = useState<string | null>(null);
+  const [misErrorMsg, setMisErrorMsg] = useState<string>("");
 
   // Only load joining data on mount (living history is lazy-loaded)
   useEffect(() => { loadJoining(); }, []);
 
-  // Lazy-load living history the first time the "living" tab is opened
+  // Lazy-load living history the first time the "living" or "mis" tab is opened
+  // (MIS also needs it, to exclude employees who've already exited).
   useEffect(() => {
-    if (activeTab === "living" && !livingLoadedRef.current) {
+    if ((activeTab === "living" || activeTab === "mis") && !livingLoadedRef.current) {
       livingLoadedRef.current = true;
       loadLivingHistory();
     }
@@ -357,6 +365,52 @@ export const JoiningModule = () => {
       }
     } finally {
       setPaymentLoadingId(null);
+    }
+  };
+
+  const openMisModal = (record: any) => {
+    setMisModal(record);
+    setMisForm({
+      assignedTo: record.misAssignedTo || "",
+      task: record.misTask || "",
+      planned: record.misPlanned ? "" : new Date().toISOString().split("T")[0],
+    });
+    setMisErrorMsg("");
+  };
+
+  // Step 1: HR assigns the work — sets Assigned To / Task / Planned date.
+  const handleMisAssignSave = async () => {
+    if (!misModal) return;
+    const id = misModal.pmmplAc || misModal.employeeId || misModal.employeeCode;
+    setMisSavingId(id);
+    setMisErrorMsg("");
+    try {
+      const res = await api.updateJoiningMisStep({
+        pmmplAc: id,
+        misAssignedTo: misForm.assignedTo,
+        misTask: misForm.task,
+        misPlanned: misForm.planned,
+      });
+      if (res.ok) {
+        await loadJoining();
+        setMisModal(null);
+      } else {
+        setMisErrorMsg(res.error || "Failed to save");
+      }
+    } finally {
+      setMisSavingId(null);
+    }
+  };
+
+  // Step 2: HR marks the MIS job as distributed — stamps Actual (now, IST).
+  const handleMisMarkDone = async (record: any) => {
+    const id = record.pmmplAc || record.employeeId || record.employeeCode;
+    setMisSavingId(id);
+    try {
+      const res = await api.updateJoiningMisStep({ pmmplAc: id, markComplete: true });
+      if (res.ok) await loadJoining();
+    } finally {
+      setMisSavingId(null);
     }
   };
 
@@ -465,6 +519,18 @@ export const JoiningModule = () => {
     livingList.map((r: any) => r.pmmplAc || r.employeeId || r.employeeCode).filter(Boolean)
   );
 
+  // MIS job step lives on the Joining sheet itself, so it's driven straight off
+  // joiningList (minus anyone who has already exited via Living).
+  const misEmployees = joiningList
+    .filter((r: any) => !livingEmployeeIds.has(r.pmmplAc || r.employeeId || r.employeeCode))
+    .filter((r: any) => {
+      if (!search) return true;
+      const q = search.toLowerCase();
+      return Object.entries(r).some(
+        ([k, v]) => !FILE_KEYS.has(k) && !SKIP_KEYS.has(k) && String(v).toLowerCase().includes(q)
+      );
+    });
+
   const filtered = presentEmployeesList
     .filter((r: any) => !livingEmployeeIds.has(r.pmmplAc || r.employeeId || r.employeeCode))
     .filter((r: any) => {
@@ -512,6 +578,7 @@ export const JoiningModule = () => {
           {([
             { id: "new",     label: "New Joining", icon: UserPlus },
             { id: "present", label: "Present Employees", icon: Users },
+            { id: "mis",     label: "Distribute MIS Job", icon: ClipboardList },
             { id: "living",  label: "Living History", icon: History },
           ] as { id: TabId; label: string; icon: any }[]).map(t => (
             <button
@@ -878,6 +945,136 @@ export const JoiningModule = () => {
       )}
 
       {/* ══════════════════════════════════════
+          TAB: DISTRIBUTE MIS JOB
+          ══════════════════════════════════════ */}
+      {activeTab === "mis" && (
+        <div className="bg-white rounded-3xl border border-pink-100 shadow-sm overflow-hidden">
+          <div className="p-6 border-b border-pink-50 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 bg-pink-600 rounded-xl">
+                <ClipboardList className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-slate-900">Distribute MIS Job</h3>
+                <p className="text-xs text-slate-400">Assign work to newly joined employees & track MIS distribution</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <input
+                  type="text"
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  placeholder="Search name, ID, company..."
+                  className="pl-9 pr-3 py-2 text-xs rounded-xl border border-pink-100 bg-pink-50 outline-none focus:ring-2 focus:ring-pink-400 font-medium text-slate-700 w-52"
+                />
+              </div>
+              <button
+                onClick={loadJoining}
+                className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-pink-600 bg-pink-50 border border-pink-100 rounded-xl hover:bg-pink-100 transition-all"
+              >
+                <Loader2 className={cn("w-3.5 h-3.5", isLoading && "animate-spin")} />
+                Refresh
+              </button>
+              <span className="text-xs font-bold text-slate-500 bg-pink-50 px-3 py-2 rounded-xl border border-pink-100">
+                {misEmployees.length} Records
+              </span>
+            </div>
+          </div>
+
+          {isLoading ? (
+            <div className="py-20 flex flex-col items-center gap-3">
+              <Loader2 className="w-8 h-8 animate-spin text-pink-500" />
+              <p className="text-slate-400 text-sm">Loading employees...</p>
+            </div>
+          ) : misEmployees.length === 0 ? (
+            <div className="py-20 flex flex-col items-center gap-3">
+              <AlertCircle className="w-10 h-10 text-slate-200" />
+              <p className="text-slate-400 font-bold">No joining records found</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto overflow-y-auto" style={{ maxHeight: "560px" }}>
+              <table className="w-full text-left" style={{ minWidth: "1000px" }}>
+                <thead className="bg-pink-50 border-b border-pink-100 sticky top-0 z-10">
+                  <tr>
+                    <th className="px-4 py-3.5 text-[10px] font-bold text-pink-500 uppercase tracking-wider whitespace-nowrap">#</th>
+                    <th className="px-4 py-3.5 text-[10px] font-bold text-pink-500 uppercase tracking-wider whitespace-nowrap">Employee</th>
+                    <th className="px-4 py-3.5 text-[10px] font-bold text-pink-500 uppercase tracking-wider whitespace-nowrap">Assigned To</th>
+                    <th className="px-4 py-3.5 text-[10px] font-bold text-pink-500 uppercase tracking-wider whitespace-nowrap">Task</th>
+                    <th className="px-4 py-3.5 text-[10px] font-bold text-pink-500 uppercase tracking-wider whitespace-nowrap">Planned</th>
+                    <th className="px-4 py-3.5 text-[10px] font-bold text-pink-500 uppercase tracking-wider whitespace-nowrap">Actual</th>
+                    <th className="px-4 py-3.5 text-[10px] font-bold text-pink-500 uppercase tracking-wider whitespace-nowrap">Delay</th>
+                    <th className="px-4 py-3.5 text-[10px] font-bold text-pink-500 uppercase tracking-wider whitespace-nowrap">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-pink-50">
+                  {misEmployees.map((r: any, idx: number) => {
+                    const id = r.pmmplAc || r.employeeId || r.employeeCode || "";
+                    const name = r.nameAsPerAadhar || r.employeeName || r.name || "?";
+                    const isAssigned = !!r.misPlanned;
+                    const isDone = !!r.misActual;
+                    return (
+                      <tr key={idx} className="hover:bg-pink-50/40 transition-colors">
+                        <td className="px-4 py-3.5 text-xs text-slate-400 font-bold">{idx + 1}</td>
+                        <td className="px-4 py-3.5">
+                          <div className="flex items-center gap-2">
+                            <div className="w-7 h-7 rounded-lg bg-pink-600 flex items-center justify-center text-white text-[10px] font-bold shrink-0">
+                              {String(name).charAt(0).toUpperCase()}
+                            </div>
+                            <div>
+                              <p className="text-sm font-bold text-slate-800 truncate">{name}</p>
+                              <p className="text-[10px] text-slate-400 font-medium">{id}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3.5 text-xs text-slate-600 font-medium">{r.misAssignedTo || "—"}</td>
+                        <td className="px-4 py-3.5 text-xs text-slate-600 font-medium max-w-[180px] truncate" title={r.misTask || ""}>{r.misTask || "—"}</td>
+                        <td className="px-4 py-3.5 text-xs text-slate-600 font-medium whitespace-nowrap">{r.misPlanned || "—"}</td>
+                        <td className="px-4 py-3.5 text-xs whitespace-nowrap">
+                          {isDone
+                            ? <span className="text-emerald-700 font-bold">{r.misActual}</span>
+                            : <span className="text-slate-300 font-bold">—</span>}
+                        </td>
+                        <td className="px-4 py-3.5 text-xs whitespace-nowrap">
+                          {r.misDelay || <span className="text-slate-300 font-bold">—</span>}
+                        </td>
+                        <td className="px-4 py-3.5">
+                          {isDone ? (
+                            <span className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-lg">
+                              <CheckCircle className="w-3 h-3" /> Distributed
+                            </span>
+                          ) : isAssigned ? (
+                            <button
+                              onClick={() => handleMisMarkDone(r)}
+                              disabled={misSavingId === id}
+                              className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                            >
+                              {misSavingId === id
+                                ? <Loader2 className="w-3 h-3 animate-spin" />
+                                : <CheckCircle className="w-3 h-3" />}
+                              Mark Distributed
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => openMisModal(r)}
+                              className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold text-pink-600 bg-pink-50 border border-pink-100 rounded-lg hover:bg-pink-100 transition-all"
+                            >
+                              <ClipboardList className="w-3 h-3" /> Assign
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════
           TAB: LIVING HISTORY
           ══════════════════════════════════════ */}
       {activeTab === "living" && (
@@ -1093,6 +1290,94 @@ export const JoiningModule = () => {
                   )}
                 </button>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Assign MIS Job Modal ── */}
+      {misModal && (
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[110] flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col">
+
+            {/* Header */}
+            <div className="px-6 py-4 bg-gradient-to-r from-pink-50 to-pink-50 border-b border-pink-100 flex items-center justify-between">
+              <div>
+                <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                  <ClipboardList className="w-4 h-4 text-pink-600" /> Assign MIS Job
+                </h3>
+                <p className="text-xs text-pink-700 font-bold mt-0.5">
+                  {misModal.nameAsPerAadhar || misModal.employeeName || "—"} · {misModal.pmmplAc || "—"}
+                </p>
+              </div>
+              <button onClick={() => setMisModal(null)} className="p-2 hover:bg-pink-100 rounded-xl transition-colors">
+                <X className="w-5 h-5 text-slate-500" />
+              </button>
+            </div>
+
+            {/* Form */}
+            <div className="p-6 space-y-4">
+              {misErrorMsg && (
+                <div className="p-3 bg-red-50 border border-red-100 rounded-xl text-xs font-bold text-red-600">
+                  {misErrorMsg}
+                </div>
+              )}
+              <div>
+                <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1.5">
+                  Assigned To <span className="text-pink-600 ml-0.5">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={misForm.assignedTo}
+                  onChange={e => setMisForm(f => ({ ...f, assignedTo: e.target.value }))}
+                  placeholder="Who will prepare the MIS?"
+                  className="w-full px-3.5 py-2.5 bg-pink-50 border border-pink-100 rounded-xl text-sm font-medium text-slate-800 focus:border-pink-400 focus:ring-2 focus:ring-pink-100 outline-none transition-all"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1.5">
+                  Task / Notes
+                </label>
+                <textarea
+                  value={misForm.task}
+                  onChange={e => setMisForm(f => ({ ...f, task: e.target.value }))}
+                  placeholder="What work is being assigned..."
+                  rows={3}
+                  className="w-full px-3.5 py-2.5 bg-pink-50 border border-pink-100 rounded-xl text-sm font-medium text-slate-800 focus:border-pink-400 focus:ring-2 focus:ring-pink-100 outline-none transition-all resize-none"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1.5">
+                  Planned Date <span className="text-pink-600 ml-0.5">*</span>
+                </label>
+                <input
+                  type="date"
+                  value={misForm.planned}
+                  onChange={e => setMisForm(f => ({ ...f, planned: e.target.value }))}
+                  className="w-full px-3.5 py-2.5 bg-pink-50 border border-pink-100 rounded-xl text-sm font-medium text-slate-800 focus:border-pink-400 focus:ring-2 focus:ring-pink-100 outline-none transition-all"
+                />
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="px-6 py-4 border-t border-pink-100 flex justify-end gap-3 bg-pink-50/50">
+              <button
+                onClick={() => setMisModal(null)}
+                className="px-5 py-2.5 text-xs font-bold text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleMisAssignSave}
+                disabled={!misForm.assignedTo || !misForm.planned || misSavingId === (misModal.pmmplAc || misModal.employeeId || misModal.employeeCode)}
+                className="flex items-center gap-2 px-5 py-2.5 text-xs font-bold text-white bg-pink-600 hover:bg-pink-700 rounded-xl shadow-md shadow-pink-200 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {misSavingId === (misModal.pmmplAc || misModal.employeeId || misModal.employeeCode) ? (
+                  <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Saving...</>
+                ) : (
+                  <><CheckCircle className="w-3.5 h-3.5" /> Save Assignment</>
+                )}
+              </button>
             </div>
           </div>
         </div>

@@ -258,3 +258,53 @@ function updateLivingPayment(ss, pmmplAc, paymentDate) {
 
   return { success: true, updated: true };
 }
+
+// ── MIS Job Distribution Step ─────────────────────────────────────────────
+// After an employee joins, HR assigns their work and a target ("Planned")
+// date, then later marks it distributed ("Actual"). Reuses the Joining sheet
+// (row found by PMMPL-AC), same as the Living step above. "MIS Delay" is a
+// sheet formula (Actual − Planned) — this function never writes to it.
+function updateJoiningMisStep(ss, payload) {
+  const sheet = ss.getSheetByName('Joining');
+  if (!sheet) return { success: false, error: 'Joining sheet not found' };
+
+  const { headers, index } = getHeaderInfo(sheet);
+  const data = sheet.getDataRange().getValues();
+
+  const pmmplIdx = headers.findIndex(function(h) {
+    return h.toString().toLowerCase().includes('pmmpl');
+  });
+  if (pmmplIdx === -1) return { success: false, error: 'PMMPL-AC column not found in Joining sheet' };
+
+  let targetRowIdx = -1;
+  for (let i = index + 1; i < data.length; i++) {
+    if (data[i][pmmplIdx] && data[i][pmmplIdx].toString().trim() === payload.pmmplAc.toString().trim()) {
+      targetRowIdx = i;
+      break;
+    }
+  }
+  if (targetRowIdx === -1) return { success: false, error: 'Employee ' + payload.pmmplAc + ' not found in Joining sheet' };
+
+  const setVal = function(nameStr, val) {
+    const idx = headers.findIndex(function(h) { return h.toString().toLowerCase().trim() === nameStr.toLowerCase().trim(); });
+    if (idx !== -1) sheet.getRange(targetRowIdx + 1, idx + 1).setValue(val);
+    return idx;
+  };
+
+  if (payload.misAssignedTo !== undefined) setVal('MIS Assigned To', payload.misAssignedTo);
+  if (payload.misTask !== undefined) setVal('MIS Task', payload.misTask);
+
+  if (payload.misPlanned !== undefined) {
+    const plannedIdx = headers.findIndex(function(h) { return h.toString().toLowerCase().trim() === 'mis planned'; });
+    if (plannedIdx === -1) return { success: false, error: '"MIS Planned" column not found in Joining sheet' };
+    setIstDateTimeValue(sheet.getRange(targetRowIdx + 1, plannedIdx + 1), payload.misPlanned);
+  }
+
+  if (payload.markComplete) {
+    const actualIdx = headers.findIndex(function(h) { return h.toString().toLowerCase().trim() === 'mis actual'; });
+    if (actualIdx === -1) return { success: false, error: '"MIS Actual" column not found in Joining sheet' };
+    setIstDateTimeValue(sheet.getRange(targetRowIdx + 1, actualIdx + 1), istNow());
+  }
+
+  return { success: true, updated: true };
+}

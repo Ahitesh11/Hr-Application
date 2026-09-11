@@ -278,6 +278,19 @@ export const api = {
     return { ok: false, error: res?.error || "Failed to update payment" };
   },
 
+  updateJoiningMisStep: async (data: {
+    pmmplAc: string;
+    misAssignedTo?: string;
+    misTask?: string;
+    misPlanned?: string;
+    markComplete?: boolean;
+  }): Promise<{ ok: boolean; error?: string }> => {
+    if (useMock) return { ok: true };
+    const res = await callGas("updateJoiningMisStep", data);
+    if (res && res.success) return { ok: true };
+    return { ok: false, error: res?.error || "Failed to update MIS job step" };
+  },
+
   getActualSalaryIncrements: async (): Promise<any[]> => {
     if (useMock) return [];
     const res = await callGas("getActualSalaryIncrements", {});

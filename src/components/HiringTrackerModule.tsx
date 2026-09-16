@@ -591,7 +591,9 @@ export const HiringTrackerModule = () => {
                       "Workshop Operator",
                       "Weibridge Operator",
                       "Nodulizer",
-                      "Fitter"
+                      "Fitter",
+                      "Turner",
+                      "Crusher Operator"
                     ]
                   },                  { label: "Gender", name: "gender", type: "select", options: ["Male", "Female"] },
                   { label: "Prefer", name: "prefer", type: "select", options: ["Any", "Experience", "Fresher"] },

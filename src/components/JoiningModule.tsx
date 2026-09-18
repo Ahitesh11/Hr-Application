@@ -34,7 +34,7 @@ const DESIGNATION_OPTIONS = [
   "Application Incharge", "Application Labour", "Application Manager",
   "Application Supervisor", "Asset Fitter", "Assistant Chemist",
   "Assistant Marketing Manager", "Cashier", "CFO", "Civil Site Supervisor",
-  "CRM", "Crusher Supervisor", "Data Operator", "DME", "Draftsman", "Driver",
+  "CRM", "Crusher Operator", "Crusher Supervisor", "Data Operator", "DME", "Draftsman", "Driver",
   "EA", "Electrical Helper", "Financial Executive", "Gm Hr",
   "Grinding Mill Supervisor", "Guard", "Help", "Helper", "HR",
   "Hydra Operator", "JCB Operator", "Jr Accountant", "Jr. Purchase Executive",
@@ -47,7 +47,7 @@ const DESIGNATION_OPTIONS = [
   "Senior General Manager", "Site Supervisor", "Sr Accountant",
   "Stock Yard Supervisor", "Store Executive", "Store Manager", "Store Purchaser",
   "Technical Head", "Welder", "Workshop Operator","Admin Executive","Logistic Executive","Fitter",
-  "Weibridge Operator","Nodulizer","Fitter",
+  "Weibridge Operator","Nodulizer","Fitter","Turner",
 ];
 
 const emptyForm = {

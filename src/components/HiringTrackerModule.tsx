@@ -535,6 +535,7 @@ export const HiringTrackerModule = () => {
                       "Cfo",
                       "Civil Site Supervisor",
                       "Crm",
+                      "Crusher Operator",
                       "Crusher Supervisor",
                       "Data Operator",
                       "Dme",
@@ -592,8 +593,7 @@ export const HiringTrackerModule = () => {
                       "Weibridge Operator",
                       "Nodulizer",
                       "Fitter",
-                      "Turner",
-                      "Crusher Operator"
+                      "Turner"
                     ]
                   },                  { label: "Gender", name: "gender", type: "select", options: ["Male", "Female"] },
                   { label: "Prefer", name: "prefer", type: "select", options: ["Any", "Experience", "Fresher"] },

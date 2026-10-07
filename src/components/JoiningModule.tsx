@@ -34,7 +34,7 @@ const DESIGNATION_OPTIONS = [
   "Application Incharge", "Application Labour", "Application Manager",
   "Application Supervisor", "Asset Fitter", "Assistant Chemist",
   "Assistant Marketing Manager", "Cashier", "CFO", "Civil Site Supervisor",
-  "CRM", "Crusher Operator", "Crusher Supervisor", "Data Operator", "DME", "Draftsman", "Driver",
+  "CRM", "Crusher Operator", "Crusher Supervisor", "Data Operator", "DME", "Draftsman", "Driver","Senior Manager R&D",
   "EA", "Electrical Helper", "Financial Executive", "Gm Hr",
   "Grinding Mill Supervisor", "Guard", "Help", "Helper", "HR",
   "Hydra Operator", "JCB Operator", "Jr Accountant", "Jr. Purchase Executive",

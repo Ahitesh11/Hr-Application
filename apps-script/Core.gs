@@ -304,6 +304,12 @@ function doPost(e) {
       case 'updateHiringTrackerStep':
         result = updateHiringTrackerStep(ss, request);
         break;
+      case 'getPosts':
+        result = getPosts(ss);
+        break;
+      case 'addPost':
+        result = addPost(ss, request.post);
+        break;
 
       case 'getLoanApplications':
         result = getData(ss, 'Loan Application', request.employeeId);

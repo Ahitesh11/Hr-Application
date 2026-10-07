@@ -4,6 +4,85 @@ import { HiringTracker } from "../types";
 import { Loader2, Search, RefreshCw, Briefcase, Plus, X, ChevronDown, CheckCircle } from "lucide-react";
 import { cn } from "../lib/utils";
 
+const BASE_POSTS = [
+  "Accounts Executive",
+  "Accounts Manager",
+  "Admin Executive",
+  "Application Incharge",
+  "Application Labour",
+  "Application Manager",
+  "Application Supervisor",
+  "Asset Fitter",
+  "Assistant Chemist",
+  "Assistant Marketing Manager",
+  "Cashier",
+  "Cfo",
+  "Civil Site Supervisor",
+  "Crm",
+  "Crusher Operator",
+  "Crusher Supervisor",
+  "Data Operator",
+  "Dme",
+  "Draftsman",
+  "Driver",
+  "Ea",
+  "Electrical Helper",
+  "Financial Executive",
+  "Gm Hr",
+  "Grinding Mill Supervisor",
+  "Guard",
+  "Help",
+  "Helper",
+  "Hr",
+  "Hydra Operator",
+  "Jcb Operator",
+  "Jr Accountant",
+  "Jr. Purchase Executive",
+  "Lab Assistant",
+  "Lab Helper",
+  "Lab Incharge",
+  "Labour",
+  "Liasoning",
+  "Logistic Executive",
+  "Marketing Executive",
+  "Marketing Manager",
+  "Mechanical Hepler",
+  "Mechnical Helper",
+  "Office Boy",
+  "Pc",
+  "Plant Electrician",
+  "Plant Executive",
+  "Plant Helper",
+  "Plant Incharge",
+  "Plant Mechanical",
+  "Plant Supervisor",
+  "Production Supervisor",
+  "Project Manager",
+  "Purchase Executive",
+  "Purchase Manager",
+  "Sales & Marketing",
+  "Sales Cordinator",
+  "Sales Executive",
+  "Sales Manager",
+  "Senior General Manager",
+  "Senior Manager R&D",
+  "Site Supervisor",
+  "Sr Accountant",
+  "Stock Yard Supervisor",
+  "Store Executive",
+  "Store Manager",
+  "Store Purchaser",
+  "Technical Head",
+  "Welder",
+  "Workshop Operator",
+  "Weibridge Operator",
+  "Nodulizer",
+  "Fitter",
+  "Turner",
+];
+
+const ADD_NEW_POST = "__add_new_post__";
+
 const emptyForm = {
   indentNumber: "",
   company: "",
@@ -49,6 +128,12 @@ export const HiringTrackerModule = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState(emptyForm);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Posts added from the app (stored in the "Post Master" sheet)
+  const [customPosts, setCustomPosts] = useState<string[]>([]);
+  const [isAddingPost, setIsAddingPost] = useState(false);
+  const [newPostName, setNewPostName] = useState("");
+  const [isSavingPost, setIsSavingPost] = useState(false);
   
   // Update Step Modal
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
@@ -86,9 +171,55 @@ export const HiringTrackerModule = () => {
     reader.readAsDataURL(file);
   };
 
+  const fetchPosts = async () => {
+    const posts = await api.getPosts();
+    setCustomPosts(posts);
+  };
+
   useEffect(() => {
     fetchData();
+    fetchPosts();
   }, []);
+
+  const postOptions = (() => {
+    const seen = new Set<string>();
+    return [...BASE_POSTS, ...customPosts]
+      .filter(p => {
+        const key = p.trim().toLowerCase();
+        if (!key || seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      })
+      .sort((a, b) => a.localeCompare(b));
+  })();
+
+  const handleAddPost = async () => {
+    const name = newPostName.trim().replace(/\s+/g, " ");
+    if (!name) return;
+
+    const existing = postOptions.find(p => p.toLowerCase() === name.toLowerCase());
+    if (existing) {
+      setFormData(prev => ({ ...prev, post: existing }));
+      setIsAddingPost(false);
+      setNewPostName("");
+      return;
+    }
+
+    setIsSavingPost(true);
+    try {
+      const ok = await api.addPost(name);
+      if (!ok) {
+        alert("Post save nahi hua. Please try again.");
+        return;
+      }
+      setCustomPosts(prev => [...prev, name]);
+      setFormData(prev => ({ ...prev, post: name }));
+      setIsAddingPost(false);
+      setNewPostName("");
+    } finally {
+      setIsSavingPost(false);
+    }
+  };
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -516,86 +647,8 @@ export const HiringTrackerModule = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 {[
                   { label: "Company", name: "company", type: "select", options: ["Pmmpl", "Purab", "Refrasynth", "Refratech", "Rkl"] },
-                 { 
-                    label: "Post", 
-                    name: "post", 
-                    type: "select", 
-                    options: [
-                      "Accounts Executive",
-                      "Accounts Manager",
-                      "Admin Executive",
-                      "Application Incharge",
-                      "Application Labour",
-                      "Application Manager",
-                      "Application Supervisor",
-                      "Asset Fitter",
-                      "Assistant Chemist",
-                      "Assistant Marketing Manager",
-                      "Cashier",
-                      "Cfo",
-                      "Civil Site Supervisor",
-                      "Crm",
-                      "Crusher Operator",
-                      "Crusher Supervisor",
-                      "Data Operator",
-                      "Dme",
-                      "Draftsman",
-                      "Driver",
-                      "Ea",
-                      "Electrical Helper",
-                      "Financial Executive",
-                      "Gm Hr",
-                      "Grinding Mill Supervisor",
-                      "Guard",
-                      "Help",
-                      "Helper",
-                      "Hr",
-                      "Hydra Operator",
-                      "Jcb Operator",
-                      "Jr Accountant",
-                      "Jr. Purchase Executive",
-                      "Lab Assistant",
-                      "Lab Helper",
-                      "Lab Incharge",
-                      "Labour",
-                      "Liasoning",
-                      "Logistic Executive",
-                      "Marketing Executive",
-                      "Marketing Manager",
-                      "Mechanical Hepler",
-                      "Mechnical Helper",
-                      "Office Boy",
-                      "Pc",
-                      "Plant Electrician",
-                      "Plant Executive",
-                      "Plant Helper",
-                      "Plant Incharge",
-                      "Plant Mechanical",
-                      "Plant Supervisor",
-                      "Production Supervisor",
-                      "Project Manager",
-                      "Purchase Executive",
-                      "Purchase Manager",
-                      "Sales & Marketing",
-                      "Sales Cordinator",
-                      "Sales Executive",
-                      "Sales Manager",
-                      "Senior General Manager",
-                      "Site Supervisor",
-                      "Sr Accountant",
-                      "Stock Yard Supervisor",
-                      "Store Executive",
-                      "Store Manager",
-                      "Store Purchaser",
-                      "Technical Head",
-                      "Welder",
-                      "Workshop Operator",
-                      "Weibridge Operator",
-                      "Nodulizer",
-                      "Fitter",
-                      "Turner"
-                    ]
-                  },                  { label: "Gender", name: "gender", type: "select", options: ["Male", "Female"] },
+                  { label: "Post", name: "post", type: "select", options: postOptions },
+                  { label: "Gender", name: "gender", type: "select", options: ["Male", "Female"] },
                   { label: "Prefer", name: "prefer", type: "select", options: ["Any", "Experience", "Fresher"] },
                   { label: "Number Of Enquiry Need", name: "numberOfEnquiryNeed", type: "number" },
                   { label: "Position Full-Fill Date", name: "positionFullFillDate", type: "date" },
@@ -606,16 +659,55 @@ export const HiringTrackerModule = () => {
                     <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-1.5">
                       {field.label}
                     </label>
-                    {field.type === "select" ? (
+                    {field.name === "post" && isAddingPost ? (
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          autoFocus
+                          value={newPostName}
+                          onChange={(e) => setNewPostName(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") { e.preventDefault(); handleAddPost(); }
+                            if (e.key === "Escape") { setIsAddingPost(false); setNewPostName(""); }
+                          }}
+                          placeholder="New post name"
+                          className="flex-1 min-w-0 px-3.5 py-2.5 bg-white border border-pink-300 rounded-xl text-sm font-medium text-slate-800 placeholder:text-slate-300 focus:border-pink-400 focus:ring-2 focus:ring-pink-100 outline-none transition-all"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleAddPost}
+                          disabled={isSavingPost || !newPostName.trim()}
+                          className="px-3 bg-pink-600 text-white font-bold text-xs rounded-xl hover:bg-pink-700 transition-colors disabled:opacity-50 flex items-center gap-1"
+                        >
+                          {isSavingPost ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+                          Add
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => { setIsAddingPost(false); setNewPostName(""); }}
+                          className="px-2 text-slate-500 hover:bg-slate-200 rounded-xl transition-colors"
+                          title="Cancel"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ) : field.type === "select" ? (
                       <div className="relative">
                         <select
                           value={(formData as any)[field.name]}
-                          onChange={(e) => setFormData({ ...formData, [field.name]: e.target.value })}
+                          onChange={(e) => {
+                            if (e.target.value === ADD_NEW_POST) {
+                              setIsAddingPost(true);
+                              return;
+                            }
+                            setFormData({ ...formData, [field.name]: e.target.value });
+                          }}
                           required
                           className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:border-pink-400 focus:ring-2 focus:ring-pink-100 outline-none transition-all appearance-none"
                         >
                           <option value="">-- Select --</option>
-                          {field.options?.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                          {field.options?.map((opt: string) => <option key={opt} value={opt}>{opt}</option>)}
+                          {field.name === "post" && <option value={ADD_NEW_POST}>+ Add New Post</option>}
                         </select>
                         <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                       </div>

@@ -321,6 +321,18 @@ export const api = {
     return !!(res && res.success);
   },
 
+  getPosts: async (): Promise<string[]> => {
+    if (useMock) return [];
+    const res = await callGas("getPosts", {});
+    return Array.isArray(res) ? res : [];
+  },
+
+  addPost: async (post: string): Promise<boolean> => {
+    if (useMock) return true;
+    const res = await callGas("addPost", { post });
+    return !!(res && res.success);
+  },
+
   getLoanApplications: async (employeeId?: string): Promise<LoanApplicationFms[]> => {
     if (useMock) return [];
     const res = await callGas("getLoanApplications", { employeeId });

@@ -253,6 +253,7 @@ export const JoiningModule = () => {
   const [hiringTrackerList, setHiringTrackerList] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [search, setSearch] = useState("");
+  const [employeeFilters, setEmployeeFilters] = useState({ company: "", location: "", designation: "" });
   const [viewRecord, setViewRecord] = useState<any | null>(null);
   const [livingTarget, setLivingTarget] = useState<any | null>(null);
   const [livingForm, setLivingForm] = useState<LivingForm>(emptyLivingForm);
@@ -531,8 +532,32 @@ export const JoiningModule = () => {
       );
     });
 
-  const filtered = presentEmployeesList
-    .filter((r: any) => !livingEmployeeIds.has(r.pmmplAc || r.employeeId || r.employeeCode))
+  const presentEmployees = presentEmployeesList
+    .filter((r: any) => !livingEmployeeIds.has(r.pmmplAc || r.employeeId || r.employeeCode));
+  const employeeFilterFields = [
+    { key: "company", label: "Company", aliases: ["company", "joiningCompanyName", "companyName"] },
+    { key: "location", label: "Employee location", aliases: ["location", "joiningPlace", "employeeLocation"] },
+    { key: "designation", label: "Designation", aliases: ["designation", "employeeDesignation"] },
+  ] as const;
+  const filterValue = (record: any, aliases: readonly string[]) => {
+    for (const key of aliases) {
+      const value = String(record[key] ?? "").trim();
+      if (value) return value;
+    }
+    return "";
+  };
+  const employeeFilterOptions = employeeFilterFields.map(field => ({
+    ...field,
+    options: Array.from(new Map(presentEmployees.map(record => {
+      const value = filterValue(record, field.aliases);
+      return [value.toLowerCase(), value] as const;
+    })).values()).filter(Boolean).sort((a, b) => a.localeCompare(b)),
+  }));
+  const hasEmployeeFilters = Object.values(employeeFilters).some(Boolean) || !!search;
+  const filtered = presentEmployees
+    .filter(record => employeeFilterFields.every(field =>
+      !employeeFilters[field.key] || filterValue(record, field.aliases).toLowerCase() === employeeFilters[field.key]
+    ))
     .filter((r: any) => {
       if (!search) return true;
       const q = search.toLowerCase();
@@ -847,6 +872,30 @@ export const JoiningModule = () => {
             </div>
           </div>
 
+          <div className="px-6 py-4 border-b border-pink-50 flex flex-wrap items-end gap-4">
+            {employeeFilterOptions.map(field => (
+              <label key={field.key} className="flex-1 min-w-[180px]">
+                <span className="block mb-1.5 text-xs font-bold text-slate-600">{field.label}</span>
+                <select
+                  value={employeeFilters[field.key]}
+                  onChange={e => setEmployeeFilters(previous => ({ ...previous, [field.key]: e.target.value }))}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-pink-100 bg-pink-50 outline-none focus:ring-2 focus:ring-pink-400 font-medium text-slate-700"
+                >
+                  <option value="">All {field.key === "company" ? "companies" : field.key === "location" ? "locations" : "designations"}</option>
+                  {field.options.map(option => <option key={option.toLowerCase()} value={option.toLowerCase()}>{option}</option>)}
+                </select>
+              </label>
+            ))}
+            {hasEmployeeFilters && (
+              <button
+                onClick={() => { setEmployeeFilters({ company: "", location: "", designation: "" }); setSearch(""); }}
+                className="px-4 py-2 text-xs font-bold text-pink-600 rounded-xl hover:bg-pink-50 transition-all"
+              >
+                Clear filters
+              </button>
+            )}
+          </div>
+
           {isLoading ? (
             <div className="py-20 flex flex-col items-center gap-3">
               <Loader2 className="w-8 h-8 animate-spin text-pink-500" />
@@ -855,9 +904,9 @@ export const JoiningModule = () => {
           ) : filtered.length === 0 ? (
             <div className="py-20 flex flex-col items-center gap-3">
               <AlertCircle className="w-10 h-10 text-slate-200" />
-              <p className="text-slate-400 font-bold">No joining records found</p>
+              <p className="text-slate-400 font-bold">{hasEmployeeFilters ? "No employees match your filters" : "No joining records found"}</p>
               <p className="text-slate-300 text-sm text-center max-w-xs">
-                Records will appear here once new joining forms are submitted.
+                {hasEmployeeFilters ? "Try changing or clearing the filters to see more employees." : "Records will appear here once new joining forms are submitted."}
               </p>
             </div>
           ) : presentDisplayColumns.length === 0 ? (

@@ -104,6 +104,21 @@ async function callGas(action: string, payload: any = {}) {
 const useMock = !GAS_URL || GAS_URL.includes("YOUR_SCRIPT_ID");
 
 export const api = {
+  getWorkforceOverview: async (refresh = false): Promise<{ employees: Record<string, unknown>[]; exits: Record<string, unknown>[] }> => {
+    if (useMock) return { employees: [], exits: [] };
+    if (refresh) {
+      readCache.delete('getPresentEmployees:{}');
+      readCache.delete('getLivingHistory:{}');
+    }
+    const [employees, exits] = await Promise.all([
+      callGas("getPresentEmployees", {}),
+      callGas("getLivingHistory", {}),
+    ]);
+    if (!Array.isArray(employees) || !Array.isArray(exits)) {
+      throw new Error("Unable to load workforce records");
+    }
+    return { employees, exits };
+  },
   login: async (employeeId: string, password: string): Promise<User | null> => {
     console.log(`Attempting login for ${employeeId} using ${useMock ? 'Mock' : 'Real GAS'}`);
     if (useMock) {

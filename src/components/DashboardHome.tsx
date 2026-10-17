@@ -8,6 +8,7 @@ import {
   FileText, AlertCircle, XCircle, Filter
 } from "lucide-react";
 import { cn } from "../lib/utils";
+import { WorkforceOverview } from "./WorkforceOverview";
 
 interface DashboardHomeProps {
   onNavigate: (tab: string) => void;
@@ -187,6 +188,8 @@ export const DashboardHome: React.FC<DashboardHomeProps> = ({ onNavigate }) => {
 
   return (
     <div className="space-y-8">
+
+      {user?.role === "Admin" && <WorkforceOverview />}
 
       {/* ── Welcome Header ── */}
       <div className="bg-white p-8 rounded-3xl border border-pink-100 shadow-sm relative overflow-hidden">

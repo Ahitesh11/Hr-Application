@@ -577,11 +577,14 @@ export const JoiningModule = () => {
         }
       });
     });
-    return Object.entries(counts)
+    const columns = Object.entries(counts)
       .sort((a, b) => b[1] - a[1])
       .map(([k]) => k)
-      .filter(k => k !== "timestamp")
+      .filter(k => !["timestamp", "salary", "currentSalary"].includes(k))
       .slice(0, 8);
+    const joiningSalaryIndex = columns.indexOf("joiningSalary");
+    columns.splice(joiningSalaryIndex >= 0 ? joiningSalaryIndex + 1 : columns.length, 0, "currentSalary");
+    return columns;
   })();
 
   return (
@@ -948,7 +951,7 @@ export const JoiningModule = () => {
                                 <span className="text-sm font-bold text-slate-800 truncate">{r[col] || "—"}</span>
                               </div>
                             ) : (
-                              <span className="text-xs text-slate-600 font-medium truncate block">{r[col] || "—"}</span>
+                              <span className="text-xs text-slate-600 font-medium truncate block">{col === "currentSalary" ? (r.salary ?? r.currentSalary ?? "—") : (r[col] || "—")}</span>
                             )}
                           </td>
                         ))}

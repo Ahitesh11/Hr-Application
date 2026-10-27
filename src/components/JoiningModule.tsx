@@ -3,7 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { api } from "../services/api";
 import {
   UserPlus, Users, Loader2, Search, Upload, CheckCircle,
-  AlertCircle, X, Eye, ChevronDown, LogOut, History, ClipboardList
+  AlertCircle, X, Eye, ChevronDown, LogOut, History, ClipboardList, Download
 } from "lucide-react";
 import { cn, formatIstDateTime } from "../lib/utils";
 
@@ -301,6 +301,34 @@ export const JoiningModule = () => {
       return m ? Math.max(max, parseInt(m[1], 10)) : max;
     }, 0);
     return `PMMPL-${maxNum + 1}`;
+  };
+
+  const exportLivingHistory = () => {
+    const rows = livingView === "paid" ? livingList.filter((r: any) => r.actual1) : livingList;
+    const cols: [string, (r: any) => any][] = [
+      ["PMMPL-AC", r => r.pmmplAc],
+      ["Employee Name", r => r.nameAsPerAadhar || r.employeeName],
+      ["Designation", r => r.designation],
+      ["Date Of Living", r => r.dateOfLiving],
+      ["Working Days", r => r.totalWorkingDays],
+      ["Amount", r => r.amount],
+      ["Assets", r => r.handoverAssets],
+      ["Clearance", r => r.clearanceForm],
+      ["Doc Signed", r => r.handoverDocSigned],
+      ["Email/Bio", r => r.cancelEmailBiometric],
+      ["Benefits", r => r.removeBenefitEnrollment],
+      ["Pay Planned", r => r.planned1],
+      ["Payment Form", r => r.makePaymentForm],
+      ["Salary Payment", r => r.actual1 || "Pending"],
+    ];
+    const esc = (v: any) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+    const csv = [cols.map(([h]) => esc(h)).join(","), ...rows.map((r: any) => cols.map(([, f]) => esc(f(r))).join(","))].join("\r\n");
+    const url = URL.createObjectURL(new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8;" }));
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `living-history-${livingView}-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   const loadLivingHistory = useCallback(async () => {
@@ -1163,6 +1191,14 @@ export const JoiningModule = () => {
               >
                 <Loader2 className={cn("w-3.5 h-3.5", isLivingLoading && "animate-spin")} />
                 {isLivingLoading ? "Loading..." : "Refresh"}
+              </button>
+              <button
+                onClick={exportLivingHistory}
+                disabled={isLivingLoading || livingList.length === 0}
+                className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-white bg-pink-700 hover:bg-pink-800 rounded-xl transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                <Download className="w-3.5 h-3.5" />
+                Export
               </button>
               <span className="text-xs font-bold text-slate-500 bg-pink-50 px-3 py-2 rounded-xl border border-pink-100">
                 {livingList.length} Records

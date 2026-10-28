@@ -85,6 +85,16 @@ export const SalaryIncrementModule: React.FC = () => {
   // Strip commas from numbers like "15,000" → "15000"
   const cleanNum = (raw: string): string => (raw || "").replace(/,/g, "").trim();
 
+  // HOD is stored as an employee ID — resolve it to a name from Present Employees.
+  const getHodName = (hodId: any): string => {
+    const id = (hodId ?? "").toString().trim();
+    if (!id) return "";
+    const p = allPresentEmps.find(
+      e => [e.employeeId, e.pmmplAc, e.employeeCode].some(v => (v ?? "").toString().trim() === id)
+    );
+    return p?.employeeName || p?.nameAsPerAadhar || p?.name || "";
+  };
+
   const handleFetchEmployee = async (code: string) => {
     if (!code) return;
 
@@ -594,6 +604,7 @@ export const SalaryIncrementModule: React.FC = () => {
                 <th className="px-4 py-3.5 text-[10px] font-black uppercase tracking-wider text-right whitespace-nowrap">Last Inc. Amt</th>
                 <th className="px-4 py-3.5 text-[10px] font-black uppercase tracking-wider text-left whitespace-nowrap">Last Inc. Date</th>
                 <th className="px-4 py-3.5 text-[10px] font-black uppercase tracking-wider text-left whitespace-nowrap">HOD</th>
+                <th className="px-4 py-3.5 text-[10px] font-black uppercase tracking-wider text-left whitespace-nowrap">HOD Name</th>
                 {/* Extra columns for mgmt tab */}
                 {(activeTab === "mgmt" || activeTab === "final" || activeTab === "history") && <>
                   <th className="px-4 py-3.5 text-[10px] font-black uppercase tracking-wider text-right whitespace-nowrap bg-orange-500/30">HOD Amt</th>
@@ -675,6 +686,8 @@ export const SalaryIncrementModule: React.FC = () => {
                     <td className="px-4 py-3 text-xs text-slate-500 whitespace-nowrap">{item.lastIncrementDate || "—"}</td>
                     {/* HOD */}
                     <td className="px-4 py-3 text-xs text-slate-500 whitespace-nowrap">{item.hod || "—"}</td>
+                    {/* HOD Name — matched by ID against Present Employees */}
+                    <td className="px-4 py-3 text-xs font-semibold text-slate-700 whitespace-nowrap">{getHodName(item.hod) || "—"}</td>
                     {/* HOD Amount & Feedback */}
                     {(activeTab === "mgmt" || activeTab === "final" || activeTab === "history") && <>
                       <td className="px-4 py-3 text-right bg-orange-50/40">
